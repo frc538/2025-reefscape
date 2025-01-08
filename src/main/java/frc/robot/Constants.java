@@ -8,6 +8,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Units.*;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
@@ -15,7 +16,6 @@ import edu.wpi.first.math.util.Units;
  * (log replay from a file).
  */
 public final class Constants {
-
   public static final Mode currentMode = Mode.REAL;
 
   public static enum Mode {
@@ -58,7 +58,6 @@ public final class Constants {
   }
 
   public static class ModuleConstants {
-
     public static int DriveMotorPinionTeeth = 13;
     public static int NeoFreeSpeedRPM = 5676;
     public static double WheelRadiusMeters = Units.inchesToMeters(1.5);
