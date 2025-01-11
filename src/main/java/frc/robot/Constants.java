@@ -1,34 +1,22 @@
-// Copyright 2021-2025 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
 
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Units.*;
-import edu.wpi.first.wpilibj.RobotBase;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
  * on a roboRIO. Change the value of "simMode" to switch between "sim" (physics sim) and "replay"
  * (log replay from a file).
  */
-public final class Constants {
+public final class Constants { 
 
-    public static final Mode currentMode = Mode.REAL;
+  public static final Mode currentMode = Mode.REAL;
 
   public static enum Mode {
     /** Running on a real robot. */
@@ -45,7 +33,7 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
 
-  public static class DriveConstants{
+  public static class DriveConstants {
     public static final double kFrontLeftChassisAngularOffset = -Math.PI / 2;
     public static final double kFrontRightChassisAngularOffset = 0;
     public static final double kBackLeftChassisAngularOffset = Math.PI;
@@ -56,8 +44,6 @@ public final class Constants {
     public static final double kDirectionSlewRate = 1.2; // radians per second
     public static final double kMagnitudeSlewRate = 1.8; // Mesured in percent per second (1 = 100%)
     public static final double kRotationSlewRate = 2.0; // Mesured in percent per second (1 = 100%)
-    
-
   }
 
   public static class SparkMaxCANID {
@@ -78,11 +64,13 @@ public final class Constants {
     public static double DriveGearing = 45.0 * 22 / 15 / DriveMotorPinionTeeth;
     public static double TurnPositionConversionFactor = 2 * Math.PI;
     public static double TurnVelocityConversionFactor = 2 * Math.PI / 60;
-    public static double DrivePositionConversionFactor = 2 * Math.PI * WheelRadiusMeters / DriveGearing;
-    public static double DriveVelocityConversionFactor = 2 * Math.PI / 60 * WheelRadiusMeters / DriveGearing;
+    public static double DrivePositionConversionFactor =
+        2 * Math.PI * WheelRadiusMeters / DriveGearing;
+    public static double DriveVelocityConversionFactor =
+        2 * Math.PI / 60 * WheelRadiusMeters / DriveGearing;
     public static double DriveMotorFreeSpeedRevsPerSecond = NeoFreeSpeedRPM / 60.0;
-    public static double DriveWheelFreeSpeedMetersPerSecond = DriveMotorFreeSpeedRevsPerSecond * 2.0 * Math.PI
-        * WheelRadiusMeters / DriveGearing;
+    public static double DriveWheelFreeSpeedMetersPerSecond =
+        DriveMotorFreeSpeedRevsPerSecond * 2.0 * Math.PI * WheelRadiusMeters / DriveGearing;
 
     public static double DriveP = 0.4;
     public static double DriveI = 0;
@@ -101,12 +89,12 @@ public final class Constants {
     public static double TrackWidth = Units.inchesToMeters(25.5);
     public static double WheelBase = Units.inchesToMeters(25.5);
 
-    public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
-      new Translation2d(WheelBase / 2, TrackWidth / 2), 
-      new Translation2d(WheelBase / 2, -TrackWidth / 2),
-      new Translation2d(-WheelBase / 2, TrackWidth / 2),
-      new Translation2d(-WheelBase / 2, -TrackWidth / 2)
-    );
+    public static final SwerveDriveKinematics kDriveKinematics =
+        new SwerveDriveKinematics(
+            new Translation2d(WheelBase / 2, TrackWidth / 2),
+            new Translation2d(WheelBase / 2, -TrackWidth / 2),
+            new Translation2d(-WheelBase / 2, TrackWidth / 2),
+            new Translation2d(-WheelBase / 2, -TrackWidth / 2));
 
     public static int DriveCurrentLimit = 50;
     public static int TurnCurrentLimit = 20;
