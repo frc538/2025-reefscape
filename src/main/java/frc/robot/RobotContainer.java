@@ -4,7 +4,15 @@
 
 package frc.robot;
 
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.SwerveDriveSubsystem;
+import frc.robot.subsystems.SwerveModuleIO;
+import frc.robot.subsystems.SwerveModuleIOSparkmax;
+
+import java.util.concurrent.DelayQueue;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,50 +27,47 @@ import org.littletonrobotics.junction.Logger;
 public class RobotContainer {
   private final SendableChooser<Command> mAutoChooser = new SendableChooser<>();
 
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
-  private final SwerveDriveSubsystem mDriveSubsystem;
+  private final CommandXboxController m_driverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  private final SwerveDriveSubsystem mDriveSubsystewer;
+  
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
     switch (Constants.currentMode) {
       case REAL:
-        mDriveSubsystem =
-            new SwerveDriveSubsystem(
-                new SwerveModuleIOSparkmax(
-                    Constants.SparkMaxCANID.kFrontLeftDrive,
-                    Constants.SparkMaxCANID.kFrontLeftTurn,
-                    Constants.DriveConstants.kFrontLeftChassisAngularOffset),
-                new SwerveModuleIOSparkmax(
-                    Constants.SparkMaxCANID.kFrontRightDrive,
-                    Constants.SparkMaxCANID.kFrontRightTurn,
-                    Constants.DriveConstants.kFrontRightChassisAngularOffset),
-                new SwerveModuleIOSparkmax(
-                    Constants.SparkMaxCANID.kRearLeftDrive,
-                    Constants.SparkMaxCANID.kRearLefttTurn,
-                    Constants.DriveConstants.kBackLeftChassisAngularOffset),
-                new SwerveModuleIOSparkmax(
-                    Constants.SparkMaxCANID.kRearRightDrive,
-                    Constants.SparkMaxCANID.kRearRightTurn,
-                    Constants.DriveConstants.kBackRightChassisAngularOffset),
-                0);
+        mDriveSubsystem = new SwerveDriveSubsystem(
+            new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kFrontLeftDrive,
+                Constants.SparkMaxCANID.kFrontLeftTurn,
+                Constants.DriveConstants.kFrontLeftChassisAngularOffset),
+            new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kFrontRightDrive,
+                Constants.SparkMaxCANID.kFrontRightTurn,
+                Constants.DriveConstants.kFrontRightChassisAngularOffset),
+            new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kRearLeftDrive,
+                Constants.SparkMaxCANID.kRearLefttTurn,
+                Constants.DriveConstants.kBackLeftChassisAngularOffset),
+            new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kRearRightDrive,
+                Constants.SparkMaxCANID.kRearRightTurn,
+                Constants.DriveConstants.kBackRightChassisAngularOffset),
+            0);
         break;
       default:
-        mDriveSubsystem =
-            new SwerveDriveSubsystem(
-                new SwerveModuleIO() {},
-                new SwerveModuleIO() {},
-                new SwerveModuleIO() {},
-                new SwerveModuleIO() {},
-                0);
+        mDriveSubsystem = new SwerveDriveSubsystem(
+            new SwerveModuleIO() {},
+            new SwerveModuleIO() {},
+            new SwerveModuleIO() {},
+            new SwerveModuleIO() {},
+            0);
         break;
     }
     // Configure the trigger bindings
     configureBindings();
 
     mAutoChooser.setDefaultOption("No auto", null);
-    Command instant =
-        Commands.run(() -> mDriveSubsystem.drive(0.5, 0, 0, true), mDriveSubsystem).withTimeout(3);
+    Command instant = Commands
+      .run(() -> mDriveSubsystem.drive(0.5, 0, 0, true), mDriveSubsystem)
+      .withTimeout(3);
     mAutoChooser.addOption("Instant Auto", instant);
 
     SmartDashboard.putData("Auto Selector", mAutoChooser);
