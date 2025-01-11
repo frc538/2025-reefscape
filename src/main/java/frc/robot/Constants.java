@@ -14,7 +14,7 @@ import edu.wpi.first.math.util.Units;
  * on a roboRIO. Change the value of "simMode" to switch between "sim" (physics sim) and "replay"
  * (log replay from a file).
  */
-public final class Constants { 
+public final class Constants {
 
   public static final Mode currentMode = Mode.REAL;
 
