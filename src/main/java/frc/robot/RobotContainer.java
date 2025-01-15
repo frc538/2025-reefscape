@@ -62,10 +62,14 @@ public class RobotContainer {
     configureBindings();
 
     mAutoChooser.setDefaultOption("No auto", null);
-    Command instant = Commands
+    Command leave = Commands
       .run(() -> mDriveSubsystem.drive(0.5, 0, 0, true), mDriveSubsystem)
       .withTimeout(3);
-    mAutoChooser.addOption("Instant Auto", instant);
+    Command coral = Commands
+      .run(() -> mDriveSubsystem.drive(0.5, 0, 0, true), mDriveSubsystem)
+      .withTimeout(3);
+    mAutoChooser.addOption("Leave", leave);
+    mAutoChooser.addOption("Coral", coral);
 
     SmartDashboard.putData("Auto Selector", mAutoChooser);
   }
