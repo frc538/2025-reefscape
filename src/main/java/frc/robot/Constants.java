@@ -58,6 +58,7 @@ public final class Constants {
   }
 
   public static class ModuleConstants {
+
     public static int DriveMotorPinionTeeth = 13;
     public static int NeoFreeSpeedRPM = 5676;
     public static double WheelRadiusMeters = Units.inchesToMeters(1.5);

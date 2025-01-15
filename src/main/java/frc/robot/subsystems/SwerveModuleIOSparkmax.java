@@ -46,6 +46,9 @@ public class SwerveModuleIOSparkmax implements SwerveModuleIO {
         .positionConversionFactor(Constants.ModuleConstants.DrivePositionConversionFactor)
         .velocityConversionFactor(Constants.ModuleConstants.DriveVelocityConversionFactor);
     driveConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(0.4, 0.0, 0.0);
+
+    driveConfig.smartCurrentLimit(Constants.ModuleConstants.DriveCurrentLimit);
+
     driveMotor.configure(
         driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -55,6 +58,9 @@ public class SwerveModuleIOSparkmax implements SwerveModuleIO {
         .positionConversionFactor(Constants.ModuleConstants.TurnPositionConversionFactor)
         .velocityConversionFactor(Constants.ModuleConstants.TurnVelocityConversionFactor);
     turnConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(1.0, 0.0, 0.0);
+
+    turnConfig.smartCurrentLimit(Constants.ModuleConstants.TurnCurrentLimit);
+
     turnMotor.configure(
         driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
