@@ -11,6 +11,8 @@ import frc.robot.subsystems.SwerveModuleIOSparkmax;
 
 import java.util.concurrent.DelayQueue;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -106,6 +108,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return new PathPlannerAuto("Leave");
   }
 }
