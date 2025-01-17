@@ -67,14 +67,17 @@ public class SwerveDriveSubsystem extends SubsystemBase {
   }
 
   public void setX() {
+    System.out.println("set x");
+
     mFrontLeftio.setmDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
     mFrontRightio.setmDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     mBackLeftio.setmDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     mBackRightio.setmDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+    Logger.recordOutput("isSetX true", true);
   }
 
   public Command setXCommand() {
-    return Commands.run(() -> setX(), this);
+    return run(() -> setX());
   }
 
   public Command toggleFieldRelative() {
@@ -88,6 +91,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
   public void drive(double forwardSpeed, double leftSpeed, double rotation, boolean rateLimit) {
     double xSpeedCommanded;
     double ySpeedCommanded;
+
+    Logger.recordOutput("Drive/Forward speed", forwardSpeed);
+    Logger.recordOutput("Drive/Left speed", leftSpeed);
+    Logger.recordOutput("Drive/Rotation speed", rotation);
 
     if (rateLimit) {
 
@@ -178,6 +185,16 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     Logger.processInputs("Drive/Front Right", mFrontRightinputs);
     Logger.processInputs("Drive/Back Left", mBackLeftinputs);
     Logger.processInputs("Drive/Back Right", mBackRightinputs);
+
+    SwerveModuleState[] states =
+        new SwerveModuleState[] {
+          mFrontLeftinputs.state,
+          mFrontRightinputs.state,
+          mBackLeftinputs.state,
+          mBackRightinputs.state
+        };
+
+    Logger.recordOutput("MyStates", states);
 
     Logger.recordOutput("Is Field Relative?", mIsFieldRelative);
     Logger.recordOutput("Gyro Angle", mGyro.getYaw().getValueAsDouble());

@@ -40,29 +40,67 @@ public class SwerveModuleIOSparkmax implements SwerveModuleIO {
     driveMotor = new SparkMax(driveId, MotorType.kBrushless);
     turnMotor = new SparkMax(turnId, MotorType.kBrushless);
 
-    driveConfig.inverted(false).idleMode(IdleMode.kBrake);
+    driveConfig
+        .idleMode(IdleMode.kBrake)
+        .smartCurrentLimit(Constants.ModuleConstants.DriveCurrentLimit);
+
     driveConfig
         .encoder
         .positionConversionFactor(Constants.ModuleConstants.DrivePositionConversionFactor)
         .velocityConversionFactor(Constants.ModuleConstants.DriveVelocityConversionFactor);
-    driveConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(0.4, 0.0, 0.0);
 
-    driveConfig.smartCurrentLimit(Constants.ModuleConstants.DriveCurrentLimit);
+    driveConfig
+        .closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .pid(0.04, 0, 0)
+        .velocityFF(1 / Constants.ModuleConstants.DriveMotorFreeSpeedRevsPerSecond)
+        .outputRange(-1, 1);
+
+    // driveConfig.inverted(false).idleMode(IdleMode.kBrake);
+    // driveConfig
+    //     .encoder
+    //     .positionConversionFactor(Constants.ModuleConstants.DrivePositionConversionFactor)
+    //     .velocityConversionFactor(Constants.ModuleConstants.DriveVelocityConversionFactor);
+    // driveConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(0.4, 0.0, 0.0);
+
+    // driveConfig.smartCurrentLimit(Constants.ModuleConstants.DriveCurrentLimit);
+
+    // driveMotor.configure(
+    //     driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    turnConfig
+        .idleMode(IdleMode.kBrake)
+        .smartCurrentLimit(Constants.ModuleConstants.TurnCurrentLimit);
+
+    turnConfig
+        .absoluteEncoder
+        .inverted(true)
+        .positionConversionFactor(Constants.ModuleConstants.TurnPositionConversionFactor)
+        .velocityConversionFactor(Constants.ModuleConstants.TurnVelocityConversionFactor);
+
+    turnConfig
+        .closedLoop
+        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+        .pid(1, 0, 0)
+        .outputRange(-1, 1)
+        .positionWrappingEnabled(true)
+        .positionWrappingInputRange(0, 2 * Math.PI);
+
+    // turnConfig.inverted(true).idleMode(IdleMode.kBrake);
+    // turnConfig
+    //     .encoder
+    //     .positionConversionFactor(Constants.ModuleConstants.TurnPositionConversionFactor)
+    //     .velocityConversionFactor(Constants.ModuleConstants.TurnVelocityConversionFactor);
+    // turnConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder).pid(1.0, 0.0, 0.0);
+
+    // turnConfig.smartCurrentLimit(Constants.ModuleConstants.TurnCurrentLimit);
+
+    // turnMotor.configure(
+    //     driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     driveMotor.configure(
         driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    turnConfig.inverted(true).idleMode(IdleMode.kBrake);
-    turnConfig
-        .encoder
-        .positionConversionFactor(Constants.ModuleConstants.TurnPositionConversionFactor)
-        .velocityConversionFactor(Constants.ModuleConstants.TurnVelocityConversionFactor);
-    turnConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(1.0, 0.0, 0.0);
-
-    turnConfig.smartCurrentLimit(Constants.ModuleConstants.TurnCurrentLimit);
-
-    turnMotor.configure(
-        driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    turnMotor.configure(turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     driveEncoder = driveMotor.getEncoder();
     turnEncoder = turnMotor.getAbsoluteEncoder();

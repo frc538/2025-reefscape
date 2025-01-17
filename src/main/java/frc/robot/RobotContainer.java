@@ -14,6 +14,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 import frc.robot.subsystems.SwerveModuleIO;
 import frc.robot.subsystems.SwerveModuleIOSparkmax;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
   private final SendableChooser<Command> mAutoChooser = new SendableChooser<>();
@@ -80,6 +81,7 @@ public class RobotContainer {
     mDriveSubsystem.setDefaultCommand(
         Commands.run(
             () -> {
+              Logger.recordOutput("isSetX true", false);
               double forwardSpeed = MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.1);
               double leftSpeed = MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.1);
               double counterclockwiseSpeed =
