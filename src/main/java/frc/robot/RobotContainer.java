@@ -27,49 +27,52 @@ import frc.robot.subsystems.SwerveModuleIOSparkmax;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
-  private final SendableChooser<Command> mAutoChooser = new SendableChooser<>();
-
-  private final CommandXboxController m_driverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
-  private final SwerveDriveSubsystem mDriveSubsystem;
+    private final SendableChooser<Command> mAutoChooser = new SendableChooser<>();
+    private static final Command kLeaveAuto = new PathPlannerAuto("Leave");
+    private static final Command kCoralAuto = new PathPlannerAuto("Coral");
   
-
-  /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
-   */
-  public RobotContainer() {
-    switch (Constants.currentMode) {
-      case REAL:
-        mDriveSubsystem = new SwerveDriveSubsystem(
-            new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kFrontLeftDrive,
-                Constants.SparkMaxCANID.kFrontLeftTurn,
-                Constants.DriveConstants.kFrontLeftChassisAngularOffset),
-            new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kFrontRightDrive,
-                Constants.SparkMaxCANID.kFrontRightTurn,
-                Constants.DriveConstants.kFrontRightChassisAngularOffset),
-            new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kRearLeftDrive,
-                Constants.SparkMaxCANID.kRearLefttTurn,
-                Constants.DriveConstants.kBackLeftChassisAngularOffset),
-            new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kRearRightDrive,
-                Constants.SparkMaxCANID.kRearRightTurn,
-                Constants.DriveConstants.kBackRightChassisAngularOffset),
-            0);
-        break;
-      default:
-        mDriveSubsystem = new SwerveDriveSubsystem(
-            new SwerveModuleIO() {},
-            new SwerveModuleIO() {},
-            new SwerveModuleIO() {},
-            new SwerveModuleIO() {},
-            0);
-        break;
-    }
-    // Configure the trigger bindings
-    configureBindings();
-
-    mAutoChooser.setDefaultOption("No auto", null);
-    mAutoChooser.addOption("Leave", kLeaveAuto);
+    private final CommandXboxController m_driverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
+    private final SwerveDriveSubsystem mDriveSubsystem;
+    
+  
+    /**
+     * The container for the robot. Contains subsystems, OI devices, and commands.
+     */
+    public RobotContainer() {
+      switch (Constants.currentMode) {
+        case REAL:
+          mDriveSubsystem = new SwerveDriveSubsystem(
+              new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kFrontLeftDrive,
+                  Constants.SparkMaxCANID.kFrontLeftTurn,
+                  Constants.DriveConstants.kFrontLeftChassisAngularOffset),
+              new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kFrontRightDrive,
+                  Constants.SparkMaxCANID.kFrontRightTurn,
+                  Constants.DriveConstants.kFrontRightChassisAngularOffset),
+              new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kRearLeftDrive,
+                  Constants.SparkMaxCANID.kRearLefttTurn,
+                  Constants.DriveConstants.kBackLeftChassisAngularOffset),
+              new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kRearRightDrive,
+                  Constants.SparkMaxCANID.kRearRightTurn,
+                  Constants.DriveConstants.kBackRightChassisAngularOffset),
+              0);
+          break;
+        default:
+          mDriveSubsystem = new SwerveDriveSubsystem(
+              new SwerveModuleIO() {},
+              new SwerveModuleIO() {},
+              new SwerveModuleIO() {},
+              new SwerveModuleIO() {},
+              0);
+          break;
+      }
+      // Configure the trigger bindings
+      configureBindings();
+  
+      mAutoChooser.setDefaultOption("No auto", null);
+      mAutoChooser.addOption("Leave", kLeaveAuto);
     mAutoChooser.addOption("Coral", kCoralAuto);
     SmartDashboard.putData("Auto Selector", mAutoChooser);
+    /*
     switch (mAutoChooser) {
       case kCoralAuto:
         // Put coral auto code here
@@ -81,6 +84,7 @@ public class RobotContainer {
         new PathPlannerAuto("Leave");
         break;
     }
+        */
   }
 
   private void configureBindings() {
