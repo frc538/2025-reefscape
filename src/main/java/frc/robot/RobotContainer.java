@@ -11,9 +11,14 @@ import frc.robot.subsystems.SwerveModuleIOSparkmax;
 
 import java.util.concurrent.DelayQueue;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -24,64 +29,89 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
-    private final SendableChooser<Command> mAutoChooser = new SendableChooser<>();
-    private static final Command kLeaveAuto = new PathPlannerAuto("Leave");
-    private static final Command kCoralAuto = new PathPlannerAuto("Coral");
-  
-    private final CommandXboxController m_driverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
-    private final SwerveDriveSubsystem mDriveSubsystem;
-    
-  
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
-    public RobotContainer() {
-      switch (Constants.currentMode) {
-        case REAL:
-          mDriveSubsystem = new SwerveDriveSubsystem(
-              new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kFrontLeftDrive,
-                  Constants.SparkMaxCANID.kFrontLeftTurn,
-                  Constants.DriveConstants.kFrontLeftChassisAngularOffset),
-              new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kFrontRightDrive,
-                  Constants.SparkMaxCANID.kFrontRightTurn,
-                  Constants.DriveConstants.kFrontRightChassisAngularOffset),
-              new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kRearLeftDrive,
-                  Constants.SparkMaxCANID.kRearLefttTurn,
-                  Constants.DriveConstants.kBackLeftChassisAngularOffset),
-              new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kRearRightDrive,
-                  Constants.SparkMaxCANID.kRearRightTurn,
-                  Constants.DriveConstants.kBackRightChassisAngularOffset),
-              0);
-          break;
-        default:
-          mDriveSubsystem = new SwerveDriveSubsystem(
-              new SwerveModuleIO() {},
-              new SwerveModuleIO() {},
-              new SwerveModuleIO() {},
-              new SwerveModuleIO() {},
-              0);
-          break;
-      }
-      // Configure the trigger bindings
-      configureBindings();
-  
-      mAutoChooser.setDefaultOption("No auto", null);
-      mAutoChooser.addOption("Leave", kLeaveAuto);
-    mAutoChooser.addOption("Coral", kCoralAuto);
-    SmartDashboard.putData("Auto Selector", mAutoChooser);
-    /*
-    switch (mAutoChooser) {
-      case kCoralAuto:
-        // Put coral auto code here
-        new PathPlannerAuto("Coral");
+  private final SendableChooser<Command> mAutoChooser = new SendableChooser<>();
+
+  private final CommandXboxController m_driverController = new CommandXboxController(
+      OperatorConstants.kDriverControllerPort);
+  private final SwerveDriveSubsystem mDriveSubsystem;
+
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
+  public RobotContainer() {
+    switch (Constants.currentMode) {
+      case REAL:
+        mDriveSubsystem = new SwerveDriveSubsystem(
+            new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kFrontLeftDrive,
+                Constants.SparkMaxCANID.kFrontLeftTurn,
+                Constants.DriveConstants.kFrontLeftChassisAngularOffset),
+            new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kFrontRightDrive,
+                Constants.SparkMaxCANID.kFrontRightTurn,
+                Constants.DriveConstants.kFrontRightChassisAngularOffset),
+            new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kRearLeftDrive,
+                Constants.SparkMaxCANID.kRearLefttTurn,
+                Constants.DriveConstants.kBackLeftChassisAngularOffset),
+            new SwerveModuleIOSparkmax(Constants.SparkMaxCANID.kRearRightDrive,
+                Constants.SparkMaxCANID.kRearRightTurn,
+                Constants.DriveConstants.kBackRightChassisAngularOffset),
+            0);
         break;
-      case kLeaveAuto:
       default:
-        // Put leave auto code here
-        new PathPlannerAuto("Leave");
+        mDriveSubsystem = new SwerveDriveSubsystem(
+              new SwerveModuleIO() {},
+              new SwerveModuleIO() {},
+              new SwerveModuleIO() {},
+              new SwerveModuleIO() {},
+            0);
         break;
     }
-        */
+    RobotConfig config;
+    try {
+      config = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+      // Handle exception as needed
+      e.printStackTrace();
+      return;
+    }
+    // Configure AutoBuilder last
+    AutoBuilder.configure(
+        mDriveSubsystem::getPose, // Robot pose supplier
+        mDriveSubsystem::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+        mDriveSubsystem::getCurrentSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+        (speeds, feedforwards) -> mDriveSubsystem.drive(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond,
+            speeds.omegaRadiansPerSecond, false), // Method that will drive the robot given ROBOT RELATIVE
+                                                  // ChassisSpeeds. Also optionally outputs individual module
+                                                  // feedforwards
+        new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for
+                                        // holonomic drive trains
+            new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+            new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+        ),
+        config, // The robot configuration
+        () -> {
+          // Boolean supplier that controls when the path will be mirrored for the red
+          // alliance
+          // This will flip the path being followed to the red side of the field.
+          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        },
+        mDriveSubsystem // Reference to this subsystem to set requirements
+    );
+
+    // Configure the trigger bindings
+    configureBindings();
+    Command kLeaveAuto = new PathPlannerAuto("Leave");
+    Command kCoralAuto = new PathPlannerAuto("Coral");
+    mAutoChooser.setDefaultOption("No auto", null);
+    mAutoChooser.addOption("Leave", kLeaveAuto);
+    mAutoChooser.addOption("Coral", kCoralAuto);
+    SmartDashboard.putData("Auto Selector", mAutoChooser);
+
   }
 
   private void configureBindings() {
@@ -103,6 +133,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto("Leave");
+    return mAutoChooser.getSelected();
   }
 }
