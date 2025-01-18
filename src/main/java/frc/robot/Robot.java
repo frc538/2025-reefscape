@@ -27,11 +27,6 @@ public class Robot extends LoggedRobot {
 
   private final RobotContainer m_robotContainer;
 
-  private static final String kLeaveAuto = "Leave";
-  private static final String kCoralAuto = "Coral";
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
-
   public Robot() {
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -72,10 +67,6 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-    m_chooser.setDefaultOption("Default Auto", kLeaveAuto);
-    m_chooser.addOption("My Auto", kCoralAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
-
     Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
     // be added.
 
@@ -109,28 +100,11 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
-    System.out.println("Auto selected: " + m_autoSelected);
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
-    }
   }
 
   @Override
   public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case kCoralAuto:
-        // Put coral auto code here
-        new PathPlannerAuto("Coral");
-        break;
-      case kLeaveAuto:
-      default:
-        // Put leave auto code here
-        new PathPlannerAuto("Leave");
-        break;
-    }
+
   }
 
   @Override

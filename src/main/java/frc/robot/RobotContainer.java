@@ -67,16 +67,20 @@ public class RobotContainer {
     configureBindings();
 
     mAutoChooser.setDefaultOption("No auto", null);
-    Command leave = Commands
-      .run(() -> mDriveSubsystem.drive(0.5, 0, 0, true), mDriveSubsystem)
-      .withTimeout(3);
-    Command coral = Commands
-      .run(() -> mDriveSubsystem.drive(0.5, 0, 0, true), mDriveSubsystem)
-      .withTimeout(3);
-    mAutoChooser.addOption("Leave", leave);
-    mAutoChooser.addOption("Coral", coral);
-
+    mAutoChooser.addOption("Leave", kLeaveAuto);
+    mAutoChooser.addOption("Coral", kCoralAuto);
     SmartDashboard.putData("Auto Selector", mAutoChooser);
+    switch (mAutoChooser) {
+      case kCoralAuto:
+        // Put coral auto code here
+        new PathPlannerAuto("Coral");
+        break;
+      case kLeaveAuto:
+      default:
+        // Put leave auto code here
+        new PathPlannerAuto("Leave");
+        break;
+    }
   }
 
   private void configureBindings() {
