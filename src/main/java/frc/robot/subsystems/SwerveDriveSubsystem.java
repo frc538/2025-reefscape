@@ -5,11 +5,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,7 +12,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -51,11 +45,14 @@ public class SwerveDriveSubsystem extends SubsystemBase {
   private double mCurrentTranslationDirection = 0;
   private double mCurrentTranslationMagnitude = 0;
 
-  private SlewRateLimiter mMagnitudeLimiter = new SlewRateLimiter(Constants.DriveConstants.kMagnitudeSlewRate);
-  private SlewRateLimiter mRotationLimiter = new SlewRateLimiter(Constants.DriveConstants.kRotationSlewRate);
+  private SlewRateLimiter mMagnitudeLimiter =
+      new SlewRateLimiter(Constants.DriveConstants.kMagnitudeSlewRate);
+  private SlewRateLimiter mRotationLimiter =
+      new SlewRateLimiter(Constants.DriveConstants.kRotationSlewRate);
   private ChassisSpeeds mSpeedDelivered;
 
   private Pose2d mPose;
+
   /** Creates a new SwerveDriveSubsystem. */
   public SwerveDriveSubsystem(
       SwerveModuleIO FrontLeftDriveio,
@@ -207,7 +204,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
     Logger.recordOutput("Is Field Relative?", mIsFieldRelative);
     Logger.recordOutput("Gyro Angle", mGyro.getYaw().getValueAsDouble());
-    mLights.set(mIsFieldRelative? 0.77: 0.61);
+    mLights.set(mIsFieldRelative ? 0.77 : 0.61);
   }
 
   public Pose2d getPose() {
