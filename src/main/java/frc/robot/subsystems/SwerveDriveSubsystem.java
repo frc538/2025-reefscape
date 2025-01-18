@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -48,6 +49,9 @@ public class SwerveDriveSubsystem extends SubsystemBase {
       new SlewRateLimiter(Constants.DriveConstants.kMagnitudeSlewRate);
   private SlewRateLimiter mRotationLimiter =
       new SlewRateLimiter(Constants.DriveConstants.kRotationSlewRate);
+  private ChassisSpeeds mSpeedDelivered = new ChassisSpeeds();
+
+  private Pose2d mPose;
 
   /** Creates a new SwerveDriveSubsystem. */
   public SwerveDriveSubsystem(
@@ -155,6 +159,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     double ySpeedDelivered = ySpeedCommanded * Constants.DriveConstants.kMaxSpeedMetersPerSecond;
     double rotationDelivered = mCurrentRotation * Constants.DriveConstants.kMaxAngularSpeed;
 
+    mSpeedDelivered = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotationDelivered);
+
     var swerveModuleStates =
         Constants.ModuleConstants.kDriveKinematics.toSwerveModuleStates(
             mIsFieldRelative
@@ -199,5 +205,17 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     Logger.recordOutput("Is Field Relative?", mIsFieldRelative);
     Logger.recordOutput("Gyro Angle", mGyro.getYaw().getValueAsDouble());
     mLights.set(mIsFieldRelative ? 0.77 : 0.61);
+  }
+
+  public Pose2d getPose() {
+    return mPose;
+  }
+
+  public void resetPose(Pose2d pose) {
+    mPose = pose;
+  }
+
+  public ChassisSpeeds getCurrentSpeeds() {
+    return mSpeedDelivered;
   }
 }

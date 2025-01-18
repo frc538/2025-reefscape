@@ -4,7 +4,13 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -60,11 +66,58 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
 
-    mAutoChooser.setDefaultOption("No auto", null);
-    Command instant =
-        Commands.run(() -> mDriveSubsystem.drive(0.5, 0, 0, true), mDriveSubsystem).withTimeout(3);
-    mAutoChooser.addOption("Instant Auto", instant);
+    RobotConfig config;
+    try {
+      config = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+      // Handle exception as needed
+      e.printStackTrace();
+      return;
+    }
+    // Configure AutoBuilder last
+    AutoBuilder.configure(
+        mDriveSubsystem::getPose, // Robot pose supplier
+        mDriveSubsystem
+            ::resetPose, // Method to reset odometry (will be called if your auto has a starting
+        // pose)
+        mDriveSubsystem::getCurrentSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+        (speeds, feedforwards) ->
+            mDriveSubsystem.drive(
+                speeds.vxMetersPerSecond,
+                speeds.vyMetersPerSecond,
+                speeds.omegaRadiansPerSecond,
+                false), // Method that will drive the robot given ROBOT RELATIVE
+        // ChassisSpeeds. Also optionally outputs individual module
+        // feedforwards
+        new PPHolonomicDriveController( // PPHolonomicController is the built in path following
+            // controller for
+            // holonomic drive trains
+            new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+            new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+            ),
+        config, // The robot configuration
+        () -> {
+          // Boolean supplier that controls when the path will be mirrored for the red
+          // alliance
+          // This will flip the path being followed to the red side of the field.
+          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        },
+        mDriveSubsystem // Reference to this subsystem to set requirements
+        );
+
+    // Configure the trigger bindings
+    configureBindings();
+    Command kLeaveAuto = new PathPlannerAuto("Leave");
+    Command kCoralAuto = new PathPlannerAuto("Coral");
+    mAutoChooser.setDefaultOption("No auto", null);
+    mAutoChooser.addOption("Leave", kLeaveAuto);
+    mAutoChooser.addOption("Coral", kCoralAuto);
     SmartDashboard.putData("Auto Selector", mAutoChooser);
   }
 
@@ -97,6 +150,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return mAutoChooser.getSelected();
   }
 }
