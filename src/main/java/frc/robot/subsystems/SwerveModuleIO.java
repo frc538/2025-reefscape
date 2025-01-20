@@ -20,4 +20,8 @@ public interface SwerveModuleIO {
 
   public default void setmDesiredState(SwerveModuleState desiredState) {}
   ;
+
+  public default SwerveModulePosition getPosition() {
+    return null;
+  }
 }

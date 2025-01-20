@@ -44,6 +44,19 @@ public final class Constants {
     public static final double kDirectionSlewRate = 1.2; // radians per second
     public static final double kMagnitudeSlewRate = 1.8; // Mesured in percent per second (1 = 100%)
     public static final double kRotationSlewRate = 2.0; // Mesured in percent per second (1 = 100%)
+
+    // Chassis configuration
+    public static final double kTrackWidth = Units.inchesToMeters(25.5);
+    // Distance between centers of right and left wheels on robot
+    public static final double kWheelBase = Units.inchesToMeters(25.5);
+    // Distance between front and back wheels on robot
+
+    public static final SwerveDriveKinematics kDriveKinematics =
+        new SwerveDriveKinematics(
+            new Translation2d(kWheelBase / 2, kTrackWidth / 2),
+            new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+            new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
   }
 
   public static class SparkMaxCANID {
@@ -86,16 +99,6 @@ public final class Constants {
     public static double TurnFF = 0;
     public static double TurnMinOutput = -1;
     public static double TurnMaxOutput = 1;
-
-    public static double TrackWidth = Units.inchesToMeters(25.5);
-    public static double WheelBase = Units.inchesToMeters(25.5);
-
-    public static final SwerveDriveKinematics kDriveKinematics =
-        new SwerveDriveKinematics(
-            new Translation2d(WheelBase / 2, TrackWidth / 2),
-            new Translation2d(WheelBase / 2, -TrackWidth / 2),
-            new Translation2d(-WheelBase / 2, TrackWidth / 2),
-            new Translation2d(-WheelBase / 2, -TrackWidth / 2));
 
     public static int DriveCurrentLimit = 50;
     public static int TurnCurrentLimit = 20;

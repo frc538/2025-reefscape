@@ -10,6 +10,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
@@ -17,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.SwerveUtils;
 import org.littletonrobotics.junction.Logger;
 
@@ -53,6 +56,9 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
   private Pose2d mPose;
 
+  // Odometry class for tracking robot pose
+  SwerveDriveOdometry m_odometry;
+
   /** Creates a new SwerveDriveSubsystem. */
   public SwerveDriveSubsystem(
       SwerveModuleIO FrontLeftDriveio,
@@ -68,6 +74,17 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
     mGyro = new Pigeon2(kPigeonID);
     mGyro.setYaw(0);
+
+    m_odometry =
+        new SwerveDriveOdometry(
+            DriveConstants.kDriveKinematics,
+            Rotation2d.fromDegrees(mGyro.getYaw().getValueAsDouble()),
+            new SwerveModulePosition[] {
+              mFrontLeftinputs.position,
+              mFrontRightinputs.position,
+              mBackLeftinputs.position,
+              mBackRightinputs.position
+            });
   }
 
   public void setX() {
@@ -162,7 +179,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     mSpeedDelivered = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotationDelivered);
 
     var swerveModuleStates =
-        Constants.ModuleConstants.kDriveKinematics.toSwerveModuleStates(
+        Constants.DriveConstants.kDriveKinematics.toSwerveModuleStates(
             mIsFieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(
                     xSpeedDelivered,
@@ -205,14 +222,37 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     Logger.recordOutput("Is Field Relative?", mIsFieldRelative);
     Logger.recordOutput("Gyro Angle", mGyro.getYaw().getValueAsDouble());
     mLights.set(mIsFieldRelative ? 0.77 : 0.61);
+
+    // Update the odometry in the periodic block
+    m_odometry.update(
+        Rotation2d.fromDegrees(mGyro.getYaw().getValueAsDouble()),
+        new SwerveModulePosition[] {
+          mFrontLeftinputs.position,
+          mFrontRightinputs.position,
+          mBackLeftinputs.position,
+          mBackRightinputs.position
+        });
   }
 
   public Pose2d getPose() {
-    return mPose;
+    return m_odometry.getPoseMeters();
   }
 
+  /**
+   * Resets the odometry to the specified pose.
+   *
+   * @param pose The pose to which to set the odometry.
+   */
   public void resetPose(Pose2d pose) {
-    mPose = pose;
+    m_odometry.resetPosition(
+        Rotation2d.fromDegrees(mGyro.getYaw().getValueAsDouble()),
+        new SwerveModulePosition[] {
+          mFrontLeftio.getPosition(),
+          mFrontRightio.getPosition(),
+          mBackLeftio.getPosition(),
+          mBackRightio.getPosition()
+        },
+        pose);
   }
 
   public ChassisSpeeds getCurrentSpeeds() {
