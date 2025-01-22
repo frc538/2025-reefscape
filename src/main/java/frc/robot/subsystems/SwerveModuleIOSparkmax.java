@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.pathplanner.lib.config.PIDConstants;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -15,6 +16,8 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -53,7 +56,7 @@ public class SwerveModuleIOSparkmax implements SwerveModuleIO {
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pid(0.04, 0, 0)
-        .velocityFF(1 / Constants.ModuleConstants.DriveMotorFreeSpeedRevsPerSecond)
+        .velocityFF(1 / Constants.ModuleConstants.DriveWheelFreeSpeedMetersPerSecond)
         .outputRange(-1, 1);
 
     // driveConfig.inverted(false).idleMode(IdleMode.kBrake);
@@ -123,6 +126,14 @@ public class SwerveModuleIOSparkmax implements SwerveModuleIO {
     inputs.position =
         new SwerveModulePosition(
             driveEncoder.getPosition(), new Rotation2d(turnEncoder.getPosition() - mAngularOffset));
+
+    inputs.driveAppliedOutput = driveMotor.getAppliedOutput();
+    inputs.driveAppliedBusVoltage = driveMotor.getBusVoltage();
+    inputs.driveAppliedCurrent = driveMotor.getOutputCurrent();
+
+    inputs.turnAppliedOutput = turnMotor.getAppliedOutput();
+    inputs.turnAppliedBusVoltage = turnMotor.getBusVoltage();
+    inputs.turnAppliedCurrent = turnMotor.getOutputCurrent();
   }
 
   public void reset() {
