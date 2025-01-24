@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.GyroIO;
+import frc.robot.subsystems.GyroIOPigeon;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 import frc.robot.subsystems.SwerveModuleIO;
 import frc.robot.subsystems.SwerveModuleIOSparkmax;
@@ -51,7 +53,7 @@ public class RobotContainer {
                     Constants.SparkMaxCANID.kRearRightDrive,
                     Constants.SparkMaxCANID.kRearRightTurn,
                     Constants.DriveConstants.kBackRightChassisAngularOffset),
-                0);
+                new GyroIOPigeon(0));
         break;
       default:
         mDriveSubsystem =
@@ -60,7 +62,7 @@ public class RobotContainer {
                 new SwerveModuleIO() {},
                 new SwerveModuleIO() {},
                 new SwerveModuleIO() {},
-                0);
+                new GyroIO() {});
         break;
     }
     // Configure the trigger bindings
@@ -110,7 +112,6 @@ public class RobotContainer {
         },
         mDriveSubsystem // Reference to this subsystem to set requirements
         );
-
     // Configure the trigger bindings
     configureBindings();
     Command kLeaveAuto = new PathPlannerAuto("Leave");

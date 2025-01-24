@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,10 +17,10 @@ import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.SwerveUtils;
+import frc.robot.subsystems.GyroIO.GyroIOInputs;
 import org.littletonrobotics.junction.Logger;
 
 public class SwerveDriveSubsystem extends SubsystemBase {
@@ -30,12 +29,19 @@ public class SwerveDriveSubsystem extends SubsystemBase {
   private final SwerveModuleIO mBackLeftio;
   private final SwerveModuleIO mBackRightio;
 
-  private final SwerveModuleIOInputsAutoLogged mFrontLeftinputs = new SwerveModuleIOInputsAutoLogged();
-  private final SwerveModuleIOInputsAutoLogged mFrontRightinputs = new SwerveModuleIOInputsAutoLogged();
-  private final SwerveModuleIOInputsAutoLogged mBackLeftinputs = new SwerveModuleIOInputsAutoLogged();
-  private final SwerveModuleIOInputsAutoLogged mBackRightinputs = new SwerveModuleIOInputsAutoLogged();
+  private final GyroIO mGyroIO;
 
-  private final Pigeon2 mGyro;
+  private final SwerveModuleIOInputsAutoLogged mFrontLeftinputs =
+      new SwerveModuleIOInputsAutoLogged();
+  private final SwerveModuleIOInputsAutoLogged mFrontRightinputs =
+      new SwerveModuleIOInputsAutoLogged();
+  private final SwerveModuleIOInputsAutoLogged mBackLeftinputs =
+      new SwerveModuleIOInputsAutoLogged();
+  private final SwerveModuleIOInputsAutoLogged mBackRightinputs =
+      new SwerveModuleIOInputsAutoLogged();
+
+  private final GyroIOInputs mGyroIOInputs = new GyroIOInputs();
+
   private final Spark mLights = new Spark(0);
   private boolean mIsFieldRelative = false;
 
@@ -45,8 +51,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
   private double mCurrentTranslationDirection = 0;
   private double mCurrentTranslationMagnitude = 0;
 
-  private SlewRateLimiter mMagnitudeLimiter = new SlewRateLimiter(Constants.DriveConstants.kMagnitudeSlewRate);
-  private SlewRateLimiter mRotationLimiter = new SlewRateLimiter(Constants.DriveConstants.kRotationSlewRate);
+  private SlewRateLimiter mMagnitudeLimiter =
+      new SlewRateLimiter(Constants.DriveConstants.kMagnitudeSlewRate);
+  private SlewRateLimiter mRotationLimiter =
+      new SlewRateLimiter(Constants.DriveConstants.kRotationSlewRate);
   private ChassisSpeeds mSpeedDelivered = new ChassisSpeeds();
 
   private Pose2d mPose;
@@ -60,25 +68,25 @@ public class SwerveDriveSubsystem extends SubsystemBase {
       SwerveModuleIO FrontRightDriveio,
       SwerveModuleIO BackLeftDriveio,
       SwerveModuleIO BackRightDriveio,
-      int kPigeonID) {
+      GyroIO gyroIO) {
 
     mFrontLeftio = FrontLeftDriveio;
     mFrontRightio = FrontRightDriveio;
     mBackLeftio = BackLeftDriveio;
     mBackRightio = BackRightDriveio;
 
-    mGyro = new Pigeon2(kPigeonID);
-    mGyro.setYaw(0);
+    mGyroIO = gyroIO;
 
-    m_odometry = new SwerveDriveOdometry(
-        DriveConstants.kDriveKinematics,
-        Rotation2d.fromDegrees(mGyro.getYaw().getValueAsDouble()),
-        new SwerveModulePosition[] {
-            mFrontLeftinputs.position,
-            mFrontRightinputs.position,
-            mBackLeftinputs.position,
-            mBackRightinputs.position
-        });
+    m_odometry =
+        new SwerveDriveOdometry(
+            DriveConstants.kDriveKinematics,
+            Rotation2d.fromDegrees(mGyroIOInputs.yaw),
+            new SwerveModulePosition[] {
+              mFrontLeftinputs.position,
+              mFrontRightinputs.position,
+              mBackLeftinputs.position,
+              mBackRightinputs.position
+            });
   }
 
   public void setX() {
@@ -100,7 +108,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
   }
 
   public Command resetGyroCommand() {
-    return Commands.runOnce(() -> mGyro.setYaw(0), this);
+    return Commands.runOnce(() -> mGyroIO.setYaw(0), this);
   }
 
   public void drive(double forwardSpeed, double leftSpeed, double rotation, boolean rateLimit) {
@@ -114,37 +122,43 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     if (rateLimit) {
 
       double inputTranslationDirection = Math.atan2(leftSpeed, forwardSpeed);
-      double inputTranslationMagnitude = Math.sqrt(forwardSpeed * forwardSpeed + leftSpeed * leftSpeed);
+      double inputTranslationMagnitude =
+          Math.sqrt(forwardSpeed * forwardSpeed + leftSpeed * leftSpeed);
 
       double directionSlewRate;
       if (mCurrentTranslationMagnitude != 0) {
-        directionSlewRate = Math.abs(Constants.DriveConstants.kDirectionSlewRate / mCurrentTranslationMagnitude);
+        directionSlewRate =
+            Math.abs(Constants.DriveConstants.kDirectionSlewRate / mCurrentTranslationMagnitude);
       } else {
         directionSlewRate = 500.0;
       }
 
       double currentTime = WPIUtilJNI.now() * 1e-6;
       double elapsedTime = currentTime - mPreviousTime;
-      double angleDifference = SwerveUtils.angleDifference(inputTranslationDirection, mCurrentTranslationDirection);
+      double angleDifference =
+          SwerveUtils.angleDifference(inputTranslationDirection, mCurrentTranslationDirection);
 
       if (angleDifference < 0.45 * Math.PI) {
-        mCurrentTranslationDirection = SwerveUtils.stepTowardsCircular(
-            mCurrentTranslationDirection,
-            inputTranslationDirection,
-            directionSlewRate * elapsedTime);
+        mCurrentTranslationDirection =
+            SwerveUtils.stepTowardsCircular(
+                mCurrentTranslationDirection,
+                inputTranslationDirection,
+                directionSlewRate * elapsedTime);
         mCurrentTranslationMagnitude = mMagnitudeLimiter.calculate(inputTranslationMagnitude);
       } else if (angleDifference > 0.85 * Math.PI) {
         if (mCurrentTranslationMagnitude > 1e-4) {
           mCurrentTranslationMagnitude = mMagnitudeLimiter.calculate(0);
         } else {
-          mCurrentTranslationDirection = SwerveUtils.wrapAngle(mCurrentTranslationDirection + Math.PI);
+          mCurrentTranslationDirection =
+              SwerveUtils.wrapAngle(mCurrentTranslationDirection + Math.PI);
           mCurrentTranslationMagnitude = mMagnitudeLimiter.calculate(inputTranslationMagnitude);
         }
       } else {
-        mCurrentTranslationDirection = SwerveUtils.stepTowardsCircular(
-            mCurrentTranslationDirection,
-            inputTranslationDirection,
-            directionSlewRate * elapsedTime);
+        mCurrentTranslationDirection =
+            SwerveUtils.stepTowardsCircular(
+                mCurrentTranslationDirection,
+                inputTranslationDirection,
+                directionSlewRate * elapsedTime);
         mCurrentTranslationMagnitude = mMagnitudeLimiter.calculate(0);
       }
 
@@ -166,14 +180,15 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
     mSpeedDelivered = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotationDelivered);
 
-    var swerveModuleStates = Constants.DriveConstants.kDriveKinematics.toSwerveModuleStates(
-        mIsFieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                xSpeedDelivered,
-                ySpeedDelivered,
-                rotationDelivered,
-                Rotation2d.fromDegrees(mGyro.getYaw().getValueAsDouble()))
-            : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotationDelivered));
+    var swerveModuleStates =
+        Constants.DriveConstants.kDriveKinematics.toSwerveModuleStates(
+            mIsFieldRelative
+                ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                    xSpeedDelivered,
+                    ySpeedDelivered,
+                    rotationDelivered,
+                    Rotation2d.fromDegrees(mGyroIOInputs.yaw))
+                : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotationDelivered));
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, Constants.DriveConstants.kMaxSpeedMetersPerSecond);
@@ -187,6 +202,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    mGyroIO.updateInputs(mGyroIOInputs);
     // This method will be called once per scheduler run
     mFrontLeftio.updateInputs(mFrontLeftinputs);
     mFrontRightio.updateInputs(mFrontRightinputs);
@@ -198,27 +214,33 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     Logger.processInputs("Drive/Back Left", mBackLeftinputs);
     Logger.processInputs("Drive/Back Right", mBackRightinputs);
 
-    SwerveModuleState[] states = new SwerveModuleState[] {
-        mFrontLeftinputs.state,
-        mFrontRightinputs.state,
-        mBackLeftinputs.state,
-        mBackRightinputs.state
-    };
+    SwerveModuleState[] states =
+        new SwerveModuleState[] {
+          mFrontLeftinputs.state,
+          mFrontRightinputs.state,
+          mBackLeftinputs.state,
+          mBackRightinputs.state
+        };
 
     Logger.recordOutput("Drive/moduleStates", states);
 
     Logger.recordOutput("Is Field Relative?", mIsFieldRelative);
-    Logger.recordOutput("Gyro Angle", mGyro.getYaw().getValueAsDouble());
+    Logger.recordOutput("Gyro Angle", mGyroIOInputs.yaw);
+
+    var pose = m_odometry.getPoseMeters();
+    Logger.recordOutput("Odometry X", pose == null ? 0 : pose.getX());
+    Logger.recordOutput("Odometry Y", pose == null ? 0 : pose.getY());
+
     mLights.set(mIsFieldRelative ? 0.77 : 0.61);
 
     // Update the odometry in the periodic block
     m_odometry.update(
-        Rotation2d.fromDegrees(mGyro.getYaw().getValueAsDouble()),
+        Rotation2d.fromDegrees(mGyroIOInputs.yaw),
         new SwerveModulePosition[] {
-            mFrontLeftinputs.position,
-            mFrontRightinputs.position,
-            mBackLeftinputs.position,
-            mBackRightinputs.position
+          mFrontLeftinputs.position,
+          mFrontRightinputs.position,
+          mBackLeftinputs.position,
+          mBackRightinputs.position
         });
   }
 
@@ -233,12 +255,12 @@ public class SwerveDriveSubsystem extends SubsystemBase {
    */
   public void resetPose(Pose2d pose) {
     m_odometry.resetPosition(
-        Rotation2d.fromDegrees(mGyro.getYaw().getValueAsDouble()),
+        Rotation2d.fromDegrees(mGyroIOInputs.yaw),
         new SwerveModulePosition[] {
-            mFrontLeftinputs.position,
-            mFrontRightinputs.position,
-            mBackLeftinputs.position,
-            mBackRightinputs.position
+          mFrontLeftinputs.position,
+          mFrontRightinputs.position,
+          mBackLeftinputs.position,
+          mBackRightinputs.position
         },
         pose);
   }
