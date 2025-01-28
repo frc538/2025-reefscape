@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface GyroIO {
+public interface NavgationIO {
   @AutoLog
   public static class GyroIOInputs {
     double yaw = 0.0;

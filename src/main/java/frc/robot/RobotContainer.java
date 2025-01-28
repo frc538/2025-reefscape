@@ -17,8 +17,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.GyroIO;
-import frc.robot.subsystems.GyroIOPigeon;
+import frc.robot.subsystems.NavgationIO;
+import frc.robot.subsystems.NavigationIOPigeonLimelight;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 import frc.robot.subsystems.SwerveModuleIO;
 import frc.robot.subsystems.SwerveModuleIOSparkmax;
@@ -53,7 +53,7 @@ public class RobotContainer {
                     Constants.SparkMaxCANID.kRearRightDrive,
                     Constants.SparkMaxCANID.kRearRightTurn,
                     Constants.DriveConstants.kBackRightChassisAngularOffset),
-                new GyroIOPigeon(0));
+                new NavigationIOPigeonLimelight(0));
         break;
       default:
         mDriveSubsystem =
@@ -62,7 +62,7 @@ public class RobotContainer {
                 new SwerveModuleIO() {},
                 new SwerveModuleIO() {},
                 new SwerveModuleIO() {},
-                new GyroIO() {});
+                new NavgationIO() {});
         break;
     }
     // Configure the trigger bindings
