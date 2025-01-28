@@ -33,6 +33,20 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
 
+  public static class LimeLightConstants {
+    // THESE ARE PRELIMINARY NUMBERS CHANGE LATER
+    public static final double limelightX = 2;
+    public static final double limelightY = 2;
+    public static final double limelightZ = 2;
+
+    public static final double limelightRoll = 0;
+    public static final double limelightPitch = -2;
+    public static final double limelightYaw = 0;
+
+    public static final String limelightOneName = "Bacon";
+    public static final String limelightTwoName = "Eggs";
+  }
+
   public static class DriveConstants {
     public static final double kFrontLeftChassisAngularOffset = -Math.PI / 2;
     public static final double kFrontRightChassisAngularOffset = 0;

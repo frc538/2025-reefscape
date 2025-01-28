@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.SwerveUtils;
-import frc.robot.subsystems.GyroIO.GyroIOInputs;
+import frc.robot.subsystems.NavgationIO.GyroIOInputs;
 import org.littletonrobotics.junction.Logger;
 
 public class SwerveDriveSubsystem extends SubsystemBase {
@@ -29,7 +29,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
   private final SwerveModuleIO mBackLeftio;
   private final SwerveModuleIO mBackRightio;
 
-  private final GyroIO mGyroIO;
+  private final NavgationIO mGyroIO;
 
   private final SwerveModuleIOInputsAutoLogged mFrontLeftinputs =
       new SwerveModuleIOInputsAutoLogged();
@@ -68,7 +68,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
       SwerveModuleIO FrontRightDriveio,
       SwerveModuleIO BackLeftDriveio,
       SwerveModuleIO BackRightDriveio,
-      GyroIO gyroIO) {
+      NavgationIO gyroIO) {
 
     mFrontLeftio = FrontLeftDriveio;
     mFrontRightio = FrontRightDriveio;
@@ -91,7 +91,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
   public void setX() {
     System.out.println("set x");
-
     mFrontLeftio.setmDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
     mFrontRightio.setmDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     mBackLeftio.setmDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
