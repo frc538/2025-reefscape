@@ -113,7 +113,6 @@ public class RobotContainer {
         mDriveSubsystem // Reference to this subsystem to set requirements
         );
     // Configure the trigger bindings
-    configureBindings();
     Command kLeaveAuto = new PathPlannerAuto("Leave");
     Command kCoralAuto = new PathPlannerAuto("Coral");
     mAutoChooser.setDefaultOption("No auto", null);
@@ -126,7 +125,7 @@ public class RobotContainer {
     m_driverController.button(1).whileTrue(mDriveSubsystem.setXCommand()); // a (green) - while true
     m_driverController
         .button(2)
-        .onTrue(mDriveSubsystem.toggleFieldRelative()); // b (red) button - on true
+        .onTrue(mDriveSubsystem.toggleFieldRelativeCommand()); // b (red) button - on true
     m_driverController
         .button(7)
         .or(m_driverController.button(8))

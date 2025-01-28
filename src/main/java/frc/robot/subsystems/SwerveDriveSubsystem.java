@@ -90,8 +90,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
   }
 
   public void setX() {
-    System.out.println("set x");
-
     mFrontLeftio.setmDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
     mFrontRightio.setmDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     mBackLeftio.setmDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
@@ -103,8 +101,13 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     return run(() -> setX());
   }
 
-  public Command toggleFieldRelative() {
-    return Commands.runOnce(() -> mIsFieldRelative = !mIsFieldRelative, this);
+  private void toggleFieldRelative(){
+    System.out.println("toggle field relative.");
+    mIsFieldRelative = !mIsFieldRelative;
+  }
+
+  public Command toggleFieldRelativeCommand() {
+    return runOnce(this::toggleFieldRelative).ignoringDisable(true);
   }
 
   public Command resetGyroCommand() {
@@ -230,6 +233,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     var pose = m_odometry.getPoseMeters();
     Logger.recordOutput("Odometry X", pose == null ? 0 : pose.getX());
     Logger.recordOutput("Odometry Y", pose == null ? 0 : pose.getY());
+    Logger.recordOutput("Drive/OdometryPose", pose);
 
     mLights.set(mIsFieldRelative ? 0.77 : 0.61);
 
