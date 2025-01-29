@@ -23,7 +23,7 @@ public class NavigationIOPigeonLimelight implements NavgationIO {
     mGyro.setYaw(yaw);
   }
 
-  public void limelightPose(Pose2d limelightPose2d) {
-    
+  public void botPose(Pose2d limelightPose2d) {
+    LimelightHelpers.getBotPose2d_wpiBlue(frc.robot.Constants.LimeLightConstants.limelightOneName);
   }
 }

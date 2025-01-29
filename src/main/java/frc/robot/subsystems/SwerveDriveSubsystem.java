@@ -4,8 +4,10 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -18,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.LimelightHelpers;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.SwerveUtils;
 import frc.robot.subsystems.NavgationIO.GyroIOInputs;
@@ -45,6 +48,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
   private final Spark mLights = new Spark(0);
   private boolean mIsFieldRelative = false;
 
+  private Pose2d botPoseLimelight = LimelightHelpers.getBotPose2d_wpiBlue(Constants.LimeLightConstants.limelightOneName);
+
   private double mPreviousTime = WPIUtilJNI.now() * 1e-6;
 
   private double mCurrentRotation = 0;
@@ -60,7 +65,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
   private Pose2d mPose;
 
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry;
+  SwerveDrivePoseEstimator m_odometry;
 
   /** Creates a new SwerveDriveSubsystem. */
   public SwerveDriveSubsystem(
@@ -78,15 +83,13 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     mGyroIO = gyroIO;
 
     m_odometry =
-        new SwerveDriveOdometry(
-            DriveConstants.kDriveKinematics,
-            Rotation2d.fromDegrees(mGyroIOInputs.yaw),
-            new SwerveModulePosition[] {
-              mFrontLeftinputs.position,
-              mFrontRightinputs.position,
-              mBackLeftinputs.position,
-              mBackRightinputs.position
-            });
+        new SwerveDrivePoseEstimator(DriveConstants.kDriveKinematics, Rotation2d.fromDegrees(mGyroIOInputs.yaw),
+        new SwerveModulePosition[] {
+          mFrontLeftinputs.position,
+          mFrontRightinputs.position,
+          mBackLeftinputs.position,
+          mBackRightinputs.position
+        }, mPose);
   }
 
   public void setX() {
@@ -213,10 +216,14 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     mBackLeftio.updateInputs(mBackLeftinputs);
     mBackRightio.updateInputs(mBackRightinputs);
 
+    botPoseLimelight = LimelightHelpers.getBotPose2d_wpiBlue(Constants.LimeLightConstants.limelightOneName);
+
     Logger.processInputs("Drive/Front Left", mFrontLeftinputs);
     Logger.processInputs("Drive/Front Right", mFrontRightinputs);
     Logger.processInputs("Drive/Back Left", mBackLeftinputs);
     Logger.processInputs("Drive/Back Right", mBackRightinputs);
+
+    Logger.recordOutput("LimeLight Pose", botPoseLimelight);
 
     SwerveModuleState[] states =
         new SwerveModuleState[] {
@@ -231,7 +238,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     Logger.recordOutput("Is Field Relative?", mIsFieldRelative);
     Logger.recordOutput("Gyro Angle", mGyroIOInputs.yaw);
 
-    var pose = m_odometry.getPoseMeters();
+    var pose = m_odometry.getEstimatedPosition();
+    
     Logger.recordOutput("Odometry X", pose == null ? 0 : pose.getX());
     Logger.recordOutput("Odometry Y", pose == null ? 0 : pose.getY());
     Logger.recordOutput("Drive/OdometryPose", pose);
@@ -250,7 +258,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
   }
 
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return m_odometry.getEstimatedPosition();
   }
 
   /**
