@@ -42,7 +42,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
   private final GyroIOInputs mGyroIOInputs = new GyroIOInputs();
 
-  private final Spark mLights = new Spark(0);
   private boolean mIsFieldRelative = false;
 
   private double mPreviousTime = WPIUtilJNI.now() * 1e-6;
@@ -235,7 +234,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     Logger.recordOutput("Odometry Y", pose == null ? 0 : pose.getY());
     Logger.recordOutput("Drive/OdometryPose", pose);
 
-    mLights.set(mIsFieldRelative ? 0.77 : 0.61);
 
     // Update the odometry in the periodic block
     m_odometry.update(
