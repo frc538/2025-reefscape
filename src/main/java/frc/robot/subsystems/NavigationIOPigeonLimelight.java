@@ -17,6 +17,7 @@ public class NavigationIOPigeonLimelight implements NavgationIO {
 
   public void updateInputs(GyroIOInputs inputs) {
     inputs.yaw = mGyro.getYaw().getValueAsDouble();
+    inputs.yawRate = mGyro.getAngularVelocityZWorld().getValueAsDouble();
   }
 
   public void setYaw(double yaw) {

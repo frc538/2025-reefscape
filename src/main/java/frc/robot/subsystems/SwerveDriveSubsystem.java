@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -82,15 +83,69 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
     mGyroIO = gyroIO;
 
-    m_odometry =
-        new SwerveDrivePoseEstimator(DriveConstants.kDriveKinematics, Rotation2d.fromDegrees(mGyroIOInputs.yaw),
+    m_odometry = new SwerveDrivePoseEstimator(DriveConstants.kDriveKinematics,
+        Rotation2d.fromDegrees(mGyroIOInputs.yaw),
         new SwerveModulePosition[] {
-          mFrontLeftinputs.position,
-          mFrontRightinputs.position,
-          mBackLeftinputs.position,
-          mBackRightinputs.position
-        }, mPose);
+            mFrontLeftinputs.position,
+            mFrontRightinputs.position,
+            mBackLeftinputs.position,
+            mBackRightinputs.position
+        }, LimelightHelpers.getBotPose2d_wpiBlue(Constants.LimeLightConstants.limelightOneName));
+
+        boolean useMegaTag2 = true; //set to false to use MegaTag1
+    boolean doRejectUpdate = false;
+    if(useMegaTag2 == false)
+    {
+      LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+      
+      if(mt1.tagCount == 1 && mt1.rawFiducials.length == 1)
+      {
+        if(mt1.rawFiducials[0].ambiguity > .7)
+        {
+          doRejectUpdate = true;
+        }
+        if(mt1.rawFiducials[0].distToCamera > 3)
+        {
+          doRejectUpdate = true;
+        }
+      }
+      if(mt1.tagCount == 0)
+      {
+        doRejectUpdate = true;
+      }
+
+      if(!doRejectUpdate)
+      {
+        m_odometry.setVisionMeasurementStdDevs(VecBuilder.fill(.5,.5,9999999));
+        m_odometry.addVisionMeasurement(
+            mt1.pose,
+            mt1.timestampSeconds);
+      }
+    }
+    else if (useMegaTag2 == true)
+    {
+      LimelightHelpers.SetRobotOrientation("limelight", m_odometry.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.LimeLightConstants.limelightOneName);
+      if(Math.abs(mGyroIOInputs.yawRate) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+      {
+        doRejectUpdate = true;
+      }
+      if(mt2.tagCount == 0)
+      {
+        doRejectUpdate = true;
+      }
+      if(!doRejectUpdate)
+      {
+        m_odometry.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+        m_odometry.addVisionMeasurement(
+            mt2.pose,
+            mt2.timestampSeconds);
+      }
+    }
   }
+
+    //m_odometry.addVisionMeasurement(botPoseLimelight, edu.wpi.first.wpilibj.Timer.getFPGATimestamp());
+  
 
   public void setX() {
     System.out.println("set x");
