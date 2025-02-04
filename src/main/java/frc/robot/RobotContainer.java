@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.GyroIO;
 import frc.robot.subsystems.GyroIOPigeon;
+import frc.robot.subsystems.LightsSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 import frc.robot.subsystems.SwerveModuleIO;
 import frc.robot.subsystems.SwerveModuleIOSparkmax;
@@ -30,6 +31,7 @@ public class RobotContainer {
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
   private final SwerveDriveSubsystem mDriveSubsystem;
+  private final LightsSubsystem m_LightsSubsystem = new LightsSubsystem();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -130,7 +132,12 @@ public class RobotContainer {
         .button(7)
         .or(m_driverController.button(8))
         .onTrue(mDriveSubsystem.resetGyroCommand()); // start and back buttons - on true
-
+    m_driverController
+      .button(4)
+      .onTrue(m_LightsSubsystem.setLightsToRed());
+    m_driverController
+      .button(3)
+      .onTrue(m_LightsSubsystem.setLightsToGreen());
     mDriveSubsystem.setDefaultCommand(
         Commands.run(
             () -> {
