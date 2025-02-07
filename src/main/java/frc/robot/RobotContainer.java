@@ -138,6 +138,9 @@ public class RobotContainer {
     m_driverController
       .button(3)
       .onTrue(m_LightsSubsystem.setLightsToGreen());
+    m_driverController
+      .leftBumper()
+      .onTrue(m_LightsSubsystem.setLightToPurple());
     mDriveSubsystem.setDefaultCommand(
         Commands.run(
             () -> {

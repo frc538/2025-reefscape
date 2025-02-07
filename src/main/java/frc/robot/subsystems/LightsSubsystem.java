@@ -46,6 +46,9 @@ public class LightsSubsystem extends SubsystemBase {
   public Command setLightsToGreen(){
     return runOnce(() -> m_led.set(0.77));
   }
+  public Command setLightToPurple(){
+    return runOnce(()-> m_led.set(0.56));
+  }
 
   public void periodic() {
   }
