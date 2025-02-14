@@ -206,7 +206,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     boolean useMegaTag2 = true; // set to false to use MegaTag1
     boolean doRejectUpdate = false;
     if (useMegaTag2 == false) {
-      LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+      LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(Constants.LimeLightConstants.limelightOneName);
 
       if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {
         if (mt1.rawFiducials[0].ambiguity > .7) {
@@ -227,23 +227,31 @@ public class SwerveDriveSubsystem extends SubsystemBase {
             mt1.timestampSeconds);
       }
     } else if (useMegaTag2 == true) {
-      LimelightHelpers.SetRobotOrientation("limelight", m_odometry.getEstimatedPosition().getRotation().getDegrees(), 0,
+      LimelightHelpers.SetRobotOrientation(Constants.LimeLightConstants.limelightOneName, m_odometry.getEstimatedPosition().getRotation().getDegrees(), 0,
           0, 0, 0, 0);
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers
           .getBotPoseEstimate_wpiBlue_MegaTag2(Constants.LimeLightConstants.limelightOneName);
+          if (mt2 != null) {
+            Logger.recordOutput("Pose Estimate", mt2.pose);
+          }
       if (Math.abs(mGyroIOInputs.yawRate) > 720) // if our angular velocity is greater than 720 degrees per second,
                                                  // ignore vision updates
       {
         doRejectUpdate = true;
       }
-      if (mt2.tagCount == 0) {
-        doRejectUpdate = true;
+      if (mt2 != null) {
+        if (mt2.tagCount == 0) {
+          doRejectUpdate = true;
+        }
       }
+
+      Logger.recordOutput("do reject update", doRejectUpdate);
       if (!doRejectUpdate) {
         m_odometry.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+        if (mt2 != null) {
         m_odometry.addVisionMeasurement(
             mt2.pose,
-            mt2.timestampSeconds);
+            mt2.timestampSeconds);}
       }
     }
     m_odometry.update(
@@ -286,6 +294,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     Logger.recordOutput("Is Field Relative?", mIsFieldRelative);
     Logger.recordOutput("Gyro Angle", mGyroIOInputs.yaw);
 
+    UpdateOdometry();
+
     var pose = m_odometry.getEstimatedPosition();
 
     Logger.recordOutput("Odometry X", pose == null ? 0 : pose.getX());
@@ -315,7 +325,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         },
         pose);
 
-    UpdateOdometry();
   }
 
   public ChassisSpeeds getCurrentSpeeds() {

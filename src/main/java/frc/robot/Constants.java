@@ -43,7 +43,7 @@ public final class Constants {
     public static final double limelightPitch = -2;
     public static final double limelightYaw = 0;
 
-    public static final String limelightOneName = "Bacon";
+    public static final String limelightOneName = "limelight-bacon";
     public static final String limelightTwoName = "Eggs";
   }
 
