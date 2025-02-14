@@ -34,20 +34,9 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
 
-  public static class DriveConstants {
-    public static final double kFrontLeftChassisAngularOffset = -Math.PI / 2;
-    public static final double kFrontRightChassisAngularOffset = 0;
-    public static final double kBackLeftChassisAngularOffset = Math.PI;
-    public static final double kBackRightChassisAngularOffset = Math.PI / 2;
-    public static final double kMaxSpeedMetersPerSecond = 4.8;
-    public static final double kMaxAngularSpeed = 2 * Math.PI;
-
-    public static final double kDirectionSlewRate = 1.2; // radians per second
-    public static final double kMagnitudeSlewRate = 1.8; // Mesured in percent per second (1 = 100%)
-    public static final double kRotationSlewRate = 2.0; // Mesured in percent per second (1 = 100%)
-  }
 
   public static class SparkMaxCANID {
+    //IDs for drive/turn motors
     public static final int kFrontRightDrive = 23;
     public static final int kFrontRightTurn = 15;
     public static final int kFrontLeftDrive = 12;
