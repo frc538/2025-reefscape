@@ -41,8 +41,11 @@ public class DriveCommands {
   private static final double DEADBAND = 0.1;
   private static final double ANGLE_KP = 5.0;
   private static final double ANGLE_KD = 0.4;
-  private static final double ANGLE_MAX_VELOCITY = 8.0;
-  private static final double ANGLE_MAX_ACCELERATION = 20.0;
+
+  //these two variables are constraints in units of velocity and acceleration(Like radians per second^2)
+  public static double ANGLE_MAX_VELOCITY = 8.0;
+  public static double ANGLE_MAX_ACCELERATION = 20.0;
+
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
@@ -64,6 +67,40 @@ public class DriveCommands {
         .getTranslation();
   }
 
+  public static Command boost()
+  {return Commands.run( 
+    () -> 
+    {
+
+    ANGLE_MAX_ACCELERATION = 60;
+    ANGLE_MAX_VELOCITY = 12;
+      
+    }
+  );
+  }
+  public static Command boostOff()
+  {return Commands.run( 
+    () -> 
+    {
+
+    ANGLE_MAX_ACCELERATION = 20;
+    ANGLE_MAX_VELOCITY = 8;
+      
+    }
+  );
+  }
+  public static Command speedSet(
+    Double Acceleration,
+    Double velocity
+  ){
+    return Commands.run(
+      () ->
+      {
+        ANGLE_MAX_ACCELERATION = Acceleration;
+        ANGLE_MAX_VELOCITY = velocity;
+      }
+    );
+  }
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
@@ -120,6 +157,7 @@ public class DriveCommands {
             ANGLE_KP,
             0.0,
             ANGLE_KD,
+            //Gives controller constraints
             new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
     angleController.enableContinuousInput(-Math.PI, Math.PI);
 
