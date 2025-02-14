@@ -34,19 +34,6 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
 
-
-  public static class SparkMaxCANID {
-    //IDs for drive/turn motors
-    public static final int kFrontRightDrive = 23;
-    public static final int kFrontRightTurn = 15;
-    public static final int kFrontLeftDrive = 12;
-    public static final int kFrontLeftTurn = 9;
-    public static final int kRearRightDrive = 22;
-    public static final int kRearRightTurn = 1;
-    public static final int kRearLeftDrive = 11;
-    public static final int kRearLefttTurn = 2;
-  }
-
   public static class ModuleConstants {
     public static int DriveMotorPinionTeeth = 13;
     public static int NeoFreeSpeedRPM = 5676;
