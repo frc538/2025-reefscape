@@ -37,12 +37,13 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class DriveCommands {
-  //Creates variables for driving
+  // Creates variables for driving
   private static final double DEADBAND = 0.1;
   private static final double ANGLE_KP = 5.0;
   private static final double ANGLE_KD = 0.4;
 
-  //these two variables are constraints in units of velocity and acceleration(Like radians per second^2)
+  // these two variables are constraints in units of velocity and acceleration(Like radians per
+  // second^2)
   public static double ANGLE_MAX_VELOCITY = 8.0;
   public static double ANGLE_MAX_ACCELERATION = 20.0;
 
@@ -67,40 +68,30 @@ public class DriveCommands {
         .getTranslation();
   }
 
-  public static Command boost()
-  {return Commands.run( 
-    () -> 
-    {
-
-    ANGLE_MAX_ACCELERATION = 60;
-    ANGLE_MAX_VELOCITY = 12;
-      
-    }
-  );
-  }
-  public static Command boostOff()
-  {return Commands.run( 
-    () -> 
-    {
-
-    ANGLE_MAX_ACCELERATION = 20;
-    ANGLE_MAX_VELOCITY = 8;
-      
-    }
-  );
-  }
-  public static Command speedSet(
-    Double Acceleration,
-    Double velocity
-  ){
+  public static Command boost() {
     return Commands.run(
-      () ->
-      {
-        ANGLE_MAX_ACCELERATION = Acceleration;
-        ANGLE_MAX_VELOCITY = velocity;
-      }
-    );
+        () -> {
+          ANGLE_MAX_ACCELERATION = 60;
+          ANGLE_MAX_VELOCITY = 12;
+        });
   }
+
+  public static Command boostOff() {
+    return Commands.run(
+        () -> {
+          ANGLE_MAX_ACCELERATION = 20;
+          ANGLE_MAX_VELOCITY = 8;
+        });
+  }
+
+  public static Command speedSet(Double Acceleration, Double velocity) {
+    return Commands.run(
+        () -> {
+          ANGLE_MAX_ACCELERATION = Acceleration;
+          ANGLE_MAX_VELOCITY = velocity;
+        });
+  }
+
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
@@ -157,7 +148,7 @@ public class DriveCommands {
             ANGLE_KP,
             0.0,
             ANGLE_KD,
-            //Gives controller constraints
+            // Gives controller constraints
             new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
     angleController.enableContinuousInput(-Math.PI, Math.PI);
 

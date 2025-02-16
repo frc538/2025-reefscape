@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -39,8 +38,8 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
-  //DriveCommands.ANGLE_MAX_ACCELERATION = (Put trigger value here-->);
-  //DriveCommands.ANGLE_MAX_VELOCITY = (Put trigger value here-->);
+  // DriveCommands.ANGLE_MAX_ACCELERATION = (Put trigger value here-->);
+  // DriveCommands.ANGLE_MAX_VELOCITY = (Put trigger value here-->);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -139,20 +138,11 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
-    
-                controller
-                .y()
-                .onTrue(
-                    
-                                DriveCommands.boost());
-                controller
-                .y()
-                .onFalse(
-                    
-                                DriveCommands.boostOff());
-                
-                            
-}
+
+    controller.y().onTrue(DriveCommands.boost());
+
+    controller.y().onFalse(DriveCommands.boostOff());
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
