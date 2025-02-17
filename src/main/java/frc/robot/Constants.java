@@ -44,7 +44,7 @@ public final class Constants {
     public static final double limelightYaw = 0;
 
     public static final String limelightOneName = "limelight-bacon";
-    public static final String limelightTwoName = "Eggs";
+    public static final String limelightTwoName = "limelight-eggs";
   }
 
   public static class DriveConstants {
