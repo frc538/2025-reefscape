@@ -8,11 +8,9 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
@@ -25,8 +23,6 @@ import frc.robot.LimelightHelpers;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.SwerveUtils;
 import frc.robot.subsystems.NavgationIO.GyroIOInputs;
-
-import java.util.function.Function;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -61,7 +57,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
   private SlewRateLimiter mRotationLimiter = new SlewRateLimiter(Constants.DriveConstants.kRotationSlewRate);
   private ChassisSpeeds mSpeedDelivered = new ChassisSpeeds();
 
-  private Pose2d mPose;
+  //MPOSE WAS UNUSED. HERES THE LINE IN CASE SOMETHING BREAKS private Pose2d mPose;
 
   // Odometry class for tracking robot pose
   SwerveDrivePoseEstimator m_odometry;
