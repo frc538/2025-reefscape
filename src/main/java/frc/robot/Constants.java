@@ -26,6 +26,20 @@ public final class Constants {
     REPLAY
   }
 
+  public static class LimeLightConstants {
+    // THESE ARE PRELIMINARY NUMBERS CHANGE LATER
+    public static final double limelightX = 2;
+    public static final double limelightY = 2;
+    public static final double limelightZ = 2;
+
+    public static final double limelightRoll = 0;
+    public static final double limelightPitch = -2;
+    public static final double limelightYaw = 0;
+
+    public static final String limelightOneName = "limelight-bacon";
+    public static final String limelightTwoName = "limelight-eggs";
+  }
+
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
