@@ -91,7 +91,7 @@ public class Drive extends SubsystemBase {
 
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
-  private final GyroIO gyroInputs = new GyroIOInputsAutoLogged();
+  private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
   private final Alert gyroDisconnectedAlert =
@@ -193,7 +193,7 @@ public class Drive extends SubsystemBase {
           if (mt2 != null) {
             Logger.recordOutput("Pose Estimate", mt2.pose);
           }
-      if (Math.abs(GyroIOInputs.yawVelocityRadPerSec) > 720) // if our angular velocity is greater than 720 degrees per second,
+      if (Math.abs(gyroInputs.yawVelocityRadPerSec) > 720) // if our angular velocity is greater than 720 degrees per second,
                                                  // ignore vision updates
       {
         doRejectUpdate = true;
@@ -274,7 +274,7 @@ public class Drive extends SubsystemBase {
       Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
-
+  }
   /**
    * Runs the drive at the desired velocity.
    *
