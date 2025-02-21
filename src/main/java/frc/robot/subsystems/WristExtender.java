@@ -6,15 +6,22 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.Servo;
 
 /**
  *  Will need imports for Servo and Servo hub, along with anything else that might be important
 */
 
 public class WristExtender extends SubsystemBase {
+  private Servo axonMaxServo;
+  /*axonMaxServo.get(); -gets position
+   * axonMaxServo.getAngle(); -gets angle
+   * axonMaxServo.set(float); -sets position
+   * axonMaxServo.setAngle(float); -sets angle
+   */
   /** Creates a new ExampleSubsystem. */
   public WristExtender() {}
-  //private static final double extended = 0;
+  //private static final double extended = 0.5;
   //Will find a way to get whether we have coral/algae in our system or not and how many.
   //get boolean algaeAmount
   //get boolean coralAmount
@@ -50,15 +57,6 @@ public class WristExtender extends SubsystemBase {
      * and how that all will work.
      * From what I've seen there will be two motors, one to extend like an elbow and one like a wrist. 
      * 
-     * 
-     * public/private void extendArm(float) { - float would most likely be extend
-     *  if (extended!=[limit of extention going forward] || extended!=[limit of extention going backwards]) {
-     *   extended += float;
-     *   motor1 move(float.inverted) - arm
-     *   motor2 move(float) - wrist
-     *  } else {
-     *   extend = 0;
-     *  }
      * }
      * public/private void shootAlgae() {
      *  shoot algae? I'm too lazy to think about this rn
@@ -67,10 +65,11 @@ public class WristExtender extends SubsystemBase {
      *  another function I am way to lazy to think about smh
      * }
      * If [button] is true/pressed (not held) { - We can condense these commands into an automated sequence if needed
-     *  while [button1] is pressed, extend += 1, else return nothing
-     *  while [button2] is pressed, extend -= 1, else return nothing - these can be changed to if trigger/stick is 
-     * negative/positive, add or subtract or return nothing from extend.
-     *  extendArm(extend);
+     *  while [button1] is pressed and extended != 1, extended += 0.5, else return nothing
+     *  while [button2] is pressed and extended != 0, extended -= 0.5, else return nothing - these can be changed to if trigger/stick is 
+     * negative/positive, add or subtract or return nothing from extend. I do think a button would fit better, though.
+     * It's pretty choppy, though, so lowering the increments might be good.
+     *  axonMaxServo.set(extend);
      *  if [button3] is pressed, shootAlgae() and algaeAmount = false;
      *  if [button4] is pressed, dropCoral() and coralAmount = false;
      * }
