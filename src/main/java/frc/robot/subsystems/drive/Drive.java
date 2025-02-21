@@ -250,6 +250,12 @@ public class Drive extends SubsystemBase {
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
   }
 
+  public void simpleUpdateOdometry() {
+    var pose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.LimeLightConstants.limelightOneName);
+    if (pose == null) return;
+    poseEstimator.addVisionMeasurement(pose.pose, pose.timestampSeconds);
+  }
+
   @Override
   public void periodic() {
     odometryLock.lock(); // Prevents odometry updates while reading data
@@ -267,7 +273,8 @@ public class Drive extends SubsystemBase {
       }
     }
   
-    UpdateOdometry();
+    // UpdateOdometry();
+    simpleUpdateOdometry();
 
     // Log empty setpoint states when disabled
     if (DriverStation.isDisabled()) {
