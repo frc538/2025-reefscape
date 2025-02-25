@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -38,6 +42,58 @@ public final class Constants {
 
     public static final String limelightOneName = "limelight-bacon";
     public static final String limelightTwoName = "limelight-eggs";
+  }
+
+  public static class ModuleConstants {
+
+    public static int DriveMotorPinionTeeth = 13;
+    public static int NeoFreeSpeedRPM = 5676;
+    public static double WheelRadiusMeters = Units.inchesToMeters(1.5);
+    public static double DriveGearing = 45.0 * 22 / 15 / DriveMotorPinionTeeth;
+    public static double TurnPositionConversionFactor = 2 * Math.PI;
+    public static double TurnVelocityConversionFactor = 2 * Math.PI / 60;
+    public static double RightPositionConversionFactor = 2 * Math.PI;
+    public static double RightVelocityConversionFactor = 2 * Math.PI / 60;
+    public static double RightMotorFreeSpeedRevsPerSecond = NeoFreeSpeedRPM / 60.0;
+    public static double LeftPositionConversionFactor = 2 * Math.PI;
+    public static double LeftVelocityConversionFactor = 2 * Math.PI / 60;
+    public static double LeftMotorFreeSpeedRevsPerSecond = NeoFreeSpeedRPM / 60.0;
+    public static double DrivePositionConversionFactor =
+        2 * Math.PI * WheelRadiusMeters / DriveGearing;
+    public static double DriveVelocityConversionFactor =
+        2 * Math.PI / 60 * WheelRadiusMeters / DriveGearing;
+    public static double DriveMotorFreeSpeedRevsPerSecond = NeoFreeSpeedRPM / 60.0;
+    public static double DriveWheelFreeSpeedMetersPerSecond =
+        DriveMotorFreeSpeedRevsPerSecond * 2.0 * Math.PI * WheelRadiusMeters / DriveGearing;
+
+    public static double DriveP = 0.4;
+    public static double DriveI = 0;
+    public static double DriveD = 0;
+    public static double DriveFF = 1 / DriveWheelFreeSpeedMetersPerSecond;
+    public static double DriveMinOutput = -1;
+    public static double DriveMaxOutput = 1;
+
+    public static double TurnP = 1;
+    public static double TurnI = 0;
+    public static double TurnD = 0;
+    public static double TurnFF = 0;
+    public static double TurnMinOutput = -1;
+    public static double TurnMaxOutput = 1;
+
+    public static int DriveCurrentLimit = 50;
+    public static int TurnCurrentLimit = 20;
+
+    public static double MaxDriveMetersPerSecond = 4.46;
+    public static double MaxTurnRadiansPerSecond = 2 * Math.PI;
+
+    public static boolean DriveEncoderInverted = false;
+    public static boolean TurnEncoderInverted = true;
+
+    public static double TurnPIDMinInput = 0;
+    public static double TurnPIDMaxInput = 2 * Math.PI;
+
+    public static IdleMode DriveIdle = IdleMode.kBrake;
+    public static IdleMode TurnIdle = IdleMode.kBrake;
   }
 
   public static class OperatorConstants {
