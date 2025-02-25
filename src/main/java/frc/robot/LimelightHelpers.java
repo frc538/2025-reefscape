@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.littletonrobotics.junction.Logger;
+
 /**
  * LimelightHelpers provides static methods and classes for interfacing with Limelight vision
  * cameras in FRC. This library supports all Limelight features including AprilTag tracking, Neural
@@ -658,6 +660,9 @@ public class LimelightHelpers {
     double[] poseArray = tsValue.value;
     long timestamp = tsValue.timestamp;
 
+    Logger.recordOutput("getBotPoseEstimate-ts",timestamp);
+    Logger.recordOutput("getBotPoseEstimate-poseArray.length",poseArray.length);
+
     if (poseArray.length == 0) {
       // Handle the case where no data is available
       return null; // or some default PoseEstimate
@@ -692,6 +697,7 @@ public class LimelightHelpers {
         rawFiducials[i] = new RawFiducial(id, txnc, tync, ta, distToCamera, distToRobot, ambiguity);
       }
     }
+    Logger.recordOutput("LimelightHelpers-adjusted-ts",adjustedTimestamp);
 
     return new PoseEstimate(
         pose,
