@@ -2,10 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.WristExtender;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
 import edu.wpi.first.wpilibj.Servo;
 
 /**
@@ -13,18 +16,19 @@ import edu.wpi.first.wpilibj.Servo;
 */
 
 public class WristExtender extends SubsystemBase {
-  private Servo axonMaxServo;
+  private final CommandXboxController controller = new CommandXboxController(0);
+  public final Servo axonMaxServo = new Servo(0); //0 is a placeholder
+  private static double extended = 1; //1 is just a placeholder
+  private boolean extendedIsTrue = controller.start().getAsBoolean();
+  public static double algaeAmount = 0;
+  public static double coralAmount = 1;
   /*axonMaxServo.get(); -gets position
    * axonMaxServo.getAngle(); -gets angle
-   * axonMaxServo.set(float); -sets position
+   * axonMaxServo.set(float); -sets position - 0 is min, 1 is max
    * axonMaxServo.setAngle(float); -sets angle
    */
   /** Creates a new ExampleSubsystem. */
   public WristExtender() {}
-  //private static final double extended = 0.5;
-  //Will find a way to get whether we have coral/algae in our system or not and how many.
-  //get boolean algaeAmount
-  //get boolean coralAmount
   /**
    * Example command factory method.
    *
@@ -64,16 +68,24 @@ public class WristExtender extends SubsystemBase {
      * public/private void dropCoral() {
      *  another function I am way to lazy to think about smh
      * }
-     * If [button] is true/pressed (not held) { - We can condense these commands into an automated sequence if needed
-     *  while [button1] is pressed and extended != 1, extended += 0.5, else return nothing
-     *  while [button2] is pressed and extended != 0, extended -= 0.5, else return nothing - these can be changed to if trigger/stick is 
-     * negative/positive, add or subtract or return nothing from extend. I do think a button would fit better, though.
-     * It's pretty choppy, though, so lowering the increments might be good.
-     *  axonMaxServo.set(extend);
-     *  if [button3] is pressed, shootAlgae() and algaeAmount = false;
-     *  if [button4] is pressed, dropCoral() and coralAmount = false;
-     * }
      */
+    extendedIsTrue = controller.start().getAsBoolean(); //updating boolean
+    //This should mean you have to hold it, not press it once.
+    if (extendedIsTrue) { //I couldn't get the onTrue function to work
+      extended = 0; //0 is a placeholder
+      axonMaxServo.set(extended);
+    } else {
+      extended = 1; //1 is a placeholder
+      axonMaxServo.set(extended);
+    }
+    if (controller.back().getAsBoolean() && algaeAmount != 0) {
+      //shootAlgae();
+      algaeAmount -= 1;
+    }
+    if (controller.rightBumper().getAsBoolean() && coralAmount != 0) {
+      //dropCoral();
+      coralAmount -= 1;
+    }
   }
 
   @Override
