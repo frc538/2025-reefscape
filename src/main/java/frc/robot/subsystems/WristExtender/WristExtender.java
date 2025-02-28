@@ -8,8 +8,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.WristExtender.*;
+import frc.robot.subsystems.drive.ModuleIO;
 
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Servo;
+import org.littletonrobotics.junction.Logger;
 
 /**
  *  Will need imports for Servo and Servo hub, along with anything else that might be important
@@ -17,18 +22,26 @@ import edu.wpi.first.wpilibj.Servo;
 
 public class WristExtender extends SubsystemBase {
   private final CommandXboxController controller = new CommandXboxController(0);
-  public final Servo axonMaxServo = new Servo(0); //0 is a placeholder
+  public static Servo axonMaxServo = new Servo(0); //0 is a placeholder
   private static double extended = 1; //1 is just a placeholder
   private boolean extendedIsTrue = controller.start().getAsBoolean();
   public static double algaeAmount = 0;
   public static double coralAmount = 1;
+  private final WristExtenderIO io;
+  private final WristExtenderIOInputsAutoLogged inputs = new WristExtenderIOInputsAutoLogged();
+  private final int index;
   /*axonMaxServo.get(); -gets position
    * axonMaxServo.getAngle(); -gets angle
-   * axonMaxServo.set(float); -sets position - 0 is min, 1 is max
-   * axonMaxServo.setAngle(float); -sets angle
+   * axonMaxServo.set(float); -sets position - 0 is min, 1 is max (Does the same as setAngle, just uses different numbers)
+   * axonMaxServo.setAngle(float); -sets angle - 0 is min, 180 is max (Does the same as set, just uses different numbers)
    */
   /** Creates a new ExampleSubsystem. */
-  public WristExtender() {}
+  public WristExtender(
+      WristExtenderIO io,
+      int index) {
+    this.io = io;
+    this.index = index;
+  }
   /**
    * Example command factory method.
    *
