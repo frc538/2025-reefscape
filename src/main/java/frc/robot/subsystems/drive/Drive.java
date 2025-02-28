@@ -165,14 +165,28 @@ public class Drive extends SubsystemBase {
   public void UpdateOdometry() {
     boolean useMegaTag2 = true; // set to false to use MegaTag1
     boolean doRejectUpdate = false;
+    LimelightHelpers.PoseEstimate mt1 = LimelightHelpers
+        .getBotPoseEstimate_wpiBlue(Constants.LimeLightConstants.limelightOneName);
+    LimelightHelpers.SetRobotOrientation(Constants.LimeLightConstants.limelightOneName,
+        poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0,
+        0, 0, 0, 0);
+    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers
+        .getBotPoseEstimate_wpiBlue_MegaTag2(Constants.LimeLightConstants.limelightOneName);
+        if (mt1 != null) {
+          Logger.recordOutput("Odometry/MT1/Tag Count", mt1.tagCount);
+          Logger.recordOutput("Odometry/MT1/Pose", mt1.pose);
+        }
+        if (mt2 != null) {
+          Logger.recordOutput("Odometry/MT2/Tag Count", mt2.tagCount);
+          Logger.recordOutput("Odometry/MT2/Pose", mt2.pose);
+        }
+                
     if (useMegaTag2 == false) {
-      LimelightHelpers.PoseEstimate mt1 = LimelightHelpers
-          .getBotPoseEstimate_wpiBlue(Constants.LimeLightConstants.limelightOneName);
-
-      if (mt1 != null) {
-        Logger.recordOutput("Tag Count", mt1.tagCount);
+      
+      if (mt1.tagCount == 0) {
+        doRejectUpdate = true;
       }
-      /*
+        /*
        * if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {
        * if (mt1.rawFiducials[0].ambiguity > .7) {
        * doRejectUpdate = true;
@@ -183,10 +197,6 @@ public class Drive extends SubsystemBase {
        * }
        */
 
-      if (mt1.tagCount == 0) {
-        doRejectUpdate = true;
-      }
-
       Logger.recordOutput("Limelight Pose", mt1.pose);
       if (!doRejectUpdate) {
         poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
@@ -196,14 +206,6 @@ public class Drive extends SubsystemBase {
 
       }
     } else if (useMegaTag2 == true) {
-      LimelightHelpers.SetRobotOrientation(Constants.LimeLightConstants.limelightOneName,
-          poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0,
-          0, 0, 0, 0);
-      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers
-          .getBotPoseEstimate_wpiBlue_MegaTag2(Constants.LimeLightConstants.limelightOneName);
-      if (mt2 != null) {
-        Logger.recordOutput("Limelight Pose", mt2.pose);
-      }
       if (Math.abs(gyroInputs.yawVelocityRadPerSec) > 720) // if our angular velocity is greater than 720 degrees per
                                                            // second,
       // ignore vision updates
