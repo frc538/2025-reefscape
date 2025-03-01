@@ -7,6 +7,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Elevator extends SubsystemBase  {
     ElevatorIO io;
@@ -16,6 +17,9 @@ public class Elevator extends SubsystemBase  {
     LoggedNetworkNumber coralMedHeight = new LoggedNetworkNumber("/SmartDashboard/Coral Med Height", 3);
     LoggedNetworkNumber coralHighHeight = new LoggedNetworkNumber("/SmartDashboard/Coral High Height", 4);
     LoggedNetworkNumber bargeHeight = new LoggedNetworkNumber("/SmartDashboard/Barge Height", 5);
+
+    LoggedNetworkNumber arbFF = new LoggedNetworkNumber("/SmartDashboard/Arbitrary FF Gain", Constants.ElevatorConstants.arbitraryFeedForward);
+    double lastArbFF = 0.0;
     public Elevator(ElevatorIO IO) {
         io = IO;
         
@@ -42,5 +46,10 @@ public class Elevator extends SubsystemBase  {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs); 
+
+        if (arbFF.get() != lastArbFF) {
+            io.setArbFF(arbFF.get());
+            lastArbFF = arbFF.get();
+        }
     }
 }

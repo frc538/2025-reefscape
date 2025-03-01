@@ -1,5 +1,7 @@
 package frc.robot.subsystems.elevator;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
@@ -21,6 +23,9 @@ public class ElevatorIOSparkMax implements ElevatorIO {
 
     SparkMaxConfig mLeftConfig;
     SparkMaxConfig mRightConfig;
+
+    double mArbFF = 0.0;
+    double mReferencePostition = 0.0;
 
     private final SparkClosedLoopController leftController;
     private final SparkClosedLoopController rightController;
@@ -73,7 +78,15 @@ public class ElevatorIOSparkMax implements ElevatorIO {
     }
 
     public void setReference(double position) {
-        leftController.setReference(position, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, Constants.ElevatorConstants.arbitraryFeedForward);
-        rightController.setReference(position, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, Constants.ElevatorConstants.arbitraryFeedForward);
+        mReferencePostition = position;
+        Logger.recordOutput("Sim/Commanded Position", position);
+        System.out.println(position);
+        leftController.setReference(position, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, mArbFF);
+        rightController.setReference(position, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, mArbFF);
+    }
+    public void setArbFF(double arbFF) {
+        mArbFF = arbFF;
+        rightController.setReference(mReferencePostition, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, mArbFF);
+        leftController.setReference(mReferencePostition, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, mArbFF);
     }
 }
