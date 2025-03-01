@@ -21,6 +21,11 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOSim;
+import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -32,6 +37,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final Elevator elevator;
+
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
 
@@ -53,6 +60,8 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+        elevator = 
+            new Elevator(new ElevatorIOSparkMax(1,2));
         break;
 
       case SIM:
@@ -64,6 +73,8 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+        elevator = 
+            new Elevator(new ElevatorIOSim(0));
         break;
 
       default:
@@ -75,6 +86,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        elevator = new Elevator(new ElevatorIO() {});
         break;
     }
 
@@ -116,6 +128,7 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
     // Lock to 0° when A button is held
+    /*
     controller
         .a()
         .whileTrue(
@@ -124,11 +137,12 @@ public class RobotContainer {
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
                 () -> new Rotation2d()));
-
+*/
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro to 0° when B button is pressed
+  /*
     controller
         .b()
         .onTrue(
@@ -138,10 +152,13 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
-
+*/
     controller.y().onTrue(DriveCommands.boost());
 
     controller.y().onFalse(DriveCommands.boostOff());
+
+    controller.a().onTrue(elevator.CoralHigh());
+    controller.b().onTrue(elevator.Trough());
   }
 
   /**

@@ -23,4 +23,6 @@ public interface ElevatorIO {
     public default void setReference(double position) {
 
     }
+
+    public default void setConfiguration(double arbFF) {}
 }

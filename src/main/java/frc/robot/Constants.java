@@ -58,19 +58,7 @@ public final class Constants {
 
     public static int ElevatorCurrentLimit = 50;
 
-    public static double arbitraryFeedForward = 1;
-
-    public static double MaxDriveMetersPerSecond = 4.46;
-    public static double MaxTurnRadiansPerSecond = 2 * Math.PI;
-
-    public static boolean DriveEncoderInverted = false;
-    public static boolean TurnEncoderInverted = true;
-
-    public static double TurnPIDMinInput = 0;
-    public static double TurnPIDMaxInput = 2 * Math.PI;
-
-    public static IdleMode DriveIdle = IdleMode.kBrake;
-    public static IdleMode TurnIdle = IdleMode.kBrake;
+    public static double arbitraryFeedForward = 1.32;
   }
 
   public static class OperatorConstants {
