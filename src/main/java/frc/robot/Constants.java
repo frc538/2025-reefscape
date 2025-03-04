@@ -29,4 +29,11 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+
+  public static class WristExtenderConstants {
+    public static final double coralLowMediumAngle = 45.0;
+    public static final double coralHighAngle = 20.0;
+    public static final double algaeProcessorAngle = 90.0;
+    public static final double bargeAngle = 45.0;
+  }
 }

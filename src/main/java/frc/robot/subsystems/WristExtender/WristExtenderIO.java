@@ -22,13 +22,18 @@ import org.littletonrobotics.junction.AutoLog;
 public interface WristExtenderIO {
   @AutoLog
   public static class WristExtenderIOInputs {
-    public double algaeAmount= 1;
-    public double extended = 0.0; //should be same as servoPosition
-    public double coralAmount = 0.0;
-    public double servoPosition = new Servo(0).get(); //should be same as extended
-    public boolean extendedIsTrue = false;
+    public boolean algaePresent = false;
+    public boolean coralPresent = false;
+    public double servoPosition = 0.0; //should be same as extended
+    public double scoringWheelPosition = 0.0;
   }
 
   /** Updates the set of loggable inputs. */
   public default void updateInputs(WristExtenderIOInputs inputs) {}
+
+  public default void goToAngle(double angle) {}
+
+  public default void intakeAlgae() {}
+
+  public default void intakeCoral() {}
 }
