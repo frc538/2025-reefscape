@@ -34,6 +34,9 @@ public final class Constants {
 
   public static class ClimberConstants {
     public static final int CurrentLimit = 20;
+    public static final int ClimberPositionConversionFactor = /*put real value here-->*/1;
+    public static final int ClimberVelocityConversionFactor = /*put real value here-->*/1;
+    public static final int ClimberWheelFreeSpeedMetersPerSecond = /*put real value here-->*/1;
   }
 
 }

@@ -15,6 +15,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.climb.ClimberIO;
+import frc.robot.subsystems.climb.ClimberIOSparkMax;
+import frc.robot.subsystems.climb.ClimberSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -32,6 +35,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final ClimberSubsystem climberSubsystem;
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
 
@@ -53,6 +57,11 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+
+        climberSubsystem =
+            new ClimberSubsystem(
+                new ClimberIOSparkMax(4, 5, 6)
+            );
         break;
 
       case SIM:
@@ -64,6 +73,10 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+        climberSubsystem =    
+                new ClimberSubsystem(
+                new ClimberIO() {}
+            );
         break;
 
       default:
@@ -75,6 +88,10 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        climberSubsystem =
+            new ClimberSubsystem (
+                new ClimberIO() {}
+                );    
         break;
     }
 
