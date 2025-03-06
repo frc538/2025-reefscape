@@ -9,6 +9,8 @@ public interface ElevatorIO {
         double leftAppliedOutput = 0.0;
         double leftAppliedBusVoltage = 0.0;
         double leftAppliedCurrent = 0.0;
+        double leftEncoderValue = 0.0;
+        int leftEncoderRaw = 0;
         double rightAppliedOutput = 0.0;
         double rightAppliedBusVoltage = 0.0;
         double rightAppliedCurrent = 0.0;
@@ -24,5 +26,7 @@ public interface ElevatorIO {
 
     }
 
-    public default void setConfiguration(double arbFF) {}
+    public default void setArbFF(double arbFF) {}
+
+    public default void commandMotor() {}
 }

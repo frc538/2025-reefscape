@@ -12,13 +12,13 @@ import frc.robot.Constants;
 public class Elevator extends SubsystemBase  {
     ElevatorIO io;
     ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
-    LoggedNetworkNumber troughHeight = new LoggedNetworkNumber("/SmartDashboard/Trough Height",1);
-    LoggedNetworkNumber coralLowHeight = new LoggedNetworkNumber("/SmartDashboard/Coral Low Height",2);
-    LoggedNetworkNumber coralMedHeight = new LoggedNetworkNumber("/SmartDashboard/Coral Med Height",3);
-    LoggedNetworkNumber coralHighHeight = new LoggedNetworkNumber("/SmartDashboard/Coral High Height",4);
-    LoggedNetworkNumber bargeHeight = new LoggedNetworkNumber("/SmartDashboard/Barge Height",5);
+    LoggedNetworkNumber troughHeight = new LoggedNetworkNumber("/SmartDashboard/Trough Height",0);
+    LoggedNetworkNumber coralLowHeight = new LoggedNetworkNumber("/SmartDashboard/Coral Low Height",.2);
+    LoggedNetworkNumber coralMedHeight = new LoggedNetworkNumber("/SmartDashboard/Coral Med Height",.4);
+    LoggedNetworkNumber coralHighHeight = new LoggedNetworkNumber("/SmartDashboard/Coral High Height",.6);
+    LoggedNetworkNumber bargeHeight = new LoggedNetworkNumber("/SmartDashboard/Barge Height",.8);
 
-    LoggedNetworkNumber arbFF = new LoggedNetworkNumber("/SmartDashboard/Arbitrary FF Gain",Constants.ElevatorConstants.arbitraryFeedForward);
+    LoggedNetworkNumber arbFF = new LoggedNetworkNumber("/SmartDashboard/Arbitrary FF Gain",1.32);
     double lastArbFF = 0.0;
 
     public Elevator(ElevatorIO IO) {
@@ -49,10 +49,10 @@ public class Elevator extends SubsystemBase  {
         Logger.recordOutput("Elevator/Trough Height",troughHeight.get());
 
         if (arbFF.get() != lastArbFF) {
-            io.setConfiguration(arbFF.get());
+            io.setArbFF(arbFF.get());
             lastArbFF = arbFF.get();
         }
 
-        
+        io.commandMotor();
     }
 }
