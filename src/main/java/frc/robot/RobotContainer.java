@@ -27,6 +27,7 @@ import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -45,6 +46,8 @@ public class RobotContainer {
     // Controller
     private final CommandXboxController driveController = new CommandXboxController(0);
     private final CommandXboxController mechanismController = new CommandXboxController(1);
+
+    LoggedNetworkNumber PDotGainNN = new LoggedNetworkNumber("/SmartDashboard/PDot Gain", 0.1);
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -167,10 +170,11 @@ public class RobotContainer {
 
         driveController.y().onFalse(DriveCommands.boostOff());
 
-        driveController.a().onTrue(elevator.CoralHigh());
-        driveController.b().onTrue(elevator.Trough());
+       mechanismController.rightBumper().onTrue(elevator.PositionUp());
+       mechanismController.leftBumper().onTrue(elevator.PositionDown());
 
-       // mechanismController.button(5).
+       elevator.setDefaultCommand(
+         elevator.PDotCommand(mechanismController.getLeftY()*PDotGainNN.get()));
     }
 
     /**

@@ -6,6 +6,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkRelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -25,6 +26,9 @@ import frc.robot.Constants;
 public class ElevatorIOSparkMax implements ElevatorIO {
         SparkMax mLeft;
         SparkMax mRight;
+
+        SparkRelativeEncoder mLeftEncoder;
+        SparkRelativeEncoder mRightEncoder;
 
         SparkMaxConfig mLeftConfig;
         SparkMaxConfig mRightConfig;
@@ -49,19 +53,22 @@ public class ElevatorIOSparkMax implements ElevatorIO {
 
         double mReferencePosition = 0.0;
         double mArbFF = 0.0;
-        double kS = 0.0;
+        double kS = -1.0;
         double kG = 0.0;
         double kV = 0.0;
         double kA = 0.0;
         double maxV = 0.3;
         double maxA = 0.3;
-        double kP = 0.0;
+        double kP = 0.001;
         double kI = 0.0;
         double kD = 0.0;
 
         public ElevatorIOSparkMax(int leftId, int rightId) {
                 mLeft = new SparkMax(leftId, MotorType.kBrushless);
                 mRight = new SparkMax(rightId, MotorType.kBrushless);
+
+                mLeftEncoder = (SparkRelativeEncoder) mLeft.getEncoder();
+                mRightEncoder = (SparkRelativeEncoder) mRight.getEncoder();
 
                 mRightConfig
                                 .idleMode(IdleMode.kBrake)
@@ -109,13 +116,15 @@ public class ElevatorIOSparkMax implements ElevatorIO {
                 inputs.rightBusVoltage = mRight.getBusVoltage();
                 inputs.rightCurrent = mRight.getOutputCurrent();
                 inputs.rightOutput = mRight.getAppliedOutput();
+
+                inputs.leftEncoderValue = mLeftEncoder.getPosition();
+                inputs.rightEncoderValue = mRightEncoder.getPosition();
         }
 
         public void setReference(double position) {
-                leftController.setReference(position, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0,
-                                Constants.ElevatorConstants.arbitraryFeedForward);
-                rightController.setReference(position, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0,
-                                Constants.ElevatorConstants.arbitraryFeedForward);
+                mReferencePosition = position;
+                mDesiredState = new TrapezoidProfile.State(mReferencePosition, 0);
+                Logger.recordOutput("Elevator/Commanded Position", position);
         }
 
         public void commandMotor() {
@@ -145,6 +154,8 @@ public class ElevatorIOSparkMax implements ElevatorIO {
                 mCurrentState = state_step;
                 double ffCommand = m_feedforward.calculateWithVelocities(mCurrentState.velocity, state_step.velocity);
                 leftController.setReference(mReferencePosition, ControlType.kPosition, ClosedLoopSlot.kSlot0,
+                                ffCommand);
+                rightController.setReference(mReferencePosition, ControlType.kPosition, ClosedLoopSlot.kSlot0,
                                 ffCommand);
 
                 Logger.recordOutput("Elevator/Feed Forward Command", ffCommand);
