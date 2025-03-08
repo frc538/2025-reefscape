@@ -65,7 +65,13 @@ public final class Constants {
 
     public static int ElevatorCurrentLimit = 50;
 
-    public static double arbitraryFeedForward = 1.32;
+    public static double arbitraryFeedForward = 0;
+
+    public static int leftCanId = 34;
+    public static int rightCanId = 16;
+
+    public static int elevatorUpLimitDIOChannel = 1;
+    public static int elevatorDownLimitDIOChannel = 0;
   }
 
   public static class OperatorConstants {

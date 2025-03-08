@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -68,7 +70,9 @@ public class RobotContainer {
                         new ModuleIOTalonFX(TunerConstants.FrontRight),
                         new ModuleIOTalonFX(TunerConstants.BackLeft),
                         new ModuleIOTalonFX(TunerConstants.BackRight));
-                elevator = new Elevator(new ElevatorIOSparkMax(1, 2));
+                elevator = new Elevator(new ElevatorIOSparkMax(Constants.ElevatorConstants.leftCanId,
+                        Constants.ElevatorConstants.rightCanId, Constants.ElevatorConstants.elevatorUpLimitDIOChannel,
+                        Constants.ElevatorConstants.elevatorDownLimitDIOChannel));
                 break;
 
             case SIM:
@@ -170,11 +174,14 @@ public class RobotContainer {
 
         driveController.y().onFalse(DriveCommands.boostOff());
 
-       mechanismController.rightBumper().onTrue(elevator.PositionUp());
-       mechanismController.leftBumper().onTrue(elevator.PositionDown());
+        mechanismController.rightBumper().onTrue(elevator.PositionUp());
+        mechanismController.leftBumper().onTrue(elevator.PositionDown());
 
-       elevator.setDefaultCommand(
-         elevator.PDotCommand(mechanismController.getLeftY()*PDotGainNN.get()));
+        // elevator.setDefaultCommand(
+        //         elevator.PDotCommand(MathUtil.applyDeadband(-mechanismController.getLeftY() * PDotGainNN.get(),0.1)));
+        
+        mechanismController.povUp().whileTrue(elevator.PDotCommand(0.03));
+        mechanismController.povDown().whileTrue(elevator.PDotCommand(-0.03));
     }
 
     /**

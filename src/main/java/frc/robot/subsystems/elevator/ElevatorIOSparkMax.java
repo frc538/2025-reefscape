@@ -14,13 +14,10 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
 
 public class ElevatorIOSparkMax implements ElevatorIO {
@@ -30,11 +27,14 @@ public class ElevatorIOSparkMax implements ElevatorIO {
         SparkRelativeEncoder mLeftEncoder;
         SparkRelativeEncoder mRightEncoder;
 
-        SparkMaxConfig mLeftConfig;
-        SparkMaxConfig mRightConfig;
+        SparkMaxConfig mLeftConfig = new SparkMaxConfig();
+        SparkMaxConfig mRightConfig = new SparkMaxConfig();
 
         private final SparkClosedLoopController leftController;
         private final SparkClosedLoopController rightController;
+
+        private final DigitalInput topLimit;
+        private final DigitalInput bottomLimit;
 
         Constraints profileConstraints;
         TrapezoidProfile commandProfile;
@@ -63,7 +63,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
         double kI = 0.0;
         double kD = 0.0;
 
-        public ElevatorIOSparkMax(int leftId, int rightId) {
+        public ElevatorIOSparkMax(int leftId, int rightId, int upLimitChannel, int downLimitChannel) {
                 mLeft = new SparkMax(leftId, MotorType.kBrushless);
                 mRight = new SparkMax(rightId, MotorType.kBrushless);
 
@@ -72,13 +72,14 @@ public class ElevatorIOSparkMax implements ElevatorIO {
 
                 mRightConfig
                                 .idleMode(IdleMode.kBrake)
-                                .smartCurrentLimit(Constants.ElevatorConstants.ElevatorCurrentLimit);
+                                .smartCurrentLimit(Constants.ElevatorConstants.ElevatorCurrentLimit)
+                                .inverted(false);
                 mRightConfig.encoder
                                 .positionConversionFactor(Constants.ElevatorConstants.ElevatorPositionConversionFactor)
                                 .velocityConversionFactor(Constants.ElevatorConstants.ElevatorVelocityConversionFactor);
                 mRightConfig.closedLoop
                                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                                .pid(0.04, 0, 0)
+                                .pid(0.00, 0, 0)
                                 .outputRange(-1, 1);
                 mRightConfig.closedLoop.maxMotion
                                 .allowedClosedLoopError(Constants.ElevatorConstants.allowedClosedLoopError)
@@ -87,13 +88,14 @@ public class ElevatorIOSparkMax implements ElevatorIO {
 
                 mLeftConfig
                                 .idleMode(IdleMode.kBrake)
-                                .smartCurrentLimit(Constants.ElevatorConstants.ElevatorCurrentLimit);
+                                .smartCurrentLimit(Constants.ElevatorConstants.ElevatorCurrentLimit)
+                                .inverted(true);
                 mLeftConfig.encoder
                                 .positionConversionFactor(Constants.ElevatorConstants.ElevatorPositionConversionFactor)
                                 .velocityConversionFactor(Constants.ElevatorConstants.ElevatorVelocityConversionFactor);
                 mLeftConfig.closedLoop
                                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                                .pid(0.04, 0, 0)
+                                .pid(0.0, 0, 0)
                                 .outputRange(-1, 1);
                 mLeftConfig.closedLoop.maxMotion
                                 .allowedClosedLoopError(Constants.ElevatorConstants.allowedClosedLoopError)
@@ -105,6 +107,16 @@ public class ElevatorIOSparkMax implements ElevatorIO {
 
                 leftController = mLeft.getClosedLoopController();
                 rightController = mRight.getClosedLoopController();
+
+                profileConstraints = new Constraints(maxV, maxA);
+                commandProfile = new TrapezoidProfile(profileConstraints);
+
+                m_feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
+                mCurrentState = new TrapezoidProfile.State();
+                mDesiredState = new TrapezoidProfile.State();
+
+                topLimit = new DigitalInput(upLimitChannel);
+                bottomLimit = new DigitalInput(downLimitChannel);
         }
 
         // ¯\_(ツ)_/¯\\
@@ -119,12 +131,19 @@ public class ElevatorIOSparkMax implements ElevatorIO {
 
                 inputs.leftEncoderValue = mLeftEncoder.getPosition();
                 inputs.rightEncoderValue = mRightEncoder.getPosition();
+
+                inputs.atBottom = !bottomLimit.get();
+                inputs.atTop = !topLimit.get();
         }
 
         public void setReference(double position) {
                 mReferencePosition = position;
                 mDesiredState = new TrapezoidProfile.State(mReferencePosition, 0);
                 Logger.recordOutput("Elevator/Commanded Position", position);
+        }
+
+        public void setArbFF(double arbFF) {
+                kG = arbFF;
         }
 
         public void commandMotor() {
@@ -147,6 +166,10 @@ public class ElevatorIOSparkMax implements ElevatorIO {
                         mLeftConfig.closedLoop.pid(kP, kI, kD);
                         mLeft.configure(mLeftConfig, ResetMode.kNoResetSafeParameters,
                                         PersistMode.kNoPersistParameters);
+
+                        mRightConfig.closedLoop.pid(kP, kI, kD);
+                        mRight.configure(mRightConfig, ResetMode.kNoResetSafeParameters,
+                                        PersistMode.kNoPersistParameters);
                 }
 
                 /* Do the command processing */
@@ -159,7 +182,14 @@ public class ElevatorIOSparkMax implements ElevatorIO {
                                 ffCommand);
 
                 Logger.recordOutput("Elevator/Feed Forward Command", ffCommand);
+                Logger.recordOutput("Elevator/Motor Position Command", mReferencePosition);
                 Logger.recordOutput("Elevator/Profile/Position", state_step.position);
                 Logger.recordOutput("Elevator/Profile/Velocity", state_step.velocity);
+        }
+
+        @Override
+        public void resetEncoders() {
+                mLeftEncoder.setPosition(0);
+                mRightEncoder.setPosition(0);
         }
 }
