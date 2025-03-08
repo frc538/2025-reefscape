@@ -11,6 +11,10 @@ import frc.robot.Constants;
 
 public class Elevator extends SubsystemBase  {
     ElevatorIO io;
+    
+    private int positionTarget = 0;
+    private int positionMax = 6;
+
     ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
     LoggedNetworkNumber troughHeight = new LoggedNetworkNumber("/SmartDashboard/Trough Height",0);
     LoggedNetworkNumber coralLowHeight = new LoggedNetworkNumber("/SmartDashboard/Coral Low Height",.2);
@@ -23,6 +27,26 @@ public class Elevator extends SubsystemBase  {
 
     public Elevator(ElevatorIO IO) {
         io = IO;
+    }
+    public Command PositionUp() {
+        if (positionTarget < positionMax) {
+            positionTarget = positionTarget + 1;
+        }
+    }
+    public Command PositionDown() {
+        if (positionTarget < positionMax) {
+            positionTarget = positionTarget + 1;
+        }
+    }
+    private Command GoToPosition() {
+        switch(positionTarget) {
+            case 0: return Bottom();
+            case 1: return Trough();
+            case 2: return CoralLow();
+            case 3: return CoralMed();
+            case 4: return CoralHigh();
+            case 5: return Barge();
+        }
     }
     public Command Bottom() {
         return runOnce(() -> io.setReference(0));
