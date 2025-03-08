@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Intake.IntakeIOImplementation;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.climb.ClimberIO;
 import frc.robot.subsystems.climb.ClimberIOSparkMax;
 import frc.robot.subsystems.climb.ClimberSubsystem;
@@ -144,7 +146,10 @@ public class RobotContainer {
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
+    // coral intake trigger
+    controller.rightTrigger().onTrue(IntakeIOImplementation.coralIntake());
+    //Algae intake trigger
+    controller.leftTrigger().onTrue(IntakeIOImplementation.AlgaeIntake());
     // Reset gyro to 0° when B button is pressed
     controller
         .b()
