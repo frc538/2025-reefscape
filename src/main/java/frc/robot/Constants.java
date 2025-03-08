@@ -37,6 +37,7 @@ public final class Constants {
     public static final int ClimberPositionConversionFactor = /*put real value here-->*/1;
     public static final int ClimberVelocityConversionFactor = /*put real value here-->*/1;
     public static final int ClimberWheelFreeSpeedMetersPerSecond = /*put real value here-->*/1;
+    public static final int ClimberMotorCANId = 13;
   }
 
 }

@@ -13,10 +13,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.ClimberConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Intake.IntakeIOImplementation;
-import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.climb.ClimberIO;
 import frc.robot.subsystems.climb.ClimberIOSparkMax;
 import frc.robot.subsystems.climb.ClimberSubsystem;
@@ -62,7 +62,7 @@ public class RobotContainer {
 
         climberSubsystem =
             new ClimberSubsystem(
-                new ClimberIOSparkMax(4, 5, 6)
+                new ClimberIOSparkMax(Constants.ClimberConstants.ClimberMotorCANId, 5, 6)
             );
         break;
         
@@ -153,8 +153,9 @@ public class RobotContainer {
     // controller.leftTrigger().onTrue(IntakeIOImplementation.AlgaeIntake());
     // Reset gyro to 0° when B button is pressed
     
-    controller.rightBumper().onTrue((IntakeIOImplementation.AlgaeIntake()));
-    controller.leftBumper().onTrue((IntakeIOImplementation.coralIntake()));
+    controller.rightBumper().whileTrue((climberSubsystem.ClimberDown()));
+    controller.leftBumper().whileTrue((climberSubsystem.ClimberUp()));
+    climberSubsystem.setDefaultCommand(climberSubsystem.Stop());
     IntakeIOImplementation.speed = controller.getRightY();
     
     controller

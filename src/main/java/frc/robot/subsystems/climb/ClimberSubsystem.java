@@ -15,12 +15,14 @@ public class ClimberSubsystem extends SubsystemBase{
 
     }
     public Command ClimberUp(){
-        return Commands.run(()->io.setOutput(1));
+        return Commands.run(()->io.setOutput(-0.1),this);
     }
     public Command ClimberDown(){
-        return Commands.run(()->io.setOutput(-1));
+        return Commands.run(()->io.setOutput(0.1),this);
     }
-    
+    public Command Stop(){
+        return Commands.runOnce(()->io.setOutput(0),this);
+    }
 
     @Override
     public void periodic(){
