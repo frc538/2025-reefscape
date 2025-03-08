@@ -28,34 +28,20 @@ public class WristExtenderIOServo implements WristExtenderIO {
   
   public static Servo axonMaxServo; //0 is a placeholder
   private static Servo axonMaxScoringWheel;
+  public static DigitalInput SwitchChannelAlgae; //0 is a placeholder
+  private static DigitalInput SwitchChannelCoral;
 
-  private final DigitalInput SwitchChannel;
-
-  public WristExtenderIOServo(int WristExtenderServoChannel, int ScoringWheelServoChannel, int SwitchDIOChannel) {
+  public WristExtenderIOServo(int WristExtenderServoChannel, int ScoringWheelServoChannel, int SwitchDIOChannelAlgae, int SwitchDIOChannelCoral) {
     axonMaxServo = new Servo(WristExtenderServoChannel);
     axonMaxScoringWheel = new Servo(ScoringWheelServoChannel);
-    SwitchChannel = new DigitalInput(SwitchDIOChannel);
-
-    // if (extendedIsTrue) { //I couldn't get the onTrue function to work
-    //   extended = 0; //0 is a placeholder
-    //   axonMaxServo.set(extended);
-    // } else {
-    //   extended = 1; //1 is a placeholder
-    //   axonMaxServo.set(extended);
-    // }
-    // if (controller.back().getAsBoolean() && algaePresent == true) {
-    //   //shootAlgae();
-    //   algaePresent = false;
-    // }
-    // if (controller.rightBumper().getAsBoolean() && ) {
-    //   //dropCoral();
-    //   coralAmount -= 1;
-    // }
+    SwitchChannelAlgae = new DigitalInput(SwitchDIOChannelAlgae);
+    SwitchChannelCoral = new DigitalInput(SwitchDIOChannelCoral);
   }
 
   @Override
   public void updateInputs(WristExtenderIOInputs inputs) {
-    inputs.algaePresent = SwitchChannel.get();
+    inputs.algaePresent = SwitchChannelAlgae.get();
+    inputs.coralPresent = SwitchChannelCoral.get();
   }
   
   public void goToAngle(double angle) {

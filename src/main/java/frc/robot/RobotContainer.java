@@ -57,7 +57,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
-        wristExtender = new WristExtender(new WristExtenderIOServo(1, 2, 3));
+        wristExtender = new WristExtender(new WristExtenderIOServo(3, 2, 3, 4));
         break;
 
       case SIM:
@@ -115,6 +115,12 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    //Start button will intake algae/shoot coral
+    controller.start().onTrue(wristExtender.intakeAlgaeShootCoral());
+    
+    //Back button will intake coral/shoot algae
+    controller.back().onTrue(wristExtender.intakeCoralShootAlgae());
+
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
