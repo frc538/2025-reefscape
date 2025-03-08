@@ -65,8 +65,8 @@ public class RobotContainer {
                 new ClimberIOSparkMax(4, 5, 6)
             );
         break;
-
-      case SIM:
+        
+        case SIM:
         // Sim robot, instantiate physics sim IO implementations
         drive =
             new Drive(
@@ -152,6 +152,11 @@ public class RobotContainer {
     // //Algae intake trigger
     // controller.leftTrigger().onTrue(IntakeIOImplementation.AlgaeIntake());
     // Reset gyro to 0° when B button is pressed
+    
+    controller.rightBumper().onTrue((IntakeIOImplementation.AlgaeIntake()));
+    controller.leftBumper().onTrue((IntakeIOImplementation.coralIntake()));
+    IntakeIOImplementation.speed = controller.getRightY();
+    
     controller
         .b()
         .onTrue(

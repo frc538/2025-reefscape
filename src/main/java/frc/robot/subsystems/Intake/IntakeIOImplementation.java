@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class IntakeIOImplementation {
+        public static double speed;
         private static Servo IntakeServo;
         private final DigitalInput LimitSwitchCoral;
         private final DigitalInput LimitSwitchAlgae;
@@ -18,11 +19,11 @@ public class IntakeIOImplementation {
         LimitSwitchCoral = new DigitalInput(dioCoralDetected);
    } 
    public static Command coralIntake(){
-        IntakeServo.set(0.5);
+        IntakeServo.set(speed);
                 return null;
    }
    public static Command AlgaeIntake(){
-        IntakeServo.set(-0.5);
+        IntakeServo.set(speed);
                 return null;
 }
 }
