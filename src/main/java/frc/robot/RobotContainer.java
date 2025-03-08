@@ -146,10 +146,11 @@ public class RobotContainer {
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    // coral intake trigger
-    controller.rightTrigger().onTrue(IntakeIOImplementation.coralIntake());
-    //Algae intake trigger
-    controller.leftTrigger().onTrue(IntakeIOImplementation.AlgaeIntake());
+    //suggested inputs/buttons for intake controlls.
+    // // coral intake trigger
+    // controller.rightTrigger().onTrue(IntakeIOImplementation.coralIntake());
+    // //Algae intake trigger
+    // controller.leftTrigger().onTrue(IntakeIOImplementation.AlgaeIntake());
     // Reset gyro to 0° when B button is pressed
     controller
         .b()
