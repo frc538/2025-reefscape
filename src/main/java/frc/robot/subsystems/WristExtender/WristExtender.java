@@ -41,24 +41,24 @@ public class WristExtender extends SubsystemBase {
    * @return a command
    */
 
-  public Command intakeAlgae() {
+  public Command intakeAlgaeShootCoral() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return runOnce(
         () -> {
-          io.intakeAlgae();
+          io.intakeAlgaeShootCoral();
         });
   }
 
-  public Command intakeCoral() {
+  public Command intakeCoralShootAlgae() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return runOnce(
         () -> {
-          io.intakeCoral();
+          io.intakeCoralShootAlgae();
         });
   }
-  
+
   public Command goToCoralReefLowMedium() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
@@ -68,6 +68,15 @@ public class WristExtender extends SubsystemBase {
         });
   }
 
+  
+  public Command goToCoralReefHigh() {
+    // Inline construction of command goes here.
+    // Subsystem::RunOnce implicitly requires `this` subsystem.
+    return runOnce(
+        () -> {
+          io.goToAngle(Constants.WristExtenderConstants.coralHighAngle);
+        });
+  }
   /**
    * An example method querying a boolean state of the subsystem (for example, a digital sensor).
    *

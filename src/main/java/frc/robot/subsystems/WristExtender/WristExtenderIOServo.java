@@ -63,11 +63,11 @@ public class WristExtenderIOServo implements WristExtenderIO {
     axonMaxServo.setAngle(servoAngle);
   }
 
-  public void intakeAlgae() {
+  public void intakeAlgaeShootCoral() {
     axonMaxScoringWheel.setSpeed(1.0);
   }
   
-  public void intakeCoral() {
+  public void intakeCoralShootAlgae() {
     axonMaxScoringWheel.setSpeed(-1.0);
   }
 }

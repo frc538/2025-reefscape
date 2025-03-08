@@ -33,7 +33,7 @@ public interface WristExtenderIO {
 
   public default void goToAngle(double angle) {}
 
-  public default void intakeAlgae() {}
+  public default void intakeAlgaeShootCoral() {}
 
-  public default void intakeCoral() {}
+  public default void intakeCoralShootAlgae() {}
 }
