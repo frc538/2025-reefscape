@@ -13,7 +13,13 @@ public class Elevator extends SubsystemBase  {
     ElevatorIO io;
     
     private int positionTarget = 0;
-    private int positionMax = 6;
+    private int positionMax = 5;
+    private int positionMin = 0;
+
+    private double buttonPositionCommand = 0.0;
+    private double PDotPositionCommand = 0.0;
+    private double PDotRate = 0.0;
+    private boolean UseButtonState = true;
 
     ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
     LoggedNetworkNumber troughHeight = new LoggedNetworkNumber("/SmartDashboard/Trough Height",0);
@@ -32,11 +38,13 @@ public class Elevator extends SubsystemBase  {
         if (positionTarget < positionMax) {
             positionTarget = positionTarget + 1;
         }
+        return GoToPosition();
     }
     public Command PositionDown() {
-        if (positionTarget < positionMax) {
-            positionTarget = positionTarget + 1;
+        if (positionTarget > positionMin) {
+            positionTarget = positionTarget - 1;
         }
+        return GoToPosition();
     }
     private Command GoToPosition() {
         switch(positionTarget) {
@@ -46,25 +54,42 @@ public class Elevator extends SubsystemBase  {
             case 3: return CoralMed();
             case 4: return CoralHigh();
             case 5: return Barge();
+
+            default: return runOnce(() -> positionTarget = 0);
         }
     }
     public Command Bottom() {
-        return runOnce(() -> io.setReference(0));
+        return runOnce(() -> PositionCommand(0));
     }
     public Command Trough() {
-        return runOnce(() -> io.setReference(troughHeight.get()));
+        return runOnce(() -> PositionCommand(troughHeight.get()));
     }
     public Command CoralLow() {
-        return runOnce(() -> io.setReference(coralLowHeight.get()));
+        return runOnce(() -> PositionCommand(coralLowHeight.get()));
     }
     public Command CoralMed() {
-        return runOnce(() -> io.setReference(coralMedHeight.get()));
+        return runOnce(() -> PositionCommand(coralMedHeight.get()));
     }
     public Command CoralHigh() {
-        return runOnce(() -> io.setReference(coralHighHeight.get()));
+        return runOnce(() -> PositionCommand(coralHighHeight.get()));
     }
     public Command Barge() {
-        return runOnce(() -> io.setReference(bargeHeight.get()));
+        return runOnce(() -> PositionCommand(bargeHeight.get()));
+    }
+    private void PositionCommand (double position) {
+        io.setReference(position);
+        buttonPositionCommand = position;
+        UseButtonState = true;
+        PDotPositionCommand = buttonPositionCommand;
+    }
+    public Command PDotCommand(double rate) {
+        return runOnce(() -> doRate(rate));
+    }
+    private void doRate (double rate) {
+        PDotRate = rate;
+        UseButtonState = false;
+        PDotPositionCommand = PDotPositionCommand + PDotRate;
+        io.setReference(PDotPositionCommand);
     }
     @Override
     public void periodic() {

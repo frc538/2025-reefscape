@@ -131,13 +131,12 @@ public class ElevatorIOSim implements ElevatorIO {
         // ¯\_(ツ)_/¯\\
 
         public void updateInputs(ElevatorIOInputs inputs) {
-                inputs.leftAppliedBusVoltage = mSimLeft.getAppliedOutput() * RoboRioSim.getVInVoltage();
-                inputs.leftAppliedCurrent = mSimLeft.getMotorCurrent();
-                inputs.leftAppliedOutput = mSimLeft.getAppliedOutput();
-                inputs.height = m_elevatorSim.getPositionMeters();
+                inputs.leftBusVoltage = mSimLeft.getAppliedOutput() * RoboRioSim.getVInVoltage();
+                inputs.leftCurrent = mSimLeft.getMotorCurrent();
+                inputs.leftOutput = mSimLeft.getAppliedOutput();
+                //inputs.height = m_elevatorSim.getPositionMeters();
 
                 inputs.leftEncoderValue = mLeftEncoder.getPosition();
-                inputs.leftEncoderRaw = (int)(mLeftEncoder.getPosition() / Constants.ElevatorConstants.ElevatorPositionConversionFactor);
         }
 
         public void setReference(double position) {

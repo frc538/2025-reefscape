@@ -6,14 +6,14 @@ public interface ElevatorIO {
 
     @AutoLog
     public static class ElevatorIOInputs {
-        double leftAppliedOutput = 0.0;
-        double leftAppliedBusVoltage = 0.0;
-        double leftAppliedCurrent = 0.0;
+        double leftOutput = 0.0;
+        double leftBusVoltage = 0.0;
+        double leftCurrent = 0.0;
         double leftEncoderValue = 0.0;
-        int leftEncoderRaw = 0;
-        double rightAppliedOutput = 0.0;
-        double rightAppliedBusVoltage = 0.0;
-        double rightAppliedCurrent = 0.0;
+        double rightEncoderValue = 0.0;
+        double rightOutput = 0.0;
+        double rightBusVoltage = 0.0;
+        double rightCurrent = 0.0;
         double height = 0;
     }
 
