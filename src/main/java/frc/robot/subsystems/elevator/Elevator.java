@@ -35,36 +35,49 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command PositionUp() {
+        return runOnce(() -> doPositionUp());
+    }
+    private void doPositionUp() {
+        System.out.println("PositionUp");
         if (positionTarget < positionMax) {
             positionTarget = positionTarget + 1;
         }
-        return GoToPosition();
+        goToPosition();
     }
 
     public Command PositionDown() {
+        return runOnce(() -> doPositionDown());
+    }
+    private void doPositionDown() {
+        System.out.println("PositionDown");
         if (positionTarget > positionMin) {
             positionTarget = positionTarget - 1;
         }
-        return GoToPosition();
+        goToPosition();
     }
 
-    private Command GoToPosition() {
+    private void goToPosition() {
         switch (positionTarget) {
             case 0:
-                return Bottom();
+                PositionCommand(0);
+                break;
             case 1:
-                return Trough();
+                PositionCommand(troughHeight.get());
+                break;
             case 2:
-                return CoralLow();
+                PositionCommand(coralLowHeight.get());
+                break;
             case 3:
-                return CoralMed();
+                PositionCommand(coralMedHeight.get());
+                break;
             case 4:
-                return CoralHigh();
+                PositionCommand(coralHighHeight.get());
+                break;
             case 5:
-                return Barge();
-
+                PositionCommand(bargeHeight.get());
+                break;
             default:
-                return runOnce(() -> positionTarget = 0);
+                break; 
         }
     }
 
@@ -96,7 +109,6 @@ public class Elevator extends SubsystemBase {
         io.setReference(position);
         buttonPositionCommand = position;
         UseButtonState = true;
-        PDotPositionCommand = buttonPositionCommand;
     }
 
     public Command PDotCommand(double rate) {
@@ -137,5 +149,6 @@ public class Elevator extends SubsystemBase {
 
         Logger.recordOutput("Elevator/Button Command", buttonPositionCommand);
         Logger.recordOutput("Elevator/PDot Command", PDotPositionCommand);
+        Logger.recordOutput("Elevator/Position Target", positionTarget);
     }
 }
