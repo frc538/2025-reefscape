@@ -77,6 +77,25 @@ public class WristExtender extends SubsystemBase {
           io.goToAngle(Constants.WristExtenderConstants.coralHighAngle);
         });
   }
+  
+  public Command goToAlgaeProcessor() {
+    // Inline construction of command goes here.
+    // Subsystem::RunOnce implicitly requires `this` subsystem.
+    return runOnce(
+        () -> {
+          io.goToAngle(Constants.WristExtenderConstants.algaeProcessorAngle);
+        });
+  }
+
+  
+  public Command goToBarge() {
+    // Inline construction of command goes here.
+    // Subsystem::RunOnce implicitly requires `this` subsystem.
+    return runOnce(
+        () -> {
+          io.goToAngle(Constants.WristExtenderConstants.bargeAngle);
+        });
+  }
   /**
    * An example method querying a boolean state of the subsystem (for example, a digital sensor).
    *
