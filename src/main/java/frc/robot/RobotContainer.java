@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.revrobotics.servohub.ServoHub;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -18,6 +19,10 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.WristExtender.WristExtender;
 import frc.robot.subsystems.WristExtender.WristExtenderIO;
 import frc.robot.subsystems.WristExtender.WristExtenderIOServo;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.climb.ClimberIO;
+import frc.robot.subsystems.climb.ClimberIOSparkMax;
+import frc.robot.subsystems.climb.ClimberSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -36,8 +41,14 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final WristExtender wristExtender;
+  private final ClimberSubsystem climberSubsystem;
+  private final IntakeSubsystem intakeSubsystem;
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController driverTwoController = new CommandXboxController(1);
+
+  // Servo Hub
+  private final ServoHub servoHub = new ServoHub(3);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -58,6 +69,12 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
         wristExtender = new WristExtender(new WristExtenderIOServo(3, 2, 3, 4));
+
+        climberSubsystem =
+            new ClimberSubsystem(
+                new ClimberIOSparkMax(Constants.ClimberConstants.ClimberMotorCANId, 5, 6));
+
+        intakeSubsystem = new IntakeSubsystem(servoHub);
         break;
 
       case SIM:
@@ -70,6 +87,8 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
         wristExtender = new WristExtender(new WristExtenderIO(){});
+        climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
+        intakeSubsystem = new IntakeSubsystem(servoHub);
         break;
 
       default:
@@ -82,6 +101,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         wristExtender = new WristExtender(new WristExtenderIO(){});
+        climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
+        intakeSubsystem = new IntakeSubsystem(servoHub);
         break;
     }
 
@@ -140,8 +161,19 @@ public class RobotContainer {
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
+    // suggested inputs/buttons for intake controlls.
+    // // coral intake trigger
+    // controller.rightTrigger().onTrue(IntakeIOImplementation.coralIntake());
+    // //Algae intake trigger
+    // controller.leftTrigger().onTrue(IntakeIOImplementation.AlgaeIntake());
     // Reset gyro to 0° when B button is pressed
+
+    controller.rightBumper().whileTrue((climberSubsystem.ClimberDown()));
+    controller.leftBumper().whileTrue((climberSubsystem.ClimberUp()));
+
+    driverTwoController.axisLessThan(1, -0.5).onTrue(intakeSubsystem.feedGregory());
+    driverTwoController.axisGreaterThan(1, 0.5).onTrue(intakeSubsystem.receiveCoral());
+
     controller
         .b()
         .onTrue(
