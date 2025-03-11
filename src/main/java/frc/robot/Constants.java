@@ -29,4 +29,18 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+
+  public static class ClimberConstants {
+    public static final int CurrentLimit = 20;
+    public static final int ClimberPositionConversionFactor = /*put real value here-->*/ 1;
+    public static final int ClimberVelocityConversionFactor = /*put real value here-->*/ 1;
+    public static final int ClimberWheelFreeSpeedMetersPerSecond = /*put real value here-->*/ 1;
+    public static final int ClimberMotorCANId = 13;
+    public static final int IntakeServoDIOID = 2;
+  }
+
+  public static class IntakeConstants {
+    public static final int InPosition = 819;
+    public static final int OutPosition = 1024;
+  }
 }
