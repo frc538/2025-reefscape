@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.revrobotics.servohub.ServoHub;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -13,10 +14,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants.ClimberConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Intake.IntakeIOImplementation;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.climb.ClimberIO;
 import frc.robot.subsystems.climb.ClimberIOSparkMax;
 import frc.robot.subsystems.climb.ClimberSubsystem;
@@ -38,8 +38,13 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final ClimberSubsystem climberSubsystem;
+  private final IntakeSubsystem intakeSubsystem;
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController driverTwoController = new CommandXboxController(1);
+
+  // Servo Hub
+  private final ServoHub servoHub = new ServoHub(3);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -62,11 +67,12 @@ public class RobotContainer {
 
         climberSubsystem =
             new ClimberSubsystem(
-                new ClimberIOSparkMax(Constants.ClimberConstants.ClimberMotorCANId, 5, 6)
-            );
+                new ClimberIOSparkMax(Constants.ClimberConstants.ClimberMotorCANId, 5, 6));
+
+        intakeSubsystem = new IntakeSubsystem(servoHub);
         break;
-        
-        case SIM:
+
+      case SIM:
         // Sim robot, instantiate physics sim IO implementations
         drive =
             new Drive(
@@ -75,10 +81,8 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
-        climberSubsystem =    
-                new ClimberSubsystem(
-                new ClimberIO() {}
-            );
+        climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
+        intakeSubsystem = new IntakeSubsystem(servoHub);
         break;
 
       default:
@@ -90,10 +94,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        climberSubsystem =
-            new ClimberSubsystem (
-                new ClimberIO() {}
-                );    
+        climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
+        intakeSubsystem = new IntakeSubsystem(servoHub);
         break;
     }
 
@@ -146,18 +148,20 @@ public class RobotContainer {
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    //suggested inputs/buttons for intake controlls.
+    // suggested inputs/buttons for intake controlls.
     // // coral intake trigger
     // controller.rightTrigger().onTrue(IntakeIOImplementation.coralIntake());
     // //Algae intake trigger
     // controller.leftTrigger().onTrue(IntakeIOImplementation.AlgaeIntake());
     // Reset gyro to 0° when B button is pressed
-    
+
     controller.rightBumper().whileTrue((climberSubsystem.ClimberDown()));
     controller.leftBumper().whileTrue((climberSubsystem.ClimberUp()));
     climberSubsystem.setDefaultCommand(climberSubsystem.Stop());
-    IntakeIOImplementation.speed = controller.getRightY();
-    
+
+    driverTwoController.axisLessThan(1, -0.5).onTrue(intakeSubsystem.feedGregory());
+    driverTwoController.axisGreaterThan(1, 0.5).onTrue(intakeSubsystem.receiveCoral());
+
     controller
         .b()
         .onTrue(
