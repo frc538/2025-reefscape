@@ -1,32 +1,28 @@
 package frc.robot.subsystems.climb;
 
-
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+public class ClimberSubsystem extends SubsystemBase {
+  private final ClimberIO io;
+  private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
 
-public class ClimberSubsystem extends SubsystemBase{
-    private ClimberIO io;
-    private ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
-    public ClimberSubsystem(ClimberIO IO){
-        io = IO;
+  public ClimberSubsystem(ClimberIO IO) {
+    io = IO;
+  }
 
-    }
-    public Command ClimberUp(){
-        return Commands.run(()->io.setOutput(-0.1),this);
-    }
-    public Command ClimberDown(){
-        return Commands.run(()->io.setOutput(0.1),this);
-    }
-    public Command Stop(){
-        return Commands.runOnce(()->io.setOutput(0),this);
-    }
+  public Command ClimberUp() {
+    return runEnd(() -> io.setOutput(-0.5), () -> io.setOutput(0.0));
+  }
 
-    @Override
-    public void periodic(){
-        io.updateInputs(inputs);
-        Logger.processInputs("climber subsystem", inputs);
-    }
+  public Command ClimberDown() {
+    return runEnd(() -> io.setOutput(0.5), () -> io.setOutput(0.0));
+  }
+
+  @Override
+  public void periodic() {
+    io.updateInputs(inputs);
+    Logger.processInputs("climber subsystem", inputs);
+  }
 }

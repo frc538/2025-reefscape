@@ -157,7 +157,6 @@ public class RobotContainer {
 
     controller.rightBumper().whileTrue((climberSubsystem.ClimberDown()));
     controller.leftBumper().whileTrue((climberSubsystem.ClimberUp()));
-    climberSubsystem.setDefaultCommand(climberSubsystem.Stop());
 
     driverTwoController.axisLessThan(1, -0.5).onTrue(intakeSubsystem.feedGregory());
     driverTwoController.axisGreaterThan(1, 0.5).onTrue(intakeSubsystem.receiveCoral());
