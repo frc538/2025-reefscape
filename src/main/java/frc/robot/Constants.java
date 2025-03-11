@@ -31,10 +31,10 @@ public final class Constants {
   }
 
   public static class WristExtenderConstants {
-    public static final double coralLowMediumAngle = 45.0;
-    public static final double coralHighAngle = 20.0;
-    public static final double algaeProcessorAngle = 90.0;
-    public static final double bargeAngle = 45.0;
+    public static final int coralLowMediumPulseWidth = 45;
+    public static final int coralHighPulseWidth = 20;
+    public static final int algaeProcessorPulseWidth = 90;
+    public static final int bargePulseWidth = 45;
   }
 
   public static class ClimberConstants {

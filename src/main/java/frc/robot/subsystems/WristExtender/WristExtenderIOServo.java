@@ -15,8 +15,10 @@
 
 package frc.robot.subsystems.WristExtender;
 
+import com.revrobotics.servohub.ServoChannel;
+import com.revrobotics.servohub.ServoChannel.ChannelId;
+import com.revrobotics.servohub.ServoHub;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Servo;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
@@ -26,18 +28,26 @@ import edu.wpi.first.wpilibj.Servo;
  */
 public class WristExtenderIOServo implements WristExtenderIO {
 
-  public static Servo axonMaxServo; // 0 is a placeholder
-  private static Servo axonMaxScoringWheel;
-  public static DigitalInput SwitchChannelAlgae; // 0 is a placeholder
-  private static DigitalInput SwitchChannelCoral;
+  private final ServoChannel axonMaxServo; // 0 is a placeholder
+  private final ServoChannel axonMaxScoringWheel;
+  private final DigitalInput SwitchChannelAlgae; // 0 is a placeholder
+  private final DigitalInput SwitchChannelCoral;
 
   public WristExtenderIOServo(
-      int WristExtenderServoChannel,
-      int ScoringWheelServoChannel,
+      ServoHub hub,
+      ChannelId WristExtenderServoChannel,
+      ChannelId ScoringWheelServoChannel,
       int SwitchDIOChannelAlgae,
       int SwitchDIOChannelCoral) {
-    axonMaxServo = new Servo(WristExtenderServoChannel);
-    axonMaxScoringWheel = new Servo(ScoringWheelServoChannel);
+    axonMaxServo = hub.getServoChannel(WristExtenderServoChannel);
+    axonMaxScoringWheel = hub.getServoChannel(ScoringWheelServoChannel);
+
+    axonMaxServo.setPowered(true);
+    axonMaxScoringWheel.setPowered(true);
+
+    axonMaxServo.setPulseWidth(500);
+    axonMaxServo.setEnabled(true);
+
     SwitchChannelAlgae = new DigitalInput(SwitchDIOChannelAlgae);
     SwitchChannelCoral = new DigitalInput(SwitchDIOChannelCoral);
   }
@@ -48,16 +58,21 @@ public class WristExtenderIOServo implements WristExtenderIO {
     inputs.coralPresent = SwitchChannelCoral.get();
   }
 
-  public void goToAngle(double angle) {
-    double servoAngle = angle * 0.5 / 90;
-    axonMaxServo.setAngle(servoAngle);
+  public void goToPosition(int pulseWidth) {
+    axonMaxServo.setPulseWidth(pulseWidth);
   }
 
   public void intakeAlgaeShootCoral() {
-    axonMaxScoringWheel.setSpeed(1.0);
+    axonMaxScoringWheel.setPulseWidth(2500);
+    axonMaxScoringWheel.setEnabled(true);
   }
 
   public void intakeCoralShootAlgae() {
-    axonMaxScoringWheel.setSpeed(-1.0);
+    axonMaxScoringWheel.setPulseWidth(500);
+    axonMaxScoringWheel.setEnabled(true);
+  }
+
+  public void stopIntake() {
+    axonMaxScoringWheel.setEnabled(false);
   }
 }

@@ -29,7 +29,7 @@ public interface WristExtenderIO {
   /** Updates the set of loggable inputs. */
   public default void updateInputs(WristExtenderIOInputs inputs) {}
 
-  public default void goToAngle(double angle) {}
+  public default void goToPosition(double angle) {}
 
   public default void intakeAlgaeShootCoral() {}
 

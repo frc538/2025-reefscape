@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.revrobotics.servohub.ServoChannel.ChannelId;
 import com.revrobotics.servohub.ServoHub;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -68,7 +69,10 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
-        wristExtender = new WristExtender(new WristExtenderIOServo(3, 2, 3, 4));
+        wristExtender =
+            new WristExtender(
+                new WristExtenderIOServo(
+                    servoHub, ChannelId.kChannelId3, ChannelId.kChannelId2, 3, 4));
 
         climberSubsystem =
             new ClimberSubsystem(

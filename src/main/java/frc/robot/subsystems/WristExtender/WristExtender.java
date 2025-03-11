@@ -55,7 +55,7 @@ public class WristExtender extends SubsystemBase {
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return runOnce(
         () -> {
-          io.goToAngle(Constants.WristExtenderConstants.coralLowMediumAngle);
+          io.goToPosition(Constants.WristExtenderConstants.coralLowMediumPulseWidth);
         });
   }
 
@@ -64,7 +64,7 @@ public class WristExtender extends SubsystemBase {
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return runOnce(
         () -> {
-          io.goToAngle(Constants.WristExtenderConstants.coralHighAngle);
+          io.goToPosition(Constants.WristExtenderConstants.coralHighPulseWidth);
         });
   }
 
@@ -73,7 +73,7 @@ public class WristExtender extends SubsystemBase {
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return runOnce(
         () -> {
-          io.goToAngle(Constants.WristExtenderConstants.algaeProcessorAngle);
+          io.goToPosition(Constants.WristExtenderConstants.algaeProcessorPulseWidth);
         });
   }
 
@@ -82,7 +82,7 @@ public class WristExtender extends SubsystemBase {
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return runOnce(
         () -> {
-          io.goToAngle(Constants.WristExtenderConstants.bargeAngle);
+          io.goToPosition(Constants.WristExtenderConstants.bargePulseWidth);
         });
   }
 
