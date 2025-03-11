@@ -15,8 +15,6 @@
 
 package frc.robot.subsystems.WristExtender;
 
-import edu.wpi.first.wpilibj.Servo;
-
 import org.littletonrobotics.junction.AutoLog;
 
 public interface WristExtenderIO {
@@ -24,7 +22,7 @@ public interface WristExtenderIO {
   public static class WristExtenderIOInputs {
     public boolean algaePresent = false;
     public boolean coralPresent = false;
-    public double servoPosition = 0.0; //should be same as extended
+    public double servoPosition = 0.0; // should be same as extended
     public double scoringWheelPosition = 0.0;
   }
 

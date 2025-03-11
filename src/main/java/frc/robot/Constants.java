@@ -36,6 +36,7 @@ public final class Constants {
     public static final double algaeProcessorAngle = 90.0;
     public static final double bargeAngle = 45.0;
   }
+
   public static class ClimberConstants {
     public static final int CurrentLimit = 20;
     public static final int ClimberPositionConversionFactor = /*put real value here-->*/ 1;

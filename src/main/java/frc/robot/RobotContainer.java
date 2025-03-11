@@ -16,10 +16,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.WristExtender.WristExtender;
 import frc.robot.subsystems.WristExtender.WristExtenderIO;
 import frc.robot.subsystems.WristExtender.WristExtenderIOServo;
-import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.climb.ClimberIO;
 import frc.robot.subsystems.climb.ClimberIOSparkMax;
 import frc.robot.subsystems.climb.ClimberSubsystem;
@@ -86,7 +86,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
-        wristExtender = new WristExtender(new WristExtenderIO(){});
+        wristExtender = new WristExtender(new WristExtenderIO() {});
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
         intakeSubsystem = new IntakeSubsystem(servoHub);
         break;
@@ -100,7 +100,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        wristExtender = new WristExtender(new WristExtenderIO(){});
+        wristExtender = new WristExtender(new WristExtenderIO() {});
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
         intakeSubsystem = new IntakeSubsystem(servoHub);
         break;
@@ -136,10 +136,10 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    //Start button will intake algae/shoot coral
+    // Start button will intake algae/shoot coral
     controller.start().onTrue(wristExtender.intakeAlgaeShootCoral());
-    
-    //Back button will intake coral/shoot algae
+
+    // Back button will intake coral/shoot algae
     controller.back().onTrue(wristExtender.intakeCoralShootAlgae());
 
     // Default command, normal field-relative drive

@@ -25,13 +25,17 @@ import edu.wpi.first.wpilibj.Servo;
  * <p>Device configuration and other behaviors not exposed by TunerConstants can be customized here.
  */
 public class WristExtenderIOServo implements WristExtenderIO {
-  
-  public static Servo axonMaxServo; //0 is a placeholder
+
+  public static Servo axonMaxServo; // 0 is a placeholder
   private static Servo axonMaxScoringWheel;
-  public static DigitalInput SwitchChannelAlgae; //0 is a placeholder
+  public static DigitalInput SwitchChannelAlgae; // 0 is a placeholder
   private static DigitalInput SwitchChannelCoral;
 
-  public WristExtenderIOServo(int WristExtenderServoChannel, int ScoringWheelServoChannel, int SwitchDIOChannelAlgae, int SwitchDIOChannelCoral) {
+  public WristExtenderIOServo(
+      int WristExtenderServoChannel,
+      int ScoringWheelServoChannel,
+      int SwitchDIOChannelAlgae,
+      int SwitchDIOChannelCoral) {
     axonMaxServo = new Servo(WristExtenderServoChannel);
     axonMaxScoringWheel = new Servo(ScoringWheelServoChannel);
     SwitchChannelAlgae = new DigitalInput(SwitchDIOChannelAlgae);
@@ -43,7 +47,7 @@ public class WristExtenderIOServo implements WristExtenderIO {
     inputs.algaePresent = SwitchChannelAlgae.get();
     inputs.coralPresent = SwitchChannelCoral.get();
   }
-  
+
   public void goToAngle(double angle) {
     double servoAngle = angle * 0.5 / 90;
     axonMaxServo.setAngle(servoAngle);
@@ -52,7 +56,7 @@ public class WristExtenderIOServo implements WristExtenderIO {
   public void intakeAlgaeShootCoral() {
     axonMaxScoringWheel.setSpeed(1.0);
   }
-  
+
   public void intakeCoralShootAlgae() {
     axonMaxScoringWheel.setSpeed(-1.0);
   }
