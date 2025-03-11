@@ -179,31 +179,27 @@ public class ElevatorIOSparkMax implements ElevatorIO {
 
                 if ((RobotState.isAutonomous() == true) || (RobotState.isTeleop())) {
                         if (firstFrame == false) {
-                                mLeft.configure(mLeftConfig, ResetMode.kResetSafeParameters,
-                                                PersistMode.kNoPersistParameters);
-
-                                mRight.configure(mRightConfig, ResetMode.kResetSafeParameters,
-                                                PersistMode.kNoPersistParameters);
-                        } else {
-                                /* Do the command processing */
-                                state_step = commandProfile.calculate(0.02, mCurrentState,
-                                                mDesiredState);
-                                mCurrentState = state_step;
-                                ffCommand = m_feedforward.calculateWithVelocities(mCurrentState.velocity,
-                                                state_step.velocity);
-                                leftController.setReference(state_step.position, ControlType.kPosition,
-                                                ClosedLoopSlot.kSlot0,
-                                                ffCommand);
-                                rightController.setReference(state_step.position, ControlType.kPosition,
-                                                ClosedLoopSlot.kSlot0,
-                                                ffCommand);
-
+                                leftController.setIAccum(0);
+                                rightController.setIAccum(0);
                         }
                         firstFrame = true;
+                        
+                        /* Do the command processing */
+                        state_step = commandProfile.calculate(0.02, mCurrentState,
+                                        mDesiredState);
+                        mCurrentState = state_step;
+                        ffCommand = m_feedforward.calculateWithVelocities(mCurrentState.velocity,
+                                        state_step.velocity);
+                        leftController.setReference(state_step.position, ControlType.kPosition,
+                                        ClosedLoopSlot.kSlot0,
+                                        ffCommand);
+                        rightController.setReference(state_step.position, ControlType.kPosition,
+                                        ClosedLoopSlot.kSlot0,
+                                        ffCommand);
                 } else {
                         firstFrame = false;
-                        //do stuff when disabled
-                        //init reference position to where it thinks it is as average.
+                        // do stuff when disabled
+                        // init reference position to where it thinks it is as average.
                         mReferencePosition = (mRightEncoder.getPosition() + mLeftEncoder.getPosition()) / 2;
                         mDesiredState = new TrapezoidProfile.State(mReferencePosition, 0);
                         mCurrentState = mDesiredState;
