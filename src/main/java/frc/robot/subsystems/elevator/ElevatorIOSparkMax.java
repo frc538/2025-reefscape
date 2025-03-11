@@ -19,6 +19,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
+import edu.wpi.first.wpilibj.RobotState;
 
 public class ElevatorIOSparkMax implements ElevatorIO {
         SparkMax mLeft;
@@ -32,6 +33,8 @@ public class ElevatorIOSparkMax implements ElevatorIO {
 
         private final SparkClosedLoopController leftController;
         private final SparkClosedLoopController rightController;
+
+        private boolean firstFrame;
 
         private final DigitalInput topLimit;
         private final DigitalInput bottomLimit;
@@ -147,6 +150,8 @@ public class ElevatorIOSparkMax implements ElevatorIO {
         }
 
         public void commandMotor() {
+                double ffCommand = 0;
+                TrapezoidProfile.State state_step = new TrapezoidProfile.State();
                 kS = kSnn.get();
                 kV = kVnn.get();
                 kA = kAnn.get();
@@ -172,14 +177,37 @@ public class ElevatorIOSparkMax implements ElevatorIO {
                                         PersistMode.kNoPersistParameters);
                 }
 
-                /* Do the command processing */
-                TrapezoidProfile.State state_step = commandProfile.calculate(0.02, mCurrentState, mDesiredState);
-                mCurrentState = state_step;
-                double ffCommand = m_feedforward.calculateWithVelocities(mCurrentState.velocity, state_step.velocity);
-                leftController.setReference(mReferencePosition, ControlType.kPosition, ClosedLoopSlot.kSlot0,
-                                ffCommand);
-                rightController.setReference(mReferencePosition, ControlType.kPosition, ClosedLoopSlot.kSlot0,
-                                ffCommand);
+                if ((RobotState.isAutonomous() == true) || (RobotState.isTeleop())) {
+                        if (firstFrame == false) {
+                                mLeft.configure(mLeftConfig, ResetMode.kResetSafeParameters,
+                                                PersistMode.kNoPersistParameters);
+
+                                mRight.configure(mRightConfig, ResetMode.kResetSafeParameters,
+                                                PersistMode.kNoPersistParameters);
+                        } else {
+                                /* Do the command processing */
+                                state_step = commandProfile.calculate(0.02, mCurrentState,
+                                                mDesiredState);
+                                mCurrentState = state_step;
+                                ffCommand = m_feedforward.calculateWithVelocities(mCurrentState.velocity,
+                                                state_step.velocity);
+                                leftController.setReference(state_step.position, ControlType.kPosition,
+                                                ClosedLoopSlot.kSlot0,
+                                                ffCommand);
+                                rightController.setReference(state_step.position, ControlType.kPosition,
+                                                ClosedLoopSlot.kSlot0,
+                                                ffCommand);
+
+                        }
+                        firstFrame = true;
+                } else {
+                        firstFrame = false;
+                        //do stuff when disabled
+                        //init reference position to where it thinks it is as average.
+                        mReferencePosition = (mRightEncoder.getPosition() + mLeftEncoder.getPosition()) / 2;
+                        mDesiredState = new TrapezoidProfile.State(mReferencePosition, 0);
+                        mCurrentState = mDesiredState;
+                }
 
                 Logger.recordOutput("Elevator/Feed Forward Command", ffCommand);
                 Logger.recordOutput("Elevator/Motor Position Command", mReferencePosition);
