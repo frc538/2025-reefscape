@@ -54,7 +54,7 @@ public class WristExtender extends SubsystemBase {
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return run(
         () -> {
-          Logger.recordOutput("Gregory/goto",Constants.WristExtenderConstants.coralHighPulseWidth);
+          Logger.recordOutput("Gregory/goto", Constants.WristExtenderConstants.coralHighPulseWidth);
           io.goToPosition(Constants.WristExtenderConstants.coralHighPulseWidth);
         });
   }
@@ -73,7 +73,7 @@ public class WristExtender extends SubsystemBase {
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return run(
         () -> {
-          Logger.recordOutput("Gregory/goto",Constants.WristExtenderConstants.bargePulseWidth);
+          Logger.recordOutput("Gregory/goto", Constants.WristExtenderConstants.bargePulseWidth);
           io.goToPosition(Constants.WristExtenderConstants.bargePulseWidth);
         });
   }

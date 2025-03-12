@@ -15,12 +15,11 @@
 
 package frc.robot.subsystems.WristExtender;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.revrobotics.servohub.ServoChannel;
 import com.revrobotics.servohub.ServoChannel.ChannelId;
 import com.revrobotics.servohub.ServoHub;
 import edu.wpi.first.wpilibj.DigitalInput;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
@@ -66,7 +65,7 @@ public class WristExtenderIOServo implements WristExtenderIO {
 
   @Override
   public void goToPosition(int pulseWidth) {
-    Logger.recordOutput("Gregory/goToPosition",pulseWidth);
+    Logger.recordOutput("Gregory/goToPosition", pulseWidth);
     axonMaxServo.setPulseWidth(pulseWidth);
     axonMaxServo.setEnabled(true);
   }

@@ -6,10 +6,10 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.revrobotics.servohub.ServoChannel.ChannelId;
-import com.revrobotics.servohub.ServoHub.ResetMode;
-import com.revrobotics.servohub.config.ServoHubConfig;
-import com.revrobotics.servohub.config.ServoChannelConfig.BehaviorWhenDisabled;
 import com.revrobotics.servohub.ServoHub;
+import com.revrobotics.servohub.ServoHub.ResetMode;
+import com.revrobotics.servohub.config.ServoChannelConfig.BehaviorWhenDisabled;
+import com.revrobotics.servohub.config.ServoHubConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -136,14 +136,11 @@ public class RobotContainer {
     configureButtonBindings();
 
     ServoHubConfig shc = new ServoHubConfig();
-    shc.channel1.disableBehavior(BehaviorWhenDisabled.kSupplyPower)
-            .pulseRange(500, 1500, 2500);
+    shc.channel1.disableBehavior(BehaviorWhenDisabled.kSupplyPower).pulseRange(500, 1500, 2500);
 
-    shc.channel3.disableBehavior(BehaviorWhenDisabled.kSupplyPower)
-            .pulseRange(500, 1500, 2500);
+    shc.channel3.disableBehavior(BehaviorWhenDisabled.kSupplyPower).pulseRange(500, 1500, 2500);
 
-    shc.channel4.disableBehavior(BehaviorWhenDisabled.kSupplyPower)
-            .pulseRange(500, 1500, 2500);
+    shc.channel4.disableBehavior(BehaviorWhenDisabled.kSupplyPower).pulseRange(500, 1500, 2500);
 
     servoHub.configure(shc, ResetMode.kResetSafeParameters);
   }
