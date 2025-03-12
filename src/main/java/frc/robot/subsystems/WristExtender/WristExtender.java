@@ -33,21 +33,11 @@ public class WristExtender extends SubsystemBase {
    * @return a command
    */
   public Command intakeAlgaeShootCoral() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
-        () -> {
-          io.intakeAlgaeShootCoral();
-        });
+    return runEnd(() -> io.intakeAlgaeShootCoral(), () -> io.stopIntake());
   }
 
   public Command intakeCoralShootAlgae() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
-        () -> {
-          io.intakeCoralShootAlgae();
-        });
+    return runEnd(() -> io.intakeCoralShootAlgae(), () -> io.stopIntake());
   }
 
   public Command goToCoralReefLowMedium() {

@@ -34,4 +34,6 @@ public interface WristExtenderIO {
   public default void intakeAlgaeShootCoral() {}
 
   public default void intakeCoralShootAlgae() {}
+
+  public default void stopIntake() {}
 }

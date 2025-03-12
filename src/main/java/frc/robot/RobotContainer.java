@@ -141,10 +141,10 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Start button will intake algae/shoot coral
-    controller.start().onTrue(wristExtender.intakeAlgaeShootCoral());
+    controller.start().whileTrue(wristExtender.intakeAlgaeShootCoral());
 
     // Back button will intake coral/shoot algae
-    controller.back().onTrue(wristExtender.intakeCoralShootAlgae());
+    controller.back().whileTrue(wristExtender.intakeCoralShootAlgae());
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
