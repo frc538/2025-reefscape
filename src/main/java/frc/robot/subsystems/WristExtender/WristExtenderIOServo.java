@@ -19,6 +19,7 @@ import com.revrobotics.servohub.ServoChannel;
 import com.revrobotics.servohub.ServoChannel.ChannelId;
 import com.revrobotics.servohub.ServoHub;
 import edu.wpi.first.wpilibj.DigitalInput;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
@@ -42,11 +43,13 @@ public class WristExtenderIOServo implements WristExtenderIO {
     axonMaxServo = hub.getServoChannel(WristExtenderServoChannel);
     axonMaxScoringWheel = hub.getServoChannel(ScoringWheelServoChannel);
 
-    axonMaxServo.setPowered(true);
     axonMaxScoringWheel.setPowered(true);
+    axonMaxScoringWheel.setPulseWidth(1500);
+    axonMaxScoringWheel.setEnabled(false);
 
-    axonMaxServo.setPulseWidth(500);
-    axonMaxServo.setEnabled(true);
+    axonMaxServo.setPowered(true);
+    axonMaxServo.setPulseWidth(1500);
+    axonMaxServo.setEnabled(false);
 
     SwitchChannelAlgae = new DigitalInput(SwitchDIOChannelAlgae);
     SwitchChannelCoral = new DigitalInput(SwitchDIOChannelCoral);
@@ -56,10 +59,15 @@ public class WristExtenderIOServo implements WristExtenderIO {
   public void updateInputs(WristExtenderIOInputs inputs) {
     inputs.algaePresent = SwitchChannelAlgae.get();
     inputs.coralPresent = SwitchChannelCoral.get();
+    inputs.wheelPulseWidth = axonMaxScoringWheel.getPulseWidth();
+    inputs.servoPulseWidth = axonMaxServo.getPulseWidth();
   }
 
+  @Override
   public void goToPosition(int pulseWidth) {
+    Logger.recordOutput("Gregory/goToPosition", pulseWidth);
     axonMaxServo.setPulseWidth(pulseWidth);
+    axonMaxServo.setEnabled(true);
   }
 
   public void intakeAlgaeShootCoral() {
