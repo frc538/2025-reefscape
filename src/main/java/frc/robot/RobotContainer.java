@@ -72,7 +72,7 @@ public class RobotContainer {
         wristExtender =
             new WristExtender(
                 new WristExtenderIOServo(
-                    servoHub, ChannelId.kChannelId3, ChannelId.kChannelId2, 3, 4));
+                    servoHub, ChannelId.kChannelId4, ChannelId.kChannelId3, 3, 4));
 
         climberSubsystem =
             new ClimberSubsystem(
