@@ -48,6 +48,7 @@ public class ElevatorIOSim implements ElevatorIO {
         LoggedNetworkNumber Inn = new LoggedNetworkNumber("/SmartDashboard/I",0);
         LoggedNetworkNumber Dnn = new LoggedNetworkNumber("/SmartDashboard/D",0);
 
+        
         double mReferencePosition = 0.0;
         double mArbFF = 0.0;
         double kS = 0.0;

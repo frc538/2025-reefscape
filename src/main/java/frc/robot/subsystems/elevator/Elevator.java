@@ -20,13 +20,19 @@ public class Elevator extends SubsystemBase {
     private double PDotPositionCommand = 0.0;
     private double PDotRate = 0.0;
     private boolean UseButtonState = true;
+    
+    // section heights
+    //0.420, 0.906, 1.313
+    // 0.63, 1.36, 1.97
+    // measured height, .628
+    // .628 / .420 = 
 
     ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
-    LoggedNetworkNumber troughHeight = new LoggedNetworkNumber("/SmartDashboard/Trough Height", 0);
-    LoggedNetworkNumber coralLowHeight = new LoggedNetworkNumber("/SmartDashboard/Coral Low Height", .2);
-    LoggedNetworkNumber coralMedHeight = new LoggedNetworkNumber("/SmartDashboard/Coral Med Height", .4);
-    LoggedNetworkNumber coralHighHeight = new LoggedNetworkNumber("/SmartDashboard/Coral High Height", .6);
-    LoggedNetworkNumber bargeHeight = new LoggedNetworkNumber("/SmartDashboard/Barge Height", .8);
+    LoggedNetworkNumber troughHeight = new LoggedNetworkNumber("/SmartDashboard/Trough Height", 0.46);
+    LoggedNetworkNumber coralLowHeight = new LoggedNetworkNumber("/SmartDashboard/Coral Low Height", 0.81);
+    LoggedNetworkNumber coralMedHeight = new LoggedNetworkNumber("/SmartDashboard/Coral Med Height", 1.21);
+    LoggedNetworkNumber coralHighHeight = new LoggedNetworkNumber("/SmartDashboard/Coral High Height", 1.83);
+    LoggedNetworkNumber bargeHeight = new LoggedNetworkNumber("/SmartDashboard/Barge Height", 1.9);
 
     LoggedNetworkNumber arbFF = new LoggedNetworkNumber("/SmartDashboard/Arbitrary FF Gain", 0.5);
     

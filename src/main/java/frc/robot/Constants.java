@@ -54,8 +54,8 @@ public final class Constants {
      */
 
     public static double RotationConversion = 2*Math.PI * Units.inchesToMeters(2.074);
-    public static double ElevatorPositionConversionFactor = 1.0/9.0 * RotationConversion; // m/rotation
-    public static double ElevatorVelocityConversionFactor = 1.0/9.0 * RotationConversion;
+    public static double ElevatorPositionConversionFactor = 1.5/9.0 * RotationConversion; // m/rotation
+    public static double ElevatorVelocityConversionFactor = 1.5/9.0 * RotationConversion;
     public static double ElevatorMotorFreeSpeedRevsPerSecond = NeoFreeSpeedRPM / 60.0;
 
     public static double maxAcceleration = 1;
