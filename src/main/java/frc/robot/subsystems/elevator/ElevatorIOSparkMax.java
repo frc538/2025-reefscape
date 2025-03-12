@@ -1,5 +1,7 @@
 package frc.robot.subsystems.elevator;
 
+import java.lang.reflect.Array;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -34,6 +36,9 @@ public class ElevatorIOSparkMax implements ElevatorIO {
         private final SparkClosedLoopController leftController;
         private final SparkClosedLoopController rightController;
 
+        private final double[] positionArray = { 1, 2, 3 };
+        private final double[] gainArray = { 1, 2, 3 };
+
         private boolean firstFrame;
 
         private final DigitalInput topLimit;
@@ -54,17 +59,24 @@ public class ElevatorIOSparkMax implements ElevatorIO {
         LoggedNetworkNumber Inn = new LoggedNetworkNumber("/SmartDashboard/I", 0.0);
         LoggedNetworkNumber Dnn = new LoggedNetworkNumber("/SmartDashboard/D", 0.0);
 
+        LoggedNetworkNumber gainIndexnn = new LoggedNetworkNumber("/SmartDashboard/Gain Index", 0);
+
         double mReferencePosition = 0.0;
-        double mArbFF = 0.0;
-        double kS = -1.0;
-        double kG = 0.0;
-        double kV = 0.0;
-        double kA = 0.0;
-        double maxV = 0.3;
-        double maxA = 0.3;
-        double kP = 0.001;
-        double kI = 0.0;
-        double kD = 0.0;
+
+        double[] kS = { 0, 0, 0 };
+        double[] kG = { 0, 0, 0 };
+        double[] kV = { 0, 0, 0 };
+        double[] kA = { 0, 0, 0 };
+        double[] maxV = { 0.3, 0.3, 0.3 };
+        double[] maxA = { 0.3, 0.3, 0.3 };
+        double[] kP = { 0.001, 0.001, 0.001 };
+        double[] kI = { 0, 0, 0 };
+        double[] kD = { 0, 0, 0 };
+        int gainIndex = 0;
+        double[] positionThresholds = { 1, 2 };
+        double kPLast = 0;
+        double kILast = 0;
+        double kDLast = 0;
 
         public ElevatorIOSparkMax(int leftId, int rightId, int upLimitChannel, int downLimitChannel) {
                 mLeft = new SparkMax(leftId, MotorType.kBrushless);
@@ -111,10 +123,10 @@ public class ElevatorIOSparkMax implements ElevatorIO {
                 leftController = mLeft.getClosedLoopController();
                 rightController = mRight.getClosedLoopController();
 
-                profileConstraints = new Constraints(maxV, maxA);
+                profileConstraints = new Constraints(maxV[gainIndex], maxA[gainIndex]);
                 commandProfile = new TrapezoidProfile(profileConstraints);
 
-                m_feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
+                m_feedforward = new ElevatorFeedforward(kS[gainIndex], kG[gainIndex], kV[gainIndex], kA[gainIndex]);
                 mCurrentState = new TrapezoidProfile.State();
                 mDesiredState = new TrapezoidProfile.State();
 
@@ -146,33 +158,55 @@ public class ElevatorIOSparkMax implements ElevatorIO {
         }
 
         public void setArbFF(double arbFF) {
-                kG = arbFF;
+                kG[gainIndex] = arbFF;
         }
 
         public void commandMotor() {
                 double ffCommand = 0;
                 TrapezoidProfile.State state_step = new TrapezoidProfile.State();
-                kS = kSnn.get();
-                kV = kVnn.get();
-                kA = kAnn.get();
-                if (maxV != maxVnn.get() || maxA != maxAnn.get()) {
-                        maxV = maxVnn.get();
-                        maxA = maxAnn.get();
-                        profileConstraints = new Constraints(maxV, maxA);
+                double averagePosition = (mLeftEncoder.getPosition() + mRightEncoder.getPosition()) / 2;
+                if (averagePosition > positionThresholds[1]) {
+                        gainIndex = 2;
+                } else if (averagePosition > positionThresholds[0]) {
+                        gainIndex = 1;
+                } else {
+                        gainIndex = 0;
+                }
+
+                kS[(int) gainIndexnn.get()] = kSnn.get();
+                kV[(int) gainIndexnn.get()] = kVnn.get();
+                kA[(int) gainIndexnn.get()] = kAnn.get();
+
+                kP[(int) gainIndexnn.get()] = Pnn.get();
+                kI[(int) gainIndexnn.get()] = Inn.get();
+                kD[(int) gainIndexnn.get()] = Dnn.get();
+
+                // Always update gains when read in from the network numbers into the gainIndex
+                // value
+                // Change the code to check if the configured parameter is different from the
+                // current gain for that parameter at gainIndex
+                // If it is different, then either the NN number was reprogrammed, or the
+                // elevator has changed gain region
+                // So reprogram that piece
+
+                if (profileConstraints.maxAcceleration != maxA[gainIndex]
+                                || profileConstraints.maxVelocity != maxV[gainIndex]) {
+                        profileConstraints = new Constraints(maxV[gainIndex], maxA[gainIndex]);
                         commandProfile = new TrapezoidProfile(profileConstraints);
                 }
 
-                m_feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
+                m_feedforward = new ElevatorFeedforward(kS[gainIndex], kG[gainIndex], kV[gainIndex], kA[gainIndex]);
 
-                if (Pnn.get() != kP || Inn.get() != kI || Dnn.get() != kD) {
-                        kP = Pnn.get();
-                        kI = Inn.get();
-                        kD = Dnn.get();
-                        mLeftConfig.closedLoop.pid(kP, kI, kD);
+                if (kPLast != kP[gainIndex] || kILast != kI[gainIndex]
+                                || kDLast != kD[ gainIndex]) {
+                        kPLast = kP[gainIndex];
+                        kILast = kI[gainIndex];
+                        kDLast = kD[gainIndex];
+                        mLeftConfig.closedLoop.pid(kP[gainIndex], kI[gainIndex], kD[gainIndex]);
                         mLeft.configure(mLeftConfig, ResetMode.kNoResetSafeParameters,
                                         PersistMode.kNoPersistParameters);
 
-                        mRightConfig.closedLoop.pid(kP, kI, kD);
+                        mRightConfig.closedLoop.pid(kP[gainIndex], kI[gainIndex], kD[gainIndex]);
                         mRight.configure(mRightConfig, ResetMode.kNoResetSafeParameters,
                                         PersistMode.kNoPersistParameters);
                 }
@@ -183,7 +217,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
                                 rightController.setIAccum(0);
                         }
                         firstFrame = true;
-                        
+
                         /* Do the command processing */
                         state_step = commandProfile.calculate(0.02, mCurrentState,
                                         mDesiredState);
