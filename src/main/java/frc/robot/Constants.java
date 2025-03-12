@@ -30,6 +30,13 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
 
+  public static class WristExtenderConstants {
+    public static final int coralLowMediumPulseWidth = 130;
+    public static final int coralHighPulseWidth = 2000;
+    public static final int algaeProcessorPulseWidth = 500;
+    public static final int bargePulseWidth = 130;
+  }
+
   public static class ClimberConstants {
     public static final int CurrentLimit = 20;
     public static final int ClimberPositionConversionFactor = /*put real value here-->*/ 1;

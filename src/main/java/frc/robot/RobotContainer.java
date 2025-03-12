@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.revrobotics.servohub.ServoChannel.ChannelId;
 import com.revrobotics.servohub.ServoHub;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,6 +18,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.WristExtender.WristExtender;
+import frc.robot.subsystems.WristExtender.WristExtenderIO;
+import frc.robot.subsystems.WristExtender.WristExtenderIOServo;
 import frc.robot.subsystems.climb.ClimberIO;
 import frc.robot.subsystems.climb.ClimberIOSparkMax;
 import frc.robot.subsystems.climb.ClimberSubsystem;
@@ -37,6 +41,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final WristExtender wristExtender;
   private final ClimberSubsystem climberSubsystem;
   private final IntakeSubsystem intakeSubsystem;
   // Controller
@@ -64,6 +69,10 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+        wristExtender =
+            new WristExtender(
+                new WristExtenderIOServo(
+                    servoHub, ChannelId.kChannelId4, ChannelId.kChannelId3, 3, 4));
 
         climberSubsystem =
             new ClimberSubsystem(
@@ -81,6 +90,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+        wristExtender = new WristExtender(new WristExtenderIO() {});
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
         intakeSubsystem = new IntakeSubsystem(servoHub);
         break;
@@ -94,6 +104,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        wristExtender = new WristExtender(new WristExtenderIO() {});
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
         intakeSubsystem = new IntakeSubsystem(servoHub);
         break;
@@ -129,6 +140,12 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    // Start button will intake algae/shoot coral
+    controller.start().whileTrue(wristExtender.intakeAlgaeShootCoral());
+
+    // Back button will intake coral/shoot algae
+    controller.back().whileTrue(wristExtender.intakeCoralShootAlgae());
+
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
