@@ -24,12 +24,14 @@ public interface WristExtenderIO {
     public boolean coralPresent = false;
     public double servoPosition = 0.0; // should be same as extended
     public double scoringWheelPosition = 0.0;
+    public int servoPulseWidth = 0;
+    public int wheelPulseWidth = 0;
   }
 
   /** Updates the set of loggable inputs. */
   public default void updateInputs(WristExtenderIOInputs inputs) {}
 
-  public default void goToPosition(double angle) {}
+  public default void goToPosition(int angle) {}
 
   public default void intakeAlgaeShootCoral() {}
 

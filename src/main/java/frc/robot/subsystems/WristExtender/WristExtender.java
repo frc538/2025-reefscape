@@ -43,7 +43,7 @@ public class WristExtender extends SubsystemBase {
   public Command goToCoralReefLowMedium() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
+    return run(
         () -> {
           io.goToPosition(Constants.WristExtenderConstants.coralLowMediumPulseWidth);
         });
@@ -52,8 +52,9 @@ public class WristExtender extends SubsystemBase {
   public Command goToCoralReefHigh() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
+    return run(
         () -> {
+          Logger.recordOutput("Gregory/goto",Constants.WristExtenderConstants.coralHighPulseWidth);
           io.goToPosition(Constants.WristExtenderConstants.coralHighPulseWidth);
         });
   }
@@ -61,7 +62,7 @@ public class WristExtender extends SubsystemBase {
   public Command goToAlgaeProcessor() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
+    return run(
         () -> {
           io.goToPosition(Constants.WristExtenderConstants.algaeProcessorPulseWidth);
         });
@@ -70,8 +71,9 @@ public class WristExtender extends SubsystemBase {
   public Command goToBarge() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
+    return run(
         () -> {
+          Logger.recordOutput("Gregory/goto",Constants.WristExtenderConstants.bargePulseWidth);
           io.goToPosition(Constants.WristExtenderConstants.bargePulseWidth);
         });
   }

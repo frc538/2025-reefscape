@@ -32,9 +32,9 @@ public final class Constants {
 
   public static class WristExtenderConstants {
     public static final int coralLowMediumPulseWidth = 130;
-    public static final int coralHighPulseWidth = 2000;
+    public static final int coralHighPulseWidth = 2500;
     public static final int algaeProcessorPulseWidth = 500;
-    public static final int bargePulseWidth = 130;
+    public static final int bargePulseWidth = 500;
   }
 
   public static class ClimberConstants {
