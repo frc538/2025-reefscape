@@ -2,6 +2,9 @@ package frc.robot.subsystems.elevator;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.WristExtender.WristExtender;
+import frc.robot.subsystems.WristExtender.WristExtenderIO;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -11,11 +14,14 @@ public class Elevator extends SubsystemBase {
   private int positionTarget = 0;
   private int positionMax = 5;
   private int positionMin = 0;
+  private double minGregHeight = 0.5;
 
   private double buttonPositionCommand = 0.0;
   private double PDotPositionCommand = 0.0;
   private double PDotRate = 0.0;
   private boolean UseButtonState = true;
+
+  private final WristExtender wristPosition;
 
   // section heights
   // 0.420, 0.906, 1.313
@@ -25,18 +31,16 @@ public class Elevator extends SubsystemBase {
 
   ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
   LoggedNetworkNumber troughHeight = new LoggedNetworkNumber("/SmartDashboard/Trough Height", 0.46);
-  LoggedNetworkNumber coralLowHeight =
-      new LoggedNetworkNumber("/SmartDashboard/Coral Low Height", 0.81);
-  LoggedNetworkNumber coralMedHeight =
-      new LoggedNetworkNumber("/SmartDashboard/Coral Med Height", 1.21);
-  LoggedNetworkNumber coralHighHeight =
-      new LoggedNetworkNumber("/SmartDashboard/Coral High Height", 1.83);
+  LoggedNetworkNumber coralLowHeight = new LoggedNetworkNumber("/SmartDashboard/Coral Low Height", 0.81);
+  LoggedNetworkNumber coralMedHeight = new LoggedNetworkNumber("/SmartDashboard/Coral Med Height", 1.21);
+  LoggedNetworkNumber coralHighHeight = new LoggedNetworkNumber("/SmartDashboard/Coral High Height", 1.83);
   LoggedNetworkNumber bargeHeight = new LoggedNetworkNumber("/SmartDashboard/Barge Height", 1.9);
 
   LoggedNetworkNumber arbFF = new LoggedNetworkNumber("/SmartDashboard/Arbitrary FF Gain", 0.5);
 
-  public Elevator(ElevatorIO IO) {
+  public Elevator(ElevatorIO IO, WristExtender WristExtender) {
     io = IO;
+    wristPosition = WristExtender;
   }
 
   public Command PositionUp() {
@@ -113,9 +117,12 @@ public class Elevator extends SubsystemBase {
   }
 
   private void PositionCommand(double position) {
-    io.setReference(position);
-    buttonPositionCommand = position;
-    UseButtonState = true;
+    if (position < minGregHeight && wristPosition.isGregoryDown() == true)  {
+      position = minGregHeight;
+    } 
+      io.setReference(position);
+      buttonPositionCommand = position;
+      UseButtonState = true;
   }
 
   public Command PDotCommand(double rate) {
@@ -127,6 +134,9 @@ public class Elevator extends SubsystemBase {
       PDotRate = rate;
       UseButtonState = false;
       PDotPositionCommand = PDotPositionCommand + PDotRate;
+      if (PDotPositionCommand < minGregHeight && wristPosition.isGregoryDown() == true) {
+        PDotPositionCommand = minGregHeight;
+      }
       if (PDotPositionCommand < 0) {
         PDotPositionCommand = 0;
       }

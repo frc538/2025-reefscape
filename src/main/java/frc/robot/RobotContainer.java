@@ -105,7 +105,7 @@ public class RobotContainer {
                     Constants.ElevatorConstants.leftCanId,
                     Constants.ElevatorConstants.rightCanId,
                     Constants.ElevatorConstants.elevatorUpLimitDIOChannel,
-                    Constants.ElevatorConstants.elevatorDownLimitDIOChannel));
+                    Constants.ElevatorConstants.elevatorDownLimitDIOChannel), wristExtender);
         break;
 
       case SIM:
@@ -120,7 +120,7 @@ public class RobotContainer {
         wristExtender = new WristExtender(new WristExtenderIO() {});
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
         intakeSubsystem = new IntakeSubsystem(servoHub);
-        elevator = new Elevator(new ElevatorIOSim(0));
+        elevator = new Elevator(new ElevatorIOSim(0), wristExtender);
         break;
 
       default:
@@ -132,8 +132,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        elevator = new Elevator(new ElevatorIO() {});
         wristExtender = new WristExtender(new WristExtenderIO() {});
+        elevator = new Elevator(new ElevatorIO() {}, wristExtender);
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
         intakeSubsystem = new IntakeSubsystem(servoHub);
         break;
