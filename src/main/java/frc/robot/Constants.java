@@ -4,10 +4,7 @@
 
 package frc.robot;
 
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -48,14 +45,15 @@ public final class Constants {
 
     public static int NeoFreeSpeedRPM = 5676;
 
-    /* 
+    /*
      * Rotation conversion: 2*pi*meters(2.074in) m/rotation
      * Gearing: 1/9 output to input
      */
 
-    public static double RotationConversion = 2*Math.PI * Units.inchesToMeters(2.074);
-    public static double ElevatorPositionConversionFactor = 1.5/9.0 * RotationConversion; // m/rotation
-    public static double ElevatorVelocityConversionFactor = 1.5/9.0 * RotationConversion;
+    public static double RotationConversion = 2 * Math.PI * Units.inchesToMeters(2.074);
+    public static double ElevatorPositionConversionFactor =
+        1.5 / 9.0 * RotationConversion; // m/rotation
+    public static double ElevatorVelocityConversionFactor = 1.5 / 9.0 * RotationConversion;
     public static double ElevatorMotorFreeSpeedRevsPerSecond = NeoFreeSpeedRPM / 60.0;
 
     public static double maxAcceleration = 1;
