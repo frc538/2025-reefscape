@@ -241,8 +241,8 @@ public class RobotContainer {
     // elevator.PDotCommand(MathUtil.applyDeadband(-mechanismController.getLeftY() *
     // PDotGainNN.get(),0.1)));
 
-    mechanismController.povUp().whileTrue(elevator.PDotCommand(0.03));
-    mechanismController.povDown().whileTrue(elevator.PDotCommand(-0.03));
+    mechanismController.povUp().whileTrue(elevator.PDotCommand(0.006));
+    mechanismController.povDown().whileTrue(elevator.PDotCommand(-0.006));
   }
 
   /**
