@@ -104,6 +104,6 @@ public class WristExtender extends SubsystemBase {
   }
 
   public boolean isGregoryDown() {
-    return inputs.servoPulseWidth < 1500;
+    return inputs.servoPulseWidth > 1000;
   }
 }
