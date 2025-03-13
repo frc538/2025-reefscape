@@ -122,6 +122,7 @@ public class Elevator extends SubsystemBase {
     } 
       io.setReference(position);
       buttonPositionCommand = position;
+      PDotPositionCommand = position;
       UseButtonState = true;
   }
 
