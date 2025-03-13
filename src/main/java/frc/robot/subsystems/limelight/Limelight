@@ -45,11 +45,22 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import frc.robot.subsystems.drive.Drive;
 
-public class limelight extends SubsystemBase {
+public class Limelight extends SubsystemBase {
     public Drive driveFile;
     SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(driveFile.kinematics,
             driveFile.rawGyroRotation,
             driveFile.lastModulePositions, new Pose2d());
+
+    public Limelight(Drive driveFile) {  //I don't know if this was needed or not
+        this.driveFile = driveFile;
+        // Initialize poseEstimator with the driveFile components
+        poseEstimator = new SwerveDrivePoseEstimator(
+            driveFile.kinematics,
+            driveFile.rawGyroRotation,
+            driveFile.lastModulePositions,
+            new Pose2d()
+        );
+    }
 
     public void checkLimelight(String limelightOne) {
         boolean useMegaTag2 = true; // set to false to use MegaTag1
