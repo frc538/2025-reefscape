@@ -18,6 +18,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -35,6 +36,8 @@ public class ElevatorIOSim implements ElevatorIO {
   TrapezoidProfile.State mCurrentState;
   TrapezoidProfile.State mDesiredState;
   ElevatorFeedforward m_feedforward;
+
+  private boolean firstFrame = true;
 
   LoggedNetworkNumber kSnn = new LoggedNetworkNumber("/SmartDashboard/kS", 0);
   LoggedNetworkNumber kVnn = new LoggedNetworkNumber("/SmartDashboard/kV", 3.3);
@@ -56,6 +59,10 @@ public class ElevatorIOSim implements ElevatorIO {
   double kP = 0.0;
   double kI = 0.0;
   double kD = 0.0;
+
+  double kPLast = 0;
+  double kILast = 0;
+  double kDLast = 0;
 
   private final SparkClosedLoopController leftController;
 
@@ -152,42 +159,26 @@ public class ElevatorIOSim implements ElevatorIO {
     m_feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
   }
 
-  public void commandMotor() {
-    /* Quick and dirty configuration updates for sim only */
-    kS = kSnn.get();
-    kV = kVnn.get();
-    kA = kAnn.get();
-    if (maxV != maxVnn.get() || maxA != maxAnn.get()) {
-      maxV = maxVnn.get();
-      maxA = maxAnn.get();
-      profileConstraints = new Constraints(maxV, maxA);
-      commandProfile = new TrapezoidProfile(profileConstraints);
-    }
-
-    m_feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
-
-    if (Pnn.get() != kP || Inn.get() != kI || Dnn.get() != kD) {
-      kP = Pnn.get();
-      kI = Inn.get();
-      kD = Dnn.get();
+  public void setReference(double position, double ffCommand, double kP, double kI, double kD) {
+      if (kPLast != kP|| kILast != kI || kDLast != kD) {
+      kPLast = kP;
+      kILast = kI;
+      kDLast = kD;
       mLeftConfig.closedLoop.pid(kP, kI, kD);
       mLeft.configure(
           mLeftConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
-    /* Do the command processing */
-    TrapezoidProfile.State state_step =
-        commandProfile.calculate(0.02, mCurrentState, mDesiredState);
-    mCurrentState = state_step;
-    double ffCommand =
-        m_feedforward.calculateWithVelocities(mCurrentState.velocity, state_step.velocity);
-    leftController.setReference(
-        mReferencePosition, ControlType.kPosition, ClosedLoopSlot.kSlot0, ffCommand);
+    if ((RobotState.isAutonomous() == true) || (RobotState.isTeleop())) {
+      if (firstFrame == false) {
+        leftController.setIAccum(0);
+      }
+      firstFrame = true;
+    } else {
+      firstFrame = false;
+    }
 
-    Logger.recordOutput("Elevator/Feed Forward Command", ffCommand);
-    Logger.recordOutput("Elevator/Profile/Position", state_step.position);
-    Logger.recordOutput("Elevator/Profile/Velocity", state_step.velocity);
-
+    leftController.setReference(position, ControlType.kPosition, ClosedLoopSlot.kSlot0, ffCommand);
     /* Run the simulation components */
     m_elevatorSim.setInput(mSimLeft.getAppliedOutput() * RoboRioSim.getVInVoltage());
     m_elevatorSim.update(0.02);
