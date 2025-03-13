@@ -48,7 +48,7 @@ public class WristExtenderIOServo implements WristExtenderIO {
     axonMaxScoringWheel.setEnabled(false);
 
     axonMaxServo.setPowered(true);
-    axonMaxServo.setPulseWidth(1500);
+    axonMaxServo.setPulseWidth(500);
     axonMaxServo.setEnabled(false);
 
     SwitchChannelAlgae = new DigitalInput(SwitchDIOChannelAlgae);
