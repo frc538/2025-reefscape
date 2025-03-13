@@ -1,3 +1,4 @@
+
 // Copyright 2021-2025 FRC 6328
 // http://github.com/Mechanical-Advantage
 //
@@ -89,17 +90,17 @@ public class Drive extends SubsystemBase {
           1),
       getModuleTranslations());
 
-  public static final Lock odometryLock = new ReentrantLock();
-  public final GyroIO gyroIO;
-  public final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
-  public final Module[] modules = new Module[4]; // FL, FR, BL, BR
+  static final Lock odometryLock = new ReentrantLock();
+  private final GyroIO gyroIO;
+  private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+  private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
-  public final Alert gyroDisconnectedAlert = new Alert("Disconnected gyro, using kinematics as fallback.",
+  private final Alert gyroDisconnectedAlert = new Alert("Disconnected gyro, using kinematics as fallback.",
       AlertType.kError);
 
-  public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
-  public Rotation2d rawGyroRotation = new Rotation2d();
-  public SwerveModulePosition[] lastModulePositions = // For delta tracking
+  private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
+  private Rotation2d rawGyroRotation = new Rotation2d();
+  private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
           new SwerveModulePosition(),
           new SwerveModulePosition(),
@@ -162,6 +163,108 @@ public class Drive extends SubsystemBase {
             (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
   }
 
+  public void UpdateOdometry() {
+    boolean useMegaTag2 = true; // set to false to use MegaTag1
+    boolean doRejectUpdate = false;
+    LimelightHelpers.PoseEstimate mt1 = LimelightHelpers
+        .getBotPoseEstimate_wpiBlue(Constants.LimeLightConstants.limelightOneName);
+    LimelightHelpers.SetRobotOrientation(Constants.LimeLightConstants.limelightOneName,
+        poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0,
+        0, 0, 0, 0);
+    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers
+        .getBotPoseEstimate_wpiBlue_MegaTag2(Constants.LimeLightConstants.limelightOneName);
+        if (mt1 != null) {
+          Logger.recordOutput("Odometry/MT1/Tag Count", mt1.tagCount);
+          Logger.recordOutput("Odometry/MT1/Pose", mt1.pose);
+        }
+        if (mt2 != null) {
+          Logger.recordOutput("Odometry/MT2/Tag Count", mt2.tagCount);
+          Logger.recordOutput("Odometry/MT2/Pose", mt2.pose);
+        }
+                
+    if (useMegaTag2 == false) {
+      
+      if (mt1.tagCount == 0) {
+        doRejectUpdate = true;
+      }
+        /*
+       * if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {
+       * if (mt1.rawFiducials[0].ambiguity > .7) {
+       * doRejectUpdate = true;
+       * }
+       * if (mt1.rawFiducials[0].distToCamera > 3) {
+       * doRejectUpdate = true;
+       * }
+       * }
+       */
+
+      Logger.recordOutput("Limelight Pose", mt1.pose);
+      if (!doRejectUpdate) {
+        poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
+        poseEstimator.addVisionMeasurement(
+            mt1.pose,
+            mt1.timestampSeconds);
+
+      }
+    } else if (useMegaTag2 == true) {
+      if (Math.abs(gyroInputs.yawVelocityRadPerSec) > 720) // if our angular velocity is greater than 720 degrees per
+                                                           // second,
+      // ignore vision updates
+      {
+        doRejectUpdate = true;
+      }
+      if (mt2 != null) {
+        if (mt2.tagCount == 0) {
+          doRejectUpdate = true;
+        }
+      }
+
+      Logger.recordOutput("do reject update", doRejectUpdate);
+      if (!doRejectUpdate) {
+        poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+        if (mt2 != null) {
+          poseEstimator.addVisionMeasurement(
+              mt2.pose,
+              mt2.timestampSeconds);
+        }
+      }
+    }
+
+    // Update odometry
+    Logger.recordOutput("do reject update", doRejectUpdate);
+    double[] sampleTimestamps = modules[0].getOdometryTimestamps(); // All signals are sampled together
+    int sampleCount = sampleTimestamps.length;
+    for (int i = 0; i < sampleCount; i++) {
+      // Read wheel positions and deltas from each module
+      SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
+      SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4];
+      for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
+        modulePositions[moduleIndex] = modules[moduleIndex].getOdometryPositions()[i];
+        moduleDeltas[moduleIndex] = new SwerveModulePosition(
+            modulePositions[moduleIndex].distanceMeters
+                - lastModulePositions[moduleIndex].distanceMeters,
+            modulePositions[moduleIndex].angle);
+        lastModulePositions[moduleIndex] = modulePositions[moduleIndex];
+      }
+
+      // Update gyro angle
+      if (gyroInputs.connected) {
+        // Use the real gyro angle
+        rawGyroRotation = gyroInputs.odometryYawPositions[i];
+      } else {
+        // Use the angle delta from the kinematics and module deltas
+        Twist2d twist = kinematics.toTwist2d(moduleDeltas);
+        rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
+      }
+
+      // Apply update
+      poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+    }
+
+    // Update gyro alert
+    gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+  }
+
   public void simpleUpdateOdometry() {
     var pose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.LimeLightConstants.limelightOneName);
     if (pose == null)
@@ -185,6 +288,8 @@ public class Drive extends SubsystemBase {
         module.stop();
       }
     }
+
+    UpdateOdometry();
     // simpleUpdateOdometry();
 
     // Log empty setpoint states when disabled
