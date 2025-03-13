@@ -125,28 +125,7 @@ public class Limelight extends SubsystemBase {
 
     @Override
     public void periodic() {
-        driveFile.odometryLock.lock(); // Prevents odometry updates while reading data
-        driveFile.gyroIO.updateInputs(driveFile.gyroInputs);
-        Logger.processInputs("Drive/Gyro", driveFile.gyroInputs);
-        for (var module : driveFile.modules) {
-            module.periodic();
-        }
-        driveFile.odometryLock.unlock();
-
-        // Stop moving when disabled
-        if (DriverStation.isDisabled()) {
-            for (var module : driveFile.modules) {
-                module.stop();
-            }
-        }
-
-        //checkLimelight(limelightOne);
-        // simpleUpdateOdometry();
-
-        // Log empty setpoint states when disabled
-        if (DriverStation.isDisabled()) {
-            Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
-            Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
-        }
+        checkLimelight(Constants.limelightOneName);
+        checkLimelight(Constants.limelightTwoName);
     }
 }
