@@ -188,3 +188,5 @@ compile_commands.json
 
 # AdvantageKit Generated Build File
 src/main/java/frc/robot/BuildConstants.java
+
+simgui-ds.json

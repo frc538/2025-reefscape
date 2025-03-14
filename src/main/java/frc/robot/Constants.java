@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -26,15 +27,60 @@ public final class Constants {
     REPLAY
   }
 
+  public static class LimeLightConstants {
+    // THESE ARE PRELIMINARY NUMBERS CHANGE LATER
+    public static final double limelightX = 2;
+    public static final double limelightY = 2;
+    public static final double limelightZ = 2;
+
+    public static final double limelightRoll = 0;
+    public static final double limelightPitch = -2;
+    public static final double limelightYaw = 0;
+
+    public static final String limelightOneName = "limelight-bacon";
+    public static final String limelightTwoName = "limelight-eggs";
+  }
+
+  public static class ElevatorConstants {
+
+    public static int NeoFreeSpeedRPM = 5676;
+
+    /*
+     * Rotation conversion: 2*pi*meters(2.074in) m/rotation
+     * Gearing: 1/9 output to input
+     */
+
+    public static double RotationConversion = 2 * Math.PI * Units.inchesToMeters(2.074);
+    public static double ElevatorPositionConversionFactor =
+        1.5 / 9.0 * RotationConversion; // m/rotation
+    public static double ElevatorVelocityConversionFactor = 1.5 / 9.0 * RotationConversion;
+    public static double ElevatorMotorFreeSpeedRevsPerSecond = NeoFreeSpeedRPM / 60.0;
+
+    public static double maxAcceleration = 1;
+    public static double maxVelocity = 1;
+
+    public static double allowedClosedLoopError = 0.4;
+
+    public static int ElevatorCurrentLimit = 50;
+
+    public static double arbitraryFeedForward = 0;
+
+    public static int leftCanId = 34;
+    public static int rightCanId = 16;
+
+    public static int elevatorUpLimitDIOChannel = 1;
+    public static int elevatorDownLimitDIOChannel = 0;
+  }
+
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
 
   public static class WristExtenderConstants {
     public static final int coralLowMediumPulseWidth = 130;
-    public static final int coralHighPulseWidth = 2500;
+    public static final int coralHighPulseWidth = 1500;
     public static final int algaeProcessorPulseWidth = 500;
-    public static final int bargePulseWidth = 500;
+    public static final int bargePulseWidth = 2500;
   }
 
   public static class ClimberConstants {

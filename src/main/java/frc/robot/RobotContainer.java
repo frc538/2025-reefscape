@@ -33,7 +33,12 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOSim;
+import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -47,12 +52,16 @@ public class RobotContainer {
   private final WristExtender wristExtender;
   private final ClimberSubsystem climberSubsystem;
   private final IntakeSubsystem intakeSubsystem;
+  private final Elevator elevator;
+
   // Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
-  private final CommandXboxController driverTwoController = new CommandXboxController(1);
+  private final CommandXboxController driveController = new CommandXboxController(0);
+  private final CommandXboxController mechanismController = new CommandXboxController(1);
 
   // Servo Hub
   private final ServoHub servoHub = new ServoHub(3);
+
+  LoggedNetworkNumber PDotGainNN = new LoggedNetworkNumber("/SmartDashboard/PDot Gain", 0.1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -82,6 +91,15 @@ public class RobotContainer {
                 new ClimberIOSparkMax(Constants.ClimberConstants.ClimberMotorCANId, 5, 6));
 
         intakeSubsystem = new IntakeSubsystem(servoHub);
+
+        elevator =
+            new Elevator(
+                new ElevatorIOSparkMax(
+                    Constants.ElevatorConstants.leftCanId,
+                    Constants.ElevatorConstants.rightCanId,
+                    Constants.ElevatorConstants.elevatorUpLimitDIOChannel,
+                    Constants.ElevatorConstants.elevatorDownLimitDIOChannel),
+                wristExtender);
         break;
 
       case SIM:
@@ -96,6 +114,7 @@ public class RobotContainer {
         wristExtender = new WristExtender(new WristExtenderIO() {});
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
         intakeSubsystem = new IntakeSubsystem(servoHub);
+        elevator = new Elevator(new ElevatorIOSim(0), wristExtender);
         break;
 
       default:
@@ -108,6 +127,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         wristExtender = new WristExtender(new WristExtenderIO() {});
+        elevator = new Elevator(new ElevatorIO() {}, wristExtender);
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
         intakeSubsystem = new IntakeSubsystem(servoHub);
         break;
@@ -153,33 +173,34 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Start button will intake algae/shoot coral
-    driverTwoController.start().whileTrue(wristExtender.intakeAlgaeShootCoral());
+    mechanismController.start().whileTrue(wristExtender.intakeAlgaeShootCoral());
 
     // Back button will intake coral/shoot algae
-    driverTwoController.back().whileTrue(wristExtender.intakeCoralShootAlgae());
+    mechanismController.back().whileTrue(wristExtender.intakeCoralShootAlgae());
 
-    driverTwoController.y().whileTrue(wristExtender.goToCoralReefHigh());
-    driverTwoController.a().whileTrue(wristExtender.goToBarge());
+    mechanismController.y().whileTrue(wristExtender.goToCoralReefHigh());
+    mechanismController.a().whileTrue(wristExtender.goToBarge());
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            () -> -driveController.getLeftY(),
+            () -> -driveController.getLeftX(),
+            () -> -driveController.getRightX()));
     // Lock to 0° when A button is held
-    controller
+
+    driveController
         .a()
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
+                () -> -driveController.getLeftY(),
+                () -> -driveController.getLeftX(),
                 () -> new Rotation2d()));
 
     // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    driveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     // suggested inputs/buttons for intake controlls.
     // // coral intake trigger
     // controller.rightTrigger().onTrue(IntakeIOImplementation.coralIntake());
@@ -187,13 +208,13 @@ public class RobotContainer {
     // controller.leftTrigger().onTrue(IntakeIOImplementation.AlgaeIntake());
     // Reset gyro to 0° when B button is pressed
 
-    controller.rightBumper().whileTrue((climberSubsystem.ClimberDown()));
-    controller.leftBumper().whileTrue((climberSubsystem.ClimberUp()));
+    driveController.rightBumper().whileTrue((climberSubsystem.ClimberDown()));
+    driveController.leftBumper().whileTrue((climberSubsystem.ClimberUp()));
 
-    driverTwoController.axisLessThan(1, -0.5).onTrue(intakeSubsystem.feedGregory());
-    driverTwoController.axisGreaterThan(1, 0.5).onTrue(intakeSubsystem.receiveCoral());
+    mechanismController.axisLessThan(1, -0.5).onTrue(intakeSubsystem.feedGregory());
+    mechanismController.axisGreaterThan(1, 0.5).onTrue(intakeSubsystem.receiveCoral());
 
-    controller
+    driveController
         .b()
         .onTrue(
             Commands.runOnce(
@@ -203,9 +224,19 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    controller.y().onTrue(DriveCommands.boost());
+    driveController.y().onTrue(DriveCommands.boost());
 
-    controller.y().onFalse(DriveCommands.boostOff());
+    driveController.y().onFalse(DriveCommands.boostOff());
+
+    mechanismController.rightBumper().onTrue(elevator.PositionUp());
+    mechanismController.leftBumper().onTrue(elevator.PositionDown());
+
+    // elevator.setDefaultCommand(
+    // elevator.PDotCommand(MathUtil.applyDeadband(-mechanismController.getLeftY() *
+    // PDotGainNN.get(),0.1)));
+
+    mechanismController.povUp().whileTrue(elevator.PDotCommand(0.006));
+    mechanismController.povDown().whileTrue(elevator.PDotCommand(-0.006));
   }
 
   /**

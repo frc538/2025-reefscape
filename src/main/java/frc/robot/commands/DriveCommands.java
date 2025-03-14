@@ -35,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   // Creates variables for driving
@@ -61,6 +62,9 @@ public class DriveCommands {
 
     // Square magnitude for more precise control
     linearMagnitude = linearMagnitude * linearMagnitude;
+
+    Logger.recordOutput("Drive/LinearMagnitude", linearMagnitude);
+    Logger.recordOutput("Drive/LinearDirection", linearDirection);
 
     // Return new linear velocity
     return new Pose2d(new Translation2d(), linearDirection)
@@ -118,6 +122,7 @@ public class DriveCommands {
                   linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                   linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                   omega * drive.getMaxAngularSpeedRadPerSec());
+          Logger.recordOutput("Drive/ChassisSpeeds", speeds);
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == Alliance.Red;

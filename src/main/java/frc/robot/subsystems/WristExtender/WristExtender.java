@@ -102,4 +102,8 @@ public class WristExtender extends SubsystemBase {
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
   }
+
+  public boolean isGregoryDown() {
+    return inputs.servoPulseWidth > 1000;
+  }
 }
