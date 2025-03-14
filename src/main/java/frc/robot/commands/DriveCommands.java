@@ -89,6 +89,22 @@ public class DriveCommands {
         });
   }
 
+  public static Command slowBoost() {
+    return Commands.run(
+        () -> {
+          ANGLE_MAX_ACCELERATION = 10;
+          ANGLE_MAX_VELOCITY = 4;
+        });
+  }
+
+  public static Command slowBoostOff() {
+    return Commands.run(
+        () -> {
+          ANGLE_MAX_ACCELERATION = 20;
+          ANGLE_MAX_VELOCITY = 8;
+        });
+  }
+
   public static Command speedSet(Double Acceleration, Double velocity) {
     return Commands.run(
         () -> {

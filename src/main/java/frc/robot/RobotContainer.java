@@ -231,8 +231,10 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     driveController.y().onTrue(DriveCommands.boost());
-
     driveController.y().onFalse(DriveCommands.boostOff());
+    
+    driveController.rightBumper().onTrue(DriveCommands.slowBoost());
+    driveController.rightBumper().onFalse(DriveCommands.slowBoostOff());
 
     mechanismController.rightBumper().onTrue(elevator.PositionUp());
     mechanismController.leftBumper().onTrue(elevator.PositionDown());
