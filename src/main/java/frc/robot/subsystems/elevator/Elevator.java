@@ -21,7 +21,7 @@ public class Elevator extends SubsystemBase {
   private int positionTarget = 0;
   private int positionMax = 5;
   private int positionMin = 0;
-  private double minGregHeight = 0.5;
+  private double minGregHeight = 0.46;
 
   private double buttonPositionCommand = 0.0;
   private double PDotPositionCommand = 0.0;
