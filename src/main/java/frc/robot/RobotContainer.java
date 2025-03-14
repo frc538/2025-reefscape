@@ -156,11 +156,14 @@ public class RobotContainer {
     configureButtonBindings();
 
     ServoHubConfig shc = new ServoHubConfig();
-    shc.channel1.disableBehavior(BehaviorWhenDisabled.kSupplyPower).pulseRange(500, 1500, 2500);
+    shc.channel1.disableBehavior(BehaviorWhenDisabled.kDoNotSupplyPower)
+        .pulseRange(500, 1500, 2500);
 
-    shc.channel3.disableBehavior(BehaviorWhenDisabled.kSupplyPower).pulseRange(500, 1500, 2500);
+    shc.channel3.disableBehavior(BehaviorWhenDisabled.kDoNotSupplyPower)
+        .pulseRange(500, 1500, 2500);
 
-    shc.channel4.disableBehavior(BehaviorWhenDisabled.kSupplyPower).pulseRange(500, 1500, 2500);
+    shc.channel4.disableBehavior(BehaviorWhenDisabled.kDoNotSupplyPower)
+        .pulseRange(500, 1500, 2500);
 
     servoHub.configure(shc, ResetMode.kResetSafeParameters);
   }
