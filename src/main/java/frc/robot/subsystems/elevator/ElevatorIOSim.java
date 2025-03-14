@@ -160,7 +160,7 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   public void setReference(double position, double ffCommand, double kP, double kI, double kD) {
-      if (kPLast != kP|| kILast != kI || kDLast != kD) {
+    if (kPLast != kP || kILast != kI || kDLast != kD) {
       kPLast = kP;
       kILast = kI;
       kDLast = kD;

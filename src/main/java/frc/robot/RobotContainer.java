@@ -27,13 +27,6 @@ import frc.robot.subsystems.WristExtender.WristExtenderIOServo;
 import frc.robot.subsystems.climb.ClimberIO;
 import frc.robot.subsystems.climb.ClimberIOSparkMax;
 import frc.robot.subsystems.climb.ClimberSubsystem;
-import frc.robot.subsystems.Intake.IntakeSubsystem;
-import frc.robot.subsystems.WristExtender.WristExtender;
-import frc.robot.subsystems.WristExtender.WristExtenderIO;
-import frc.robot.subsystems.WristExtender.WristExtenderIOServo;
-import frc.robot.subsystems.climb.ClimberIO;
-import frc.robot.subsystems.climb.ClimberIOSparkMax;
-import frc.robot.subsystems.climb.ClimberSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -105,7 +98,8 @@ public class RobotContainer {
                     Constants.ElevatorConstants.leftCanId,
                     Constants.ElevatorConstants.rightCanId,
                     Constants.ElevatorConstants.elevatorUpLimitDIOChannel,
-                    Constants.ElevatorConstants.elevatorDownLimitDIOChannel), wristExtender);
+                    Constants.ElevatorConstants.elevatorDownLimitDIOChannel),
+                wristExtender);
         break;
 
       case SIM:

@@ -35,7 +35,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-
 import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
@@ -123,7 +122,7 @@ public class DriveCommands {
                   linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                   linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                   omega * drive.getMaxAngularSpeedRadPerSec());
-          Logger.recordOutput("Drive/ChassisSpeeds",speeds);
+          Logger.recordOutput("Drive/ChassisSpeeds", speeds);
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == Alliance.Red;

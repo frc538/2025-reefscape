@@ -11,13 +11,9 @@ import com.revrobotics.spark.SparkRelativeEncoder;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotState;
 import frc.robot.Constants;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class ElevatorIOSparkMax implements ElevatorIO {
@@ -129,7 +125,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
 
   public void setReference(double position, double ffCommand, double kP, double kI, double kD) {
 
-    if (kPLast != kP|| kILast != kI || kDLast != kD) {
+    if (kPLast != kP || kILast != kI || kDLast != kD) {
       kPLast = kP;
       kILast = kI;
       kDLast = kD;

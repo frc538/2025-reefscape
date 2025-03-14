@@ -7,13 +7,8 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.WristExtender.WristExtender;
-import frc.robot.subsystems.WristExtender.WristExtenderIO;
-
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
-
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase.ControlType;
 
 public class Elevator extends SubsystemBase {
   ElevatorIO io;
@@ -45,7 +40,7 @@ public class Elevator extends SubsystemBase {
   double mReferencePosition = 0.0;
 
   double[] positionThresholds = {1, 2};
-  
+
   int gainIndex = 0;
 
   double[] kS = {0, 0, 0};
@@ -66,9 +61,12 @@ public class Elevator extends SubsystemBase {
 
   ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
   LoggedNetworkNumber troughHeight = new LoggedNetworkNumber("/SmartDashboard/Trough Height", 0.46);
-  LoggedNetworkNumber coralLowHeight = new LoggedNetworkNumber("/SmartDashboard/Coral Low Height", 0.81);
-  LoggedNetworkNumber coralMedHeight = new LoggedNetworkNumber("/SmartDashboard/Coral Med Height", 1.21);
-  LoggedNetworkNumber coralHighHeight = new LoggedNetworkNumber("/SmartDashboard/Coral High Height", 1.83);
+  LoggedNetworkNumber coralLowHeight =
+      new LoggedNetworkNumber("/SmartDashboard/Coral Low Height", 0.81);
+  LoggedNetworkNumber coralMedHeight =
+      new LoggedNetworkNumber("/SmartDashboard/Coral Med Height", 1.21);
+  LoggedNetworkNumber coralHighHeight =
+      new LoggedNetworkNumber("/SmartDashboard/Coral High Height", 1.83);
   LoggedNetworkNumber bargeHeight = new LoggedNetworkNumber("/SmartDashboard/Barge Height", 1.9);
 
   LoggedNetworkNumber arbFF = new LoggedNetworkNumber("/SmartDashboard/Arbitrary FF Gain", 0.5);
@@ -160,16 +158,16 @@ public class Elevator extends SubsystemBase {
   }
 
   private void PositionCommand(double position) {
-    if (position < minGregHeight && wristPosition.isGregoryDown() == true)  {
+    if (position < minGregHeight && wristPosition.isGregoryDown() == true) {
       position = minGregHeight;
-    } 
+    }
     if (bottomSwitchHit == false && position < lowestObservedPosition) {
       position = lowestObservedPosition;
     }
-      setReference(position);
-      buttonPositionCommand = position;
-      PDotPositionCommand = position;
-      UseButtonState = true;
+    setReference(position);
+    buttonPositionCommand = position;
+    PDotPositionCommand = position;
+    UseButtonState = true;
   }
 
   public Command PDotCommand(double rate) {
@@ -197,8 +195,8 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Elevator/Commanded Position", position);
   }
 
-  private void commandMotors(){
-     double ffCommand = 0;
+  private void commandMotors() {
+    double ffCommand = 0;
     TrapezoidProfile.State state_step = new TrapezoidProfile.State();
     double averagePosition = (inputs.leftEncoderValue + inputs.rightEncoderValue) / 2;
     if (averagePosition > positionThresholds[1]) {
@@ -234,17 +232,16 @@ public class Elevator extends SubsystemBase {
     m_feedforward =
         new ElevatorFeedforward(kS[gainIndex], kG[gainIndex], kV[gainIndex], kA[gainIndex]);
 
-    if ((RobotState.isAutonomous() == true) || (RobotState.isTeleop())){
-        /* Do the command processing */
+    if ((RobotState.isAutonomous() == true) || (RobotState.isTeleop())) {
+      /* Do the command processing */
       state_step = commandProfile.calculate(0.02, mCurrentState, mDesiredState);
       mCurrentState = state_step;
       ffCommand =
           m_feedforward.calculateWithVelocities(mCurrentState.velocity, state_step.velocity);
-    } 
-    else {
+    } else {
       // do stuff when disabled
       // init reference position to where it thinks it is as average.
-      //mReferencePosition = (inputs.rightEncoderValue + inputs.leftEncoderValue) / 2;
+      // mReferencePosition = (inputs.rightEncoderValue + inputs.leftEncoderValue) / 2;
       mReferencePosition = calibratedGregStartingHeight;
       PDotPositionCommand = mReferencePosition;
       buttonPositionCommand = mReferencePosition;
