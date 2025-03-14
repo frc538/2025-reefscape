@@ -217,6 +217,32 @@ public class Drive extends SubsystemBase {
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
   }
 
+  public ChassisSpeeds driveWithBoost(ChassisSpeeds baseSpeeds, boolean isBoostActive, boolean isSlowBoostActive) {
+    double speedFactor = 1.0;
+
+    // Apply boost if the boost button is pressed
+    if (isBoostActive) {
+        speedFactor = 1.5; // Boost mode makes the robot go 1.5x faster
+    }
+    
+    // Apply slowBoost if the slowBoost button is pressed
+    if (isSlowBoostActive) {
+        speedFactor = 0.5; // SlowBoost mode reduces speed to half
+    }
+
+    // Scale the speeds accordingly
+    double adjustedVx = baseSpeeds.vxMetersPerSecond * speedFactor;
+    double adjustedVy = baseSpeeds.vyMetersPerSecond * speedFactor;
+    double adjustedOmega = baseSpeeds.omegaRadiansPerSecond * speedFactor;
+
+    // Create a new ChassisSpeeds object with the adjusted values
+    ChassisSpeeds adjustedSpeeds = new ChassisSpeeds(adjustedVx, adjustedVy, adjustedOmega);
+
+    // Send the adjusted speeds to the drive
+    return adjustedSpeeds;
+  }
+
+
   /**
    * Runs the drive at the desired velocity.
    *

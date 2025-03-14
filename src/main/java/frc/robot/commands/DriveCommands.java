@@ -49,6 +49,9 @@ public class DriveCommands {
   public static double ANGLE_MAX_VELOCITY = 8.0;
   public static double ANGLE_MAX_ACCELERATION = 20.0;
 
+  public static boolean boostActive = false;
+  public static boolean slowBoostActive = true;
+
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
@@ -76,32 +79,28 @@ public class DriveCommands {
   public static Command boost() {
     return Commands.run(
         () -> {
-          ANGLE_MAX_ACCELERATION = 60;
-          ANGLE_MAX_VELOCITY = 12;
+          boostActive = true;
         });
   }
 
   public static Command boostOff() {
     return Commands.run(
         () -> {
-          ANGLE_MAX_ACCELERATION = 20;
-          ANGLE_MAX_VELOCITY = 8;
+          boostActive = false;
         });
   }
 
   public static Command slowBoost() {
     return Commands.run(
         () -> {
-          ANGLE_MAX_ACCELERATION = 10;
-          ANGLE_MAX_VELOCITY = 4;
+          slowBoostActive = true;
         });
   }
 
   public static Command slowBoostOff() {
     return Commands.run(
         () -> {
-          ANGLE_MAX_ACCELERATION = 20;
-          ANGLE_MAX_VELOCITY = 8;
+          slowBoostActive = false;
         });
   }
 
@@ -145,7 +144,7 @@ public class DriveCommands {
                   && DriverStation.getAlliance().get() == Alliance.Red;
           drive.runVelocity(
               ChassisSpeeds.fromFieldRelativeSpeeds(
-                  speeds,
+                  drive.driveWithBoost(speeds, boostActive, slowBoostActive),
                   isFlipped
                       ? drive.getRotation().plus(new Rotation2d(Math.PI))
                       : drive.getRotation()));
