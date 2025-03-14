@@ -211,4 +211,8 @@ public class ElevatorIOSim implements ElevatorIO {
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(mSimLeft.getMotorCurrent()));
   }
+
+  public void setEncoders(double position) {
+    mLeftEncoder.setPosition(position);
+  }
 }

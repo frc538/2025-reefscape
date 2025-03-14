@@ -161,4 +161,10 @@ public class ElevatorIOSparkMax implements ElevatorIO {
     mLeftEncoder.setPosition(0);
     mRightEncoder.setPosition(0);
   }
+
+  @Override
+  public void setEncoders(double position) {
+    mLeftEncoder.setPosition(position);
+    mRightEncoder.setPosition(position);
+  }
 }

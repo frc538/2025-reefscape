@@ -25,6 +25,8 @@ public interface ElevatorIO {
 
   public default void resetEncoders() {}
 
+  public default void setEncoders(double position) {}
+
   public default void setReference(double position, double ffCommand, double kP, double kI, double kD) {}
 
   public default void setArbFF(double arbFF) {}

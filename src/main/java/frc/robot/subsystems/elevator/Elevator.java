@@ -22,6 +22,9 @@ public class Elevator extends SubsystemBase {
   private int positionMax = 5;
   private int positionMin = 0;
   private double minGregHeight = 0.46;
+  private double calibratedGregStartingHeight = 0.46;
+  private double lowestObservedPosition = calibratedGregStartingHeight;
+  private boolean bottomSwitchHit = false;
 
   private double buttonPositionCommand = 0.0;
   private double PDotPositionCommand = 0.0;
@@ -160,6 +163,9 @@ public class Elevator extends SubsystemBase {
     if (position < minGregHeight && wristPosition.isGregoryDown() == true)  {
       position = minGregHeight;
     } 
+    if (bottomSwitchHit == false && position < lowestObservedPosition) {
+      position = lowestObservedPosition;
+    }
       setReference(position);
       buttonPositionCommand = position;
       PDotPositionCommand = position;
@@ -178,7 +184,7 @@ public class Elevator extends SubsystemBase {
       if (PDotPositionCommand < minGregHeight && wristPosition.isGregoryDown() == true) {
         PDotPositionCommand = minGregHeight;
       }
-      if (PDotPositionCommand < 0) {
+      if (PDotPositionCommand < 0 && bottomSwitchHit == true) {
         PDotPositionCommand = 0;
       }
       setReference(PDotPositionCommand);
@@ -234,17 +240,19 @@ public class Elevator extends SubsystemBase {
       mCurrentState = state_step;
       ffCommand =
           m_feedforward.calculateWithVelocities(mCurrentState.velocity, state_step.velocity);
-      io.setReference(state_step.position, ffCommand, kP[gainIndex], kI[gainIndex], kD[gainIndex]);
-
     } 
     else {
       // do stuff when disabled
       // init reference position to where it thinks it is as average.
-      mReferencePosition = (inputs.rightEncoderValue + inputs.leftEncoderValue) / 2;
+      //mReferencePosition = (inputs.rightEncoderValue + inputs.leftEncoderValue) / 2;
+      mReferencePosition = calibratedGregStartingHeight;
       PDotPositionCommand = mReferencePosition;
       buttonPositionCommand = mReferencePosition;
       mDesiredState = new TrapezoidProfile.State(mReferencePosition, 0);
       mCurrentState = mDesiredState;
+      io.setReference(mReferencePosition, 0, kP[gainIndex], kI[gainIndex], kD[gainIndex]);
+      io.setEncoders(mReferencePosition);
+      lowestObservedPosition = mReferencePosition;
     }
     Logger.recordOutput("Elevator/Feed Forward Command", ffCommand);
     Logger.recordOutput("Elevator/Motor Position Command", mReferencePosition);
@@ -267,6 +275,12 @@ public class Elevator extends SubsystemBase {
 
     if (inputs.atBottom) {
       io.resetEncoders();
+      lowestObservedPosition = 0;
+      bottomSwitchHit = true;
+    } else {
+      if (lowestObservedPosition > ((inputs.leftEncoderValue + inputs.rightEncoderValue) / 2)) {
+        lowestObservedPosition = ((inputs.leftEncoderValue + inputs.rightEncoderValue) / 2);
+      }
     }
 
     commandMotors();
