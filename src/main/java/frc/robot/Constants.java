@@ -94,6 +94,6 @@ public final class Constants {
 
   public static class IntakeConstants {
     public static final int InPosition = 819;
-    public static final int OutPosition = 1024;
+    public static final int OutPosition = 1000; //1024 too far out
   }
 }
