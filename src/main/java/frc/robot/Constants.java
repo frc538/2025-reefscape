@@ -76,13 +76,6 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
 
-  public static class WristExtenderConstants {
-    public static final int coralLowMediumPulseWidth = 130;
-    public static final int coralHighPulseWidth = 1500;
-    public static final int algaeProcessorPulseWidth = 500;
-    public static final int bargePulseWidth = 2500;
-  }
-
   public static class ClimberConstants {
     public static final int CurrentLimit = 20;
     public static final int ClimberPositionConversionFactor = /*put real value here-->*/ 1;
@@ -90,10 +83,5 @@ public final class Constants {
     public static final int ClimberWheelFreeSpeedMetersPerSecond = /*put real value here-->*/ 1;
     public static final int ClimberMotorCANId = 13;
     public static final int IntakeServoDIOID = 2;
-  }
-
-  public static class IntakeConstants {
-    public static final int InPosition = 819;
-    public static final int OutPosition = 1000; // 1024 too far out
   }
 }
