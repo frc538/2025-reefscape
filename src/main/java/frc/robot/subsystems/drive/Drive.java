@@ -27,7 +27,6 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -49,7 +48,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.LimelightHelpers;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
@@ -90,7 +88,7 @@ public class Drive extends SubsystemBase {
 
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
-  private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+  public final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
   private final Alert gyroDisconnectedAlert =
@@ -105,10 +103,8 @@ public class Drive extends SubsystemBase {
         new SwerveModulePosition(),
         new SwerveModulePosition()
       };
-  private SwerveDrivePoseEstimator poseEstimator =
+  public SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
-
-  int mt2_check_count = 0;
 
   public Drive(
       GyroIO gyroIO,
@@ -162,76 +158,30 @@ public class Drive extends SubsystemBase {
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
   }
 
-  public void UpdateOdometry() {
-    boolean useMegaTag2 = true; // set to false to use MegaTag1
-    boolean doRejectUpdate = false;
-    if (useMegaTag2 == false) {
-      LimelightHelpers.PoseEstimate mt1 =
-          LimelightHelpers.getBotPoseEstimate_wpiBlue(
-              Constants.LimeLightConstants.limelightOneName);
+  @Override
+  public void periodic() {
+    odometryLock.lock(); // Prevents odometry updates while reading data
+    gyroIO.updateInputs(gyroInputs);
+    Logger.processInputs("Drive/Gyro", gyroInputs);
+    for (var module : modules) {
+      module.periodic();
+    }
+    odometryLock.unlock();
 
-      if (mt1 != null) {
-        Logger.recordOutput("Tag Count", mt1.tagCount);
-      }
-      /*
-       * if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {
-       * if (mt1.rawFiducials[0].ambiguity > .7) {
-       * doRejectUpdate = true;
-       * }
-       * if (mt1.rawFiducials[0].distToCamera > 3) {
-       * doRejectUpdate = true;
-       * }
-       * }
-       */
-
-      if (mt1.tagCount == 0) {
-        doRejectUpdate = true;
-      }
-
-      Logger.recordOutput("Limelight Pose", mt1.pose);
-      if (!doRejectUpdate) {
-        poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
-        poseEstimator.addVisionMeasurement(mt1.pose, mt1.timestampSeconds);
-      }
-    } else if (useMegaTag2 == true) {
-      LimelightHelpers.SetRobotOrientation(
-          Constants.LimeLightConstants.limelightOneName,
-          poseEstimator.getEstimatedPosition().getRotation().getDegrees(),
-          0,
-          0,
-          0,
-          0,
-          0);
-      LimelightHelpers.PoseEstimate mt2 =
-          LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(
-              Constants.LimeLightConstants.limelightOneName);
-      if (mt2 != null) {
-        Logger.recordOutput("Limelight Pose", mt2.pose);
-      }
-      if (Math.abs(gyroInputs.yawVelocityRadPerSec)
-          > 720) // if our angular velocity is greater than 720 degrees per
-      // second,
-      // ignore vision updates
-      {
-        doRejectUpdate = true;
-      }
-      if (mt2 != null) {
-        if (mt2.tagCount == 0) {
-          doRejectUpdate = true;
-        }
-      }
-
-      Logger.recordOutput("do reject update", doRejectUpdate);
-      if (!doRejectUpdate) {
-        poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-        if (mt2 != null) {
-          poseEstimator.addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
-        }
+    // Stop moving when disabled
+    if (DriverStation.isDisabled()) {
+      for (var module : modules) {
+        module.stop();
       }
     }
 
+    // Log empty setpoint states when disabled
+    if (DriverStation.isDisabled()) {
+      Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
+      Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
+    }
+
     // Update odometry
-    Logger.recordOutput("do reject update", doRejectUpdate);
     double[] sampleTimestamps =
         modules[0].getOdometryTimestamps(); // All signals are sampled together
     int sampleCount = sampleTimestamps.length;
@@ -265,42 +215,6 @@ public class Drive extends SubsystemBase {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
-  }
-
-  public void simpleUpdateOdometry() {
-    var pose =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(
-            Constants.LimeLightConstants.limelightOneName);
-    if (pose == null) return;
-    poseEstimator.addVisionMeasurement(pose.pose, pose.timestampSeconds);
-  }
-
-  @Override
-  public void periodic() {
-    odometryLock.lock(); // Prevents odometry updates while reading data
-    gyroIO.updateInputs(gyroInputs);
-    Logger.processInputs("Drive/Gyro", gyroInputs);
-    Logger.recordOutput("Drive/Gyro Yaw Degrees", gyroInputs.yawPosition.getDegrees());
-    for (var module : modules) {
-      module.periodic();
-    }
-    odometryLock.unlock();
-
-    // Stop moving when disabled
-    if (DriverStation.isDisabled()) {
-      for (var module : modules) {
-        module.stop();
-      }
-    }
-
-    UpdateOdometry();
-    // simpleUpdateOdometry();
-
-    // Log empty setpoint states when disabled
-    if (DriverStation.isDisabled()) {
-      Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
-      Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
-    }
   }
 
   /**
