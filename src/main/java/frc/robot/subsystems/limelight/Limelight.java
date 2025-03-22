@@ -25,12 +25,12 @@ public class Limelight extends SubsystemBase {
         LimelightHelpers.PoseEstimate mt2 = LimelightHelpers
                 .getBotPoseEstimate_wpiBlue_MegaTag2(limelightOne);
         if (mt1 != null) {
-            Logger.recordOutput("Odometry/MT1/Tag Count", mt1.tagCount);
-            Logger.recordOutput("Odometry/MT1/Pose", mt1.pose);
+            Logger.recordOutput(String.format("Odometry/%s-MT1/Tag Count",limelightOne), mt1.tagCount);
+            Logger.recordOutput(String.format("Odometry/%s-MT1/Pose", limelightOne), mt1.pose);
         }
         if (mt2 != null) {
-            Logger.recordOutput("Odometry/MT2/Tag Count", mt2.tagCount);
-            Logger.recordOutput("Odometry/MT2/Pose", mt2.pose);
+            Logger.recordOutput(String.format("Odometry/%s-MT2/Tag Count", limelightOne), mt2.tagCount);
+            Logger.recordOutput(String.format("Odometry/%s-MT2/Pose", limelightOne), mt2.pose);
         }
 
         if (useMegaTag2 == false) {
