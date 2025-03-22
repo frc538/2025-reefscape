@@ -178,9 +178,9 @@ public class Elevator extends SubsystemBase {
       PDotRate = rate;
       UseButtonState = false;
       PDotPositionCommand = PDotPositionCommand + PDotRate;
-      //if (PDotPositionCommand < minGregHeight && wristPosition.isGregoryDown() == true) {
+      // if (PDotPositionCommand < minGregHeight && wristPosition.isGregoryDown() == true) {
       //  PDotPositionCommand = minGregHeight;
-      //}
+      // }
       if (PDotPositionCommand < 0 && bottomSwitchHit == true) {
         PDotPositionCommand = 0;
       }

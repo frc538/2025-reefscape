@@ -14,7 +14,6 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotState;
 import frc.robot.Constants;
-
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -147,19 +146,17 @@ public class ElevatorIOSparkMax implements ElevatorIO {
         rightController.setIAccum(0);
         setEncoders(position);
 
-        StartFrameCountDown = StartFrameCountDown-1;
-      }
-      else{
-        
+        StartFrameCountDown = StartFrameCountDown - 1;
+      } else {
+
       }
     } else {
       StartFrameCountDown = 10;
     }
-//Normal enabled state
-rightController.setReference(position, ControlType.kPosition, ClosedLoopSlot.kSlot0, ffCommand);
-leftController.setReference(position, ControlType.kPosition, ClosedLoopSlot.kSlot0, ffCommand);
+    // Normal enabled state
+    rightController.setReference(position, ControlType.kPosition, ClosedLoopSlot.kSlot0, ffCommand);
+    leftController.setReference(position, ControlType.kPosition, ClosedLoopSlot.kSlot0, ffCommand);
     Logger.recordOutput("Elevator/Sparkmax Ref Position", position);
-    
   }
 
   @Override
