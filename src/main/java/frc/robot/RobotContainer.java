@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.climb.ClimberIO;
 import frc.robot.subsystems.climb.ClimberIOSparkMax;
 import frc.robot.subsystems.climb.ClimberSubsystem;
@@ -47,7 +46,6 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final ClimberSubsystem climberSubsystem;
-  private final IntakeSubsystem intakeSubsystem;
   private final Elevator elevator;
 
   // Controller
@@ -82,8 +80,6 @@ public class RobotContainer {
             new ClimberSubsystem(
                 new ClimberIOSparkMax(Constants.ClimberConstants.ClimberMotorCANId, 5, 6));
 
-        intakeSubsystem = new IntakeSubsystem(servoHub);
-
         elevator =
             new Elevator(
                 new ElevatorIOSparkMax(
@@ -103,7 +99,6 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
-        intakeSubsystem = new IntakeSubsystem(servoHub);
         elevator = new Elevator(new ElevatorIOSim(0));
         break;
 
@@ -118,7 +113,6 @@ public class RobotContainer {
                 new ModuleIO() {});
         elevator = new Elevator(new ElevatorIO() {});
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
-        intakeSubsystem = new IntakeSubsystem(servoHub);
         break;
     }
 
@@ -196,9 +190,6 @@ public class RobotContainer {
 
     driveController.rightBumper().whileTrue((climberSubsystem.ClimberDown()));
     driveController.leftBumper().whileTrue((climberSubsystem.ClimberUp()));
-
-    mechanismController.axisLessThan(1, -0.5).onTrue(intakeSubsystem.feedGregory());
-    mechanismController.axisGreaterThan(1, 0.5).onTrue(intakeSubsystem.receiveCoral());
 
     driveController
         .b()
