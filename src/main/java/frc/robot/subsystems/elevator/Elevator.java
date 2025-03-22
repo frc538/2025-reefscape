@@ -19,7 +19,9 @@ public class Elevator extends SubsystemBase {
   private double minGregHeight = 0.46;
   private double calibratedGregStartingHeight = 0.46;
   private double lowestObservedPosition = calibratedGregStartingHeight;
+  private double highestObservedPosition = calibratedGregStartingHeight;
   private boolean bottomSwitchHit = false;
+  private boolean topSwitchHit = false;
 
   private double buttonPositionCommand = 0.0;
   private double PDotPositionCommand = 0.0;
@@ -27,9 +29,6 @@ public class Elevator extends SubsystemBase {
   private boolean UseButtonState = true;
 
   private final WristExtender wristPosition;
-
-  private final double[] positionArray = {1, 2, 3};
-  private final double[] gainArray = {1, 2, 3};
 
   Constraints profileConstraints;
   TrapezoidProfile commandProfile;
@@ -39,7 +38,7 @@ public class Elevator extends SubsystemBase {
 
   double mReferencePosition = 0.0;
 
-  double[] positionThresholds = {1, 2};
+  double[] positionThresholds = {0.63, 1.36};
 
   int gainIndex = 0;
 
@@ -50,7 +49,7 @@ public class Elevator extends SubsystemBase {
   double[] maxV = {0.3, 0.3, 0.3};
   double[] maxA = {0.3, 0.3, 0.3};
   double[] kP = {0.5, 0.75, 0.75};
-  double[] kI = {0.01, 0, 0};
+  double[] kI = {0.005, 0, 0};
   double[] kD = {0, 0, 0};
 
   // section heights
@@ -179,9 +178,9 @@ public class Elevator extends SubsystemBase {
       PDotRate = rate;
       UseButtonState = false;
       PDotPositionCommand = PDotPositionCommand + PDotRate;
-      if (PDotPositionCommand < minGregHeight && wristPosition.isGregoryDown() == true) {
-        PDotPositionCommand = minGregHeight;
-      }
+      // if (PDotPositionCommand < minGregHeight && wristPosition.isGregoryDown() == true) {
+      //  PDotPositionCommand = minGregHeight;
+      // }
       if (PDotPositionCommand < 0 && bottomSwitchHit == true) {
         PDotPositionCommand = 0;
       }
@@ -247,14 +246,16 @@ public class Elevator extends SubsystemBase {
       buttonPositionCommand = mReferencePosition;
       mDesiredState = new TrapezoidProfile.State(mReferencePosition, 0);
       mCurrentState = mDesiredState;
-      io.setReference(mReferencePosition, 0, kP[gainIndex], kI[gainIndex], kD[gainIndex]);
       io.setEncoders(mReferencePosition);
       lowestObservedPosition = mReferencePosition;
     }
+    io.setReference(mReferencePosition, 0, kP[gainIndex], kI[gainIndex], kD[gainIndex]);
     Logger.recordOutput("Elevator/Feed Forward Command", ffCommand);
     Logger.recordOutput("Elevator/Motor Position Command", mReferencePosition);
     Logger.recordOutput("Elevator/Profile/Position", state_step.position);
     Logger.recordOutput("Elevator/Profile/Velocity", state_step.velocity);
+    Logger.recordOutput("Elevator/Lowest Observed Position", lowestObservedPosition);
+    Logger.recordOutput("Elevator/Has Bottom Been Hit", bottomSwitchHit);
   }
 
   @Override
@@ -268,8 +269,6 @@ public class Elevator extends SubsystemBase {
       Logger.recordOutput("Elevator/Command Source", "Stick");
     }
 
-    io.setArbFF(arbFF.get());
-
     if (inputs.atBottom) {
       io.resetEncoders();
       lowestObservedPosition = 0;
@@ -282,8 +281,9 @@ public class Elevator extends SubsystemBase {
 
     commandMotors();
 
-    Logger.recordOutput("Elevator/Button Command", buttonPositionCommand);
+    Logger.recordOutput("Elevator/Button Position Command", buttonPositionCommand);
     Logger.recordOutput("Elevator/PDot Command", PDotPositionCommand);
     Logger.recordOutput("Elevator/Position Target", positionTarget);
+    Logger.recordOutput("Elevator/Section", gainIndex);
   }
 }

@@ -132,11 +132,10 @@ public class ElevatorIOSim implements ElevatorIO {
     commandProfile = new TrapezoidProfile(profileConstraints);
     m_feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
     mCurrentState = new TrapezoidProfile.State();
-    setReference(0.0);
   }
 
   // ¯\_(ツ)_/¯\\
-
+  @Override
   public void updateInputs(ElevatorIOInputs inputs) {
     inputs.leftBusVoltage = mSimLeft.getAppliedOutput() * RoboRioSim.getVInVoltage();
     inputs.leftCurrent = mSimLeft.getMotorCurrent();
@@ -146,19 +145,7 @@ public class ElevatorIOSim implements ElevatorIO {
     inputs.leftEncoderValue = mLeftEncoder.getPosition();
   }
 
-  public void setReference(double position) {
-    mReferencePosition = position;
-    mDesiredState = new TrapezoidProfile.State(mReferencePosition, 0);
-    Logger.recordOutput("Sim/Commanded Position", position);
-    System.out.println(position);
-  }
-
-  public void setArbFF(double arbFF) {
-    mArbFF = arbFF;
-    kG = arbFF;
-    m_feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
-  }
-
+  @Override
   public void setReference(double position, double ffCommand, double kP, double kI, double kD) {
     if (kPLast != kP || kILast != kI || kDLast != kD) {
       kPLast = kP;
@@ -212,6 +199,7 @@ public class ElevatorIOSim implements ElevatorIO {
         BatterySim.calculateDefaultBatteryLoadedVoltage(mSimLeft.getMotorCurrent()));
   }
 
+  @Override
   public void setEncoders(double position) {
     mLeftEncoder.setPosition(position);
   }

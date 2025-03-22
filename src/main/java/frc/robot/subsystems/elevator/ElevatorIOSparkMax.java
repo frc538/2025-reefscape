@@ -14,6 +14,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotState;
 import frc.robot.Constants;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class ElevatorIOSparkMax implements ElevatorIO {
@@ -32,7 +33,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   private final DigitalInput topLimit;
   private final DigitalInput bottomLimit;
 
-  private boolean firstFrame = true;
+  private int StartFrameCountDown = 10;
 
   LoggedNetworkNumber kSnn = new LoggedNetworkNumber("/SmartDashboard/kS", 0.0);
   LoggedNetworkNumber kVnn = new LoggedNetworkNumber("/SmartDashboard/kV", 0.0);
@@ -107,7 +108,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   }
 
   // ¯\_(ツ)_/¯\\
-
+  @Override
   public void updateInputs(ElevatorIOInputs inputs) {
     inputs.leftBusVoltage = mLeft.getBusVoltage();
     inputs.leftCurrent = mLeft.getOutputCurrent();
@@ -123,6 +124,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
     inputs.atTop = !topLimit.get();
   }
 
+  @Override
   public void setReference(double position, double ffCommand, double kP, double kI, double kD) {
 
     if (kPLast != kP || kILast != kI || kDLast != kD) {
@@ -139,17 +141,22 @@ public class ElevatorIOSparkMax implements ElevatorIO {
     }
 
     if ((RobotState.isAutonomous() == true) || (RobotState.isTeleop())) {
-      if (firstFrame == false) {
+      if (StartFrameCountDown > 0) {
         leftController.setIAccum(0);
         rightController.setIAccum(0);
-      }
-      firstFrame = true;
-    } else {
-      firstFrame = false;
-    }
+        setEncoders(position);
 
+        StartFrameCountDown = StartFrameCountDown - 1;
+      } else {
+
+      }
+    } else {
+      StartFrameCountDown = 10;
+    }
+    // Normal enabled state
     rightController.setReference(position, ControlType.kPosition, ClosedLoopSlot.kSlot0, ffCommand);
     leftController.setReference(position, ControlType.kPosition, ClosedLoopSlot.kSlot0, ffCommand);
+    Logger.recordOutput("Elevator/Sparkmax Ref Position", position);
   }
 
   @Override
@@ -162,5 +169,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   public void setEncoders(double position) {
     mLeftEncoder.setPosition(position);
     mRightEncoder.setPosition(position);
+
+    Logger.recordOutput("Elevator/Motor Encoder Set Point", position);
   }
 }
