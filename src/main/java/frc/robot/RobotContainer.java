@@ -20,6 +20,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.ArmIO;
+import frc.robot.subsystems.arm.ArmIOSparkMax;
 import frc.robot.subsystems.climb.ClimberIO;
 import frc.robot.subsystems.climb.ClimberIOSparkMax;
 import frc.robot.subsystems.climb.ClimberSubsystem;
@@ -47,6 +50,7 @@ public class RobotContainer {
   private final Drive drive;
   private final ClimberSubsystem climberSubsystem;
   private final Elevator elevator;
+  private final Arm arm;
 
   // Controller
   private final CommandXboxController driveController = new CommandXboxController(0);
@@ -87,6 +91,8 @@ public class RobotContainer {
                     Constants.ElevatorConstants.rightCanId,
                     Constants.ElevatorConstants.elevatorUpLimitDIOChannel,
                     Constants.ElevatorConstants.elevatorDownLimitDIOChannel));
+        arm =
+            new Arm(new ArmIOSparkMax(Constants.ArmConstants.ArmCanID));
         break;
 
       case SIM:
@@ -100,6 +106,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackRight));
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
         elevator = new Elevator(new ElevatorIOSim(0));
+        arm = new Arm(new ArmIO(){});
         break;
 
       default:
@@ -113,6 +120,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         elevator = new Elevator(new ElevatorIO() {});
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
+        arm = new Arm(new ArmIO(){});
         break;
     }
 
@@ -214,6 +222,9 @@ public class RobotContainer {
 
     mechanismController.povUp().whileTrue(elevator.PDotCommand(0.006));
     mechanismController.povDown().whileTrue(elevator.PDotCommand(-0.006));
+
+    mechanismController.b().whileTrue(arm.ArmUp());
+    mechanismController.x().whileTrue(arm.ArmDown());
   }
 
   /**

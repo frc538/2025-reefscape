@@ -8,8 +8,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
- * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
- * on a roboRIO. Change the value of "simMode" to switch between "sim" (physics sim) and "replay"
+ * This class defines the runtime mode used by AdvantageKit. The mode is always
+ * "real" when running
+ * on a roboRIO. Change the value of "simMode" to switch between "sim" (physics
+ * sim) and "replay"
  * (log replay from a file).
  */
 public final class Constants {
@@ -51,8 +53,7 @@ public final class Constants {
      */
 
     public static double RotationConversion = 2 * Math.PI * Units.inchesToMeters(2.074);
-    public static double ElevatorPositionConversionFactor =
-        1.5 / 9.0 * RotationConversion; // m/rotation
+    public static double ElevatorPositionConversionFactor = 1.5 / 9.0 * RotationConversion; // m/rotation
     public static double ElevatorVelocityConversionFactor = 1.5 / 9.0 * RotationConversion;
     public static double ElevatorMotorFreeSpeedRevsPerSecond = NeoFreeSpeedRPM / 60.0;
 
@@ -78,10 +79,22 @@ public final class Constants {
 
   public static class ClimberConstants {
     public static final int CurrentLimit = 20;
-    public static final int ClimberPositionConversionFactor = /*put real value here-->*/ 1;
-    public static final int ClimberVelocityConversionFactor = /*put real value here-->*/ 1;
-    public static final int ClimberWheelFreeSpeedMetersPerSecond = /*put real value here-->*/ 1;
+    public static final int ClimberPositionConversionFactor = /* put real value here--> */ 1;
+    public static final int ClimberVelocityConversionFactor = /* put real value here--> */ 1;
+    public static final int ClimberWheelFreeSpeedMetersPerSecond = /* put real value here--> */ 1;
     public static final int ClimberMotorCANId = 13;
     public static final int IntakeServoDIOID = 2;
+  }
+
+  public static class ArmConstants {
+    public static final int ArmCanID = 46;
+
+    public static int NeoFreeSpeedRPM = 5676;
+    public static int CurrentLimit = 50;
+    public static double RotationConversion = 2 * Math.PI * Units.inchesToMeters(2.074);
+    public static double PositionConversionFactor = 1.5 / 9.0 * RotationConversion; // m/rotation
+    public static double VelocityConversionFactor = 1.5 / 9.0 * RotationConversion;
+    public static double MotorFreeSpeedRevsPerSecond = NeoFreeSpeedRPM / 60.0;
+    
   }
 }
