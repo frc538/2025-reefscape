@@ -6,7 +6,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.WristExtender.WristExtender;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -27,8 +26,6 @@ public class Elevator extends SubsystemBase {
   private double PDotPositionCommand = 0.0;
   private double PDotRate = 0.0;
   private boolean UseButtonState = true;
-
-  private final WristExtender wristPosition;
 
   Constraints profileConstraints;
   TrapezoidProfile commandProfile;
@@ -70,9 +67,8 @@ public class Elevator extends SubsystemBase {
 
   LoggedNetworkNumber arbFF = new LoggedNetworkNumber("/SmartDashboard/Arbitrary FF Gain", 0.5);
 
-  public Elevator(ElevatorIO IO, WristExtender WristExtender) {
+  public Elevator(ElevatorIO IO) {
     io = IO;
-    wristPosition = WristExtender;
 
     profileConstraints = new Constraints(maxV[gainIndex], maxA[gainIndex]);
     commandProfile = new TrapezoidProfile(profileConstraints);
@@ -157,7 +153,7 @@ public class Elevator extends SubsystemBase {
   }
 
   private void PositionCommand(double position) {
-    if (position < minGregHeight && wristPosition.isGregoryDown() == true) {
+    if (position < minGregHeight) {
       position = minGregHeight;
     }
     if (bottomSwitchHit == false && position < lowestObservedPosition) {
