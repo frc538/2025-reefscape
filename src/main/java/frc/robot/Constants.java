@@ -8,10 +8,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
- * This class defines the runtime mode used by AdvantageKit. The mode is always
- * "real" when running
- * on a roboRIO. Change the value of "simMode" to switch between "sim" (physics
- * sim) and "replay"
+ * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
+ * on a roboRIO. Change the value of "simMode" to switch between "sim" (physics sim) and "replay"
  * (log replay from a file).
  */
 public final class Constants {
@@ -53,7 +51,8 @@ public final class Constants {
      */
 
     public static double RotationConversion = 2 * Math.PI * Units.inchesToMeters(2.074);
-    public static double ElevatorPositionConversionFactor = 1.5 / 9.0 * RotationConversion; // m/rotation
+    public static double ElevatorPositionConversionFactor =
+        1.5 / 9.0 * RotationConversion; // m/rotation
     public static double ElevatorVelocityConversionFactor = 1.5 / 9.0 * RotationConversion;
     public static double ElevatorMotorFreeSpeedRevsPerSecond = NeoFreeSpeedRPM / 60.0;
 
@@ -95,6 +94,5 @@ public final class Constants {
     public static double PositionConversionFactor = 1.5 / 9.0 * RotationConversion; // m/rotation
     public static double VelocityConversionFactor = 1.5 / 9.0 * RotationConversion;
     public static double MotorFreeSpeedRevsPerSecond = NeoFreeSpeedRPM / 60.0;
-    
   }
 }

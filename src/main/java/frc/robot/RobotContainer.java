@@ -5,7 +5,6 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.revrobotics.servohub.ServoChannel.ChannelId;
 import com.revrobotics.servohub.ServoHub;
 import com.revrobotics.servohub.ServoHub.ResetMode;
 import com.revrobotics.servohub.config.ServoChannelConfig.BehaviorWhenDisabled;
@@ -91,8 +90,7 @@ public class RobotContainer {
                     Constants.ElevatorConstants.rightCanId,
                     Constants.ElevatorConstants.elevatorUpLimitDIOChannel,
                     Constants.ElevatorConstants.elevatorDownLimitDIOChannel));
-        arm =
-            new Arm(new ArmIOSparkMax(Constants.ArmConstants.ArmCanID));
+        arm = new Arm(new ArmIOSparkMax(Constants.ArmConstants.ArmCanID));
         break;
 
       case SIM:
@@ -106,7 +104,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackRight));
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
         elevator = new Elevator(new ElevatorIOSim(0));
-        arm = new Arm(new ArmIO(){});
+        arm = new Arm(new ArmIO() {});
         break;
 
       default:
@@ -120,7 +118,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         elevator = new Elevator(new ElevatorIO() {});
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
-        arm = new Arm(new ArmIO(){});
+        arm = new Arm(new ArmIO() {});
         break;
     }
 
