@@ -221,8 +221,7 @@ public class RobotContainer {
     mechanismController.povUp().whileTrue(elevator.PDotCommand(0.006));
     mechanismController.povDown().whileTrue(elevator.PDotCommand(-0.006));
 
-    mechanismController.b().whileTrue(arm.ArmUp());
-    mechanismController.x().whileTrue(arm.ArmDown());
+    arm.setDefaultCommand(arm.MoveArm(() -> mechanismController.getRightY()));
   }
 
   /**
