@@ -167,6 +167,8 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    //DRIVE CONTROLLER COMMANDS
+
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
@@ -175,6 +177,16 @@ public class RobotContainer {
             () -> -driveController.getLeftX(),
             () -> -driveController.getRightX()));
     // Lock to 0° when A button is held
+
+    driveController
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                    drive)
+                .ignoringDisable(true));
 
     driveController
         .a()
@@ -187,41 +199,21 @@ public class RobotContainer {
 
     // Switch to X pattern when X button is pressed
     driveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    // suggested inputs/buttons for intake controlls.
-    // // coral intake trigger
-    // controller.rightTrigger().onTrue(IntakeIOImplementation.coralIntake());
-    // //Algae intake trigger
-    // controller.leftTrigger().onTrue(IntakeIOImplementation.AlgaeIntake());
-    // Reset gyro to 0° when B button is pressed
-
     driveController.rightBumper().whileTrue((climberSubsystem.ClimberDown()));
     driveController.leftBumper().whileTrue((climberSubsystem.ClimberUp()));
-
-    driveController
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
-
     driveController.y().onTrue(DriveCommands.boost());
-
     driveController.y().onFalse(DriveCommands.boostOff());
+
+    // MECHANISM CONTROLLER COMMANDS
 
     mechanismController.rightBumper().onTrue(elevator.PositionUp());
     mechanismController.leftBumper().onTrue(elevator.PositionDown());
-
+    mechanismController.povUp().whileTrue(elevator.PDotCommand(0.006));
+    mechanismController.povDown().whileTrue(elevator.PDotCommand(-0.006));
+    arm.setDefaultCommand(arm.MoveArm(() -> mechanismController.getRightY()));
     // elevator.setDefaultCommand(
     // elevator.PDotCommand(MathUtil.applyDeadband(-mechanismController.getLeftY() *
     // PDotGainNN.get(),0.1)));
-
-    mechanismController.povUp().whileTrue(elevator.PDotCommand(0.006));
-    mechanismController.povDown().whileTrue(elevator.PDotCommand(-0.006));
-
-    arm.setDefaultCommand(arm.MoveArm(() -> mechanismController.getRightY()));
   }
 
   /**
