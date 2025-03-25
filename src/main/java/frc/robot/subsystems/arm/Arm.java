@@ -3,9 +3,7 @@ package frc.robot.subsystems.arm;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import java.util.function.DoubleSupplier;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
@@ -18,11 +16,12 @@ public class Arm extends SubsystemBase {
   }
 
   public Command MoveArm(DoubleSupplier speedSupplier) {
-    return run(() -> {
-      mSpeed = speedSupplier.getAsDouble();
-      mSpeed = MathUtil.applyDeadband(mSpeed, 0.1);
-    io.armSpeedCommand(mSpeed);}
-    );
+    return run(
+        () -> {
+          mSpeed = speedSupplier.getAsDouble();
+          mSpeed = MathUtil.applyDeadband(mSpeed, 0.1);
+          io.armSpeedCommand(mSpeed);
+        });
   }
 
   @Override

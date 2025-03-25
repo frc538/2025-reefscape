@@ -153,9 +153,6 @@ public class Elevator extends SubsystemBase {
   }
 
   private void PositionCommand(double position) {
-    if (position < minGregHeight) {
-      position = minGregHeight;
-    }
     if (bottomSwitchHit == false && position < lowestObservedPosition) {
       position = lowestObservedPosition;
     }

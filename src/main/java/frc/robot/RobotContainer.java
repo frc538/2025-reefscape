@@ -167,7 +167,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    //DRIVE CONTROLLER COMMANDS
+    // DRIVE CONTROLLER COMMANDS
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
