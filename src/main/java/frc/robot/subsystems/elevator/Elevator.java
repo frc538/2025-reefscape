@@ -40,13 +40,13 @@ public class Elevator extends SubsystemBase {
   int gainIndex = 0;
 
   double[] kS = {0, 0, 0};
-  double[] kG = {0.5, 0.65, 0.8};
+  double[] kG = {0, 0., 0};
   double[] kV = {3.5, 3.9, 4.5};
   double[] kA = {0, 0, 0};
   double[] maxV = {0.3, 0.3, 0.3};
   double[] maxA = {0.3, 0.3, 0.3};
-  double[] kP = {0.5, 0.75, 0.75};
-  double[] kI = {0.005, 0, 0};
+  double[] kP = {0.5, 0.5, 0.5};
+  double[] kI = {0.0, 0, 0};
   double[] kD = {0, 0, 0};
 
   // section heights
@@ -242,7 +242,7 @@ public class Elevator extends SubsystemBase {
       io.setEncoders(mReferencePosition);
       lowestObservedPosition = mReferencePosition;
     }
-    io.setReference(mReferencePosition, 0, kP[gainIndex], kI[gainIndex], kD[gainIndex]);
+    io.setReference(mCurrentState.position, ffCommand, kP[gainIndex], kI[gainIndex], kD[gainIndex]);
     Logger.recordOutput("Elevator/Feed Forward Command", ffCommand);
     Logger.recordOutput("Elevator/Motor Position Command", mReferencePosition);
     Logger.recordOutput("Elevator/Profile/Position", state_step.position);
