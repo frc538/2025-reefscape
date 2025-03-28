@@ -76,24 +76,23 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
 
-  public static class WristExtenderConstants {
-    public static final int coralLowMediumPulseWidth = 130;
-    public static final int coralHighPulseWidth = 1500;
-    public static final int algaeProcessorPulseWidth = 500;
-    public static final int bargePulseWidth = 2500;
-  }
-
   public static class ClimberConstants {
     public static final int CurrentLimit = 20;
-    public static final int ClimberPositionConversionFactor = /*put real value here-->*/ 1;
-    public static final int ClimberVelocityConversionFactor = /*put real value here-->*/ 1;
-    public static final int ClimberWheelFreeSpeedMetersPerSecond = /*put real value here-->*/ 1;
+    public static final int ClimberPositionConversionFactor = /* put real value here--> */ 1;
+    public static final int ClimberVelocityConversionFactor = /* put real value here--> */ 1;
+    public static final int ClimberWheelFreeSpeedMetersPerSecond = /* put real value here--> */ 1;
     public static final int ClimberMotorCANId = 13;
     public static final int IntakeServoDIOID = 2;
   }
 
-  public static class IntakeConstants {
-    public static final int InPosition = 819;
-    public static final int OutPosition = 1000; // 1024 too far out
+  public static class ArmConstants {
+    public static final int ArmCanID = 46;
+
+    public static int NeoFreeSpeedRPM = 5676;
+    public static int CurrentLimit = 50;
+    public static double RotationConversion = 2 * Math.PI * Units.inchesToMeters(2.074);
+    public static double PositionConversionFactor = 1.5 / 9.0 * RotationConversion; // m/rotation
+    public static double VelocityConversionFactor = 1.5 / 9.0 * RotationConversion;
+    public static double MotorFreeSpeedRevsPerSecond = NeoFreeSpeedRPM / 60.0;
   }
 }

@@ -6,7 +6,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.WristExtender.WristExtender;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -16,8 +15,7 @@ public class Elevator extends SubsystemBase {
   private int positionTarget = 0;
   private int positionMax = 5;
   private int positionMin = 0;
-  private double minGregHeight = 0.46;
-  private double calibratedGregStartingHeight = 0.46;
+  private double calibratedGregStartingHeight = 0;
   private double lowestObservedPosition = calibratedGregStartingHeight;
   private double highestObservedPosition = calibratedGregStartingHeight;
   private boolean bottomSwitchHit = false;
@@ -27,8 +25,7 @@ public class Elevator extends SubsystemBase {
   private double PDotPositionCommand = 0.0;
   private double PDotRate = 0.0;
   private boolean UseButtonState = true;
-
-  private final WristExtender wristPosition;
+  private double positionReset;
 
   Constraints profileConstraints;
   TrapezoidProfile commandProfile;
@@ -43,13 +40,13 @@ public class Elevator extends SubsystemBase {
   int gainIndex = 0;
 
   double[] kS = {0, 0, 0};
-  double[] kG = {0.5, 0.65, 0.8};
+  double[] kG = {0, 0., 0};
   double[] kV = {3.5, 3.9, 4.5};
   double[] kA = {0, 0, 0};
   double[] maxV = {0.3, 0.3, 0.3};
   double[] maxA = {0.3, 0.3, 0.3};
-  double[] kP = {0.5, 0.75, 0.75};
-  double[] kI = {0.005, 0, 0};
+  double[] kP = {0.5, 0.5, 0.5};
+  double[] kI = {0.0, 0, 0};
   double[] kD = {0, 0, 0};
 
   // section heights
@@ -70,9 +67,8 @@ public class Elevator extends SubsystemBase {
 
   LoggedNetworkNumber arbFF = new LoggedNetworkNumber("/SmartDashboard/Arbitrary FF Gain", 0.5);
 
-  public Elevator(ElevatorIO IO, WristExtender WristExtender) {
+  public Elevator(ElevatorIO IO) {
     io = IO;
-    wristPosition = WristExtender;
 
     profileConstraints = new Constraints(maxV[gainIndex], maxA[gainIndex]);
     commandProfile = new TrapezoidProfile(profileConstraints);
@@ -157,9 +153,6 @@ public class Elevator extends SubsystemBase {
   }
 
   private void PositionCommand(double position) {
-    if (position < minGregHeight && wristPosition.isGregoryDown() == true) {
-      position = minGregHeight;
-    }
     if (bottomSwitchHit == false && position < lowestObservedPosition) {
       position = lowestObservedPosition;
     }
@@ -231,7 +224,7 @@ public class Elevator extends SubsystemBase {
     m_feedforward =
         new ElevatorFeedforward(kS[gainIndex], kG[gainIndex], kV[gainIndex], kA[gainIndex]);
 
-    if ((RobotState.isAutonomous() == true) || (RobotState.isTeleop())) {
+    if (RobotState.isEnabled() == true) {
       /* Do the command processing */
       state_step = commandProfile.calculate(0.02, mCurrentState, mDesiredState);
       mCurrentState = state_step;
@@ -240,20 +233,19 @@ public class Elevator extends SubsystemBase {
     } else {
       // do stuff when disabled
       // init reference position to where it thinks it is as average.
-      // mReferencePosition = (inputs.rightEncoderValue + inputs.leftEncoderValue) / 2;
-      mReferencePosition = calibratedGregStartingHeight;
+      // TODO ************* use average of both encoders on real robot **************
+      mReferencePosition = inputs.leftEncoderValue;
       PDotPositionCommand = mReferencePosition;
       buttonPositionCommand = mReferencePosition;
       mDesiredState = new TrapezoidProfile.State(mReferencePosition, 0);
       mCurrentState = mDesiredState;
-      io.setEncoders(mReferencePosition);
       lowestObservedPosition = mReferencePosition;
     }
-    io.setReference(mReferencePosition, 0, kP[gainIndex], kI[gainIndex], kD[gainIndex]);
+    io.setReference(mCurrentState.position, ffCommand, kP[gainIndex], kI[gainIndex], kD[gainIndex]);
     Logger.recordOutput("Elevator/Feed Forward Command", ffCommand);
     Logger.recordOutput("Elevator/Motor Position Command", mReferencePosition);
-    Logger.recordOutput("Elevator/Profile/Position", state_step.position);
-    Logger.recordOutput("Elevator/Profile/Velocity", state_step.velocity);
+    Logger.recordOutput("Elevator/Profile/Position", mCurrentState.position);
+    Logger.recordOutput("Elevator/Profile/Velocity", mCurrentState.velocity);
     Logger.recordOutput("Elevator/Lowest Observed Position", lowestObservedPosition);
     Logger.recordOutput("Elevator/Has Bottom Been Hit", bottomSwitchHit);
   }

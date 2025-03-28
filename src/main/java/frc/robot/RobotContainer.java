@@ -5,7 +5,6 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.revrobotics.servohub.ServoChannel.ChannelId;
 import com.revrobotics.servohub.ServoHub;
 import com.revrobotics.servohub.ServoHub.ResetMode;
 import com.revrobotics.servohub.config.ServoChannelConfig.BehaviorWhenDisabled;
@@ -20,10 +19,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Intake.IntakeSubsystem;
-import frc.robot.subsystems.WristExtender.WristExtender;
-import frc.robot.subsystems.WristExtender.WristExtenderIO;
-import frc.robot.subsystems.WristExtender.WristExtenderIOServo;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.ArmIO;
+import frc.robot.subsystems.arm.ArmIOSparkMax;
 import frc.robot.subsystems.climb.ClimberIO;
 import frc.robot.subsystems.climb.ClimberIOSparkMax;
 import frc.robot.subsystems.climb.ClimberSubsystem;
@@ -49,10 +47,9 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private final WristExtender wristExtender;
   private final ClimberSubsystem climberSubsystem;
-  private final IntakeSubsystem intakeSubsystem;
   private final Elevator elevator;
+  private final Arm arm;
 
   // Controller
   private final CommandXboxController driveController = new CommandXboxController(0);
@@ -81,16 +78,10 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
-        wristExtender =
-            new WristExtender(
-                new WristExtenderIOServo(
-                    servoHub, ChannelId.kChannelId4, ChannelId.kChannelId3, 3, 4));
 
         climberSubsystem =
             new ClimberSubsystem(
                 new ClimberIOSparkMax(Constants.ClimberConstants.ClimberMotorCANId, 5, 6));
-
-        intakeSubsystem = new IntakeSubsystem(servoHub);
 
         elevator =
             new Elevator(
@@ -98,8 +89,8 @@ public class RobotContainer {
                     Constants.ElevatorConstants.leftCanId,
                     Constants.ElevatorConstants.rightCanId,
                     Constants.ElevatorConstants.elevatorUpLimitDIOChannel,
-                    Constants.ElevatorConstants.elevatorDownLimitDIOChannel),
-                wristExtender);
+                    Constants.ElevatorConstants.elevatorDownLimitDIOChannel));
+        arm = new Arm(new ArmIOSparkMax(Constants.ArmConstants.ArmCanID));
         break;
 
       case SIM:
@@ -111,10 +102,9 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
-        wristExtender = new WristExtender(new WristExtenderIO() {});
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
-        intakeSubsystem = new IntakeSubsystem(servoHub);
-        elevator = new Elevator(new ElevatorIOSim(0), wristExtender);
+        elevator = new Elevator(new ElevatorIOSim(0));
+        arm = new Arm(new ArmIO() {});
         break;
 
       default:
@@ -126,10 +116,9 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        wristExtender = new WristExtender(new WristExtenderIO() {});
-        elevator = new Elevator(new ElevatorIO() {}, wristExtender);
+        elevator = new Elevator(new ElevatorIO() {});
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
-        intakeSubsystem = new IntakeSubsystem(servoHub);
+        arm = new Arm(new ArmIO() {});
         break;
     }
 
@@ -178,14 +167,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Start button will intake algae/shoot coral
-    mechanismController.start().whileTrue(wristExtender.intakeAlgaeShootCoral());
-
-    // Back button will intake coral/shoot algae
-    mechanismController.back().whileTrue(wristExtender.intakeCoralShootAlgae());
-
-    mechanismController.y().whileTrue(wristExtender.goToCoralReefHigh());
-    mechanismController.a().whileTrue(wristExtender.goToBarge());
+    // DRIVE CONTROLLER COMMANDS
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
@@ -195,6 +177,16 @@ public class RobotContainer {
             () -> -driveController.getLeftX(),
             () -> -driveController.getRightX()));
     // Lock to 0° when A button is held
+
+    driveController
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                    drive)
+                .ignoringDisable(true));
 
     driveController
         .a()
@@ -207,42 +199,21 @@ public class RobotContainer {
 
     // Switch to X pattern when X button is pressed
     driveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    // suggested inputs/buttons for intake controlls.
-    // // coral intake trigger
-    // controller.rightTrigger().onTrue(IntakeIOImplementation.coralIntake());
-    // //Algae intake trigger
-    // controller.leftTrigger().onTrue(IntakeIOImplementation.AlgaeIntake());
-    // Reset gyro to 0° when B button is pressed
-
     driveController.rightBumper().whileTrue((climberSubsystem.ClimberDown()));
     driveController.leftBumper().whileTrue((climberSubsystem.ClimberUp()));
-
-    mechanismController.axisLessThan(1, -0.5).onTrue(intakeSubsystem.feedGregory());
-    mechanismController.axisGreaterThan(1, 0.5).onTrue(intakeSubsystem.receiveCoral());
-
-    driveController
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
-
     driveController.y().onTrue(DriveCommands.boost());
-
     driveController.y().onFalse(DriveCommands.boostOff());
+
+    // MECHANISM CONTROLLER COMMANDS
 
     mechanismController.rightBumper().onTrue(elevator.PositionUp());
     mechanismController.leftBumper().onTrue(elevator.PositionDown());
-
+    mechanismController.povUp().whileTrue(elevator.PDotCommand(0.006));
+    mechanismController.povDown().whileTrue(elevator.PDotCommand(-0.006));
+    arm.setDefaultCommand(arm.MoveArm(() -> mechanismController.getRightY()));
     // elevator.setDefaultCommand(
     // elevator.PDotCommand(MathUtil.applyDeadband(-mechanismController.getLeftY() *
     // PDotGainNN.get(),0.1)));
-
-    mechanismController.povUp().whileTrue(elevator.PDotCommand(0.006));
-    mechanismController.povDown().whileTrue(elevator.PDotCommand(-0.006));
   }
 
   /**
