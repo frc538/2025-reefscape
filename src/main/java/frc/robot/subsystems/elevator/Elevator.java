@@ -234,7 +234,7 @@ public class Elevator extends SubsystemBase {
       // do stuff when disabled
       // init reference position to where it thinks it is as average.
       // TODO ************* use average of both encoders on real robot **************
-      mReferencePosition = inputs.leftEncoderValue; 
+      mReferencePosition = inputs.leftEncoderValue;
       PDotPositionCommand = mReferencePosition;
       buttonPositionCommand = mReferencePosition;
       mDesiredState = new TrapezoidProfile.State(mReferencePosition, 0);
