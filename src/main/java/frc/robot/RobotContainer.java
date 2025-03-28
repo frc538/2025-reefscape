@@ -36,7 +36,8 @@ import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
 import frc.robot.subsystems.limelight.Limelight;
-
+import frc.robot.subsystems.limelight.LimelightIO;
+import frc.robot.subsystems.limelight.LimelightIOImplementation;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -93,6 +94,14 @@ public class RobotContainer {
                     Constants.ElevatorConstants.elevatorUpLimitDIOChannel,
                     Constants.ElevatorConstants.elevatorDownLimitDIOChannel));
         arm = new Arm(new ArmIOSparkMax(Constants.ArmConstants.ArmCanID));
+        LimelightIOImplementation[] Limelights = new LimelightIOImplementation[2];
+
+        Limelights[0] =
+            new LimelightIOImplementation(Constants.LimeLightConstants.limelightOneName);
+        Limelights[1] =
+            new LimelightIOImplementation(Constants.LimeLightConstants.limelightTwoName);
+
+        limelight = new Limelight(drive, Limelights);
         break;
 
       case SIM:
@@ -107,6 +116,12 @@ public class RobotContainer {
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
         elevator = new Elevator(new ElevatorIOSim(0));
         arm = new Arm(new ArmIO() {});
+        LimelightIO[] LimelightsSim = new LimelightIO[2];
+
+        LimelightsSim[0] = new LimelightIO() {};
+        LimelightsSim[1] = new LimelightIO() {};
+
+        limelight = new Limelight(drive, LimelightsSim);
         break;
 
       default:
@@ -121,10 +136,16 @@ public class RobotContainer {
         elevator = new Elevator(new ElevatorIO() {});
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
         arm = new Arm(new ArmIO() {});
+
+        LimelightIO[] LimelightsReplay = new LimelightIO[2];
+
+        LimelightsReplay[0] = new LimelightIO() {};
+        LimelightsReplay[1] = new LimelightIO() {};
+
+        limelight = new Limelight(drive, LimelightsReplay);
+
         break;
     }
-
-    limelight = new Limelight(drive);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
