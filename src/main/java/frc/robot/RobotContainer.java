@@ -236,7 +236,7 @@ public class RobotContainer {
     mechanismController.leftBumper().onTrue(elevator.PositionDown());
     mechanismController.povUp().whileTrue(elevator.PDotCommand(0.006));
     mechanismController.povDown().whileTrue(elevator.PDotCommand(-0.006));
-    //arm.setDefaultCommand(arm.MoveArm(() -> mechanismController.getRightY()));\
+    // arm.setDefaultCommand(arm.MoveArm(() -> mechanismController.getRightY()));\
     arm.setDefaultCommand(arm.RateCommand(() -> mechanismController.getRightY()));
     // elevator.setDefaultCommand(
     // elevator.PDotCommand(MathUtil.applyDeadband(-mechanismController.getLeftY() *
