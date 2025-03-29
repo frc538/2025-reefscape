@@ -25,10 +25,10 @@ public class Arm extends SubsystemBase {
   double maxA = 90;
   double maxV = 45;
   double kS = 0;
-  double kG = 0;
+  double kG = 0;//simple feed forward control
   double kV = 0;
 
-  boolean simpleControl = true;
+  boolean simpleControl = true;//position control loop.
   double RateCommand = 0;
 
   double PDotPositionCommand = 0;
@@ -107,8 +107,6 @@ public class Arm extends SubsystemBase {
                 Units.degreesToRadians(mCurrentState.velocity));
       } else {
         // do stuff when disabled
-        // init reference position to where it thinks it is as average.
-        // TODO ************* use average of both encoders on real robot **************
         mReferencePosition = 0;
         PDotPositionCommand = mReferencePosition;
         mDesiredState = new TrapezoidProfile.State(mReferencePosition, 0);
@@ -116,6 +114,6 @@ public class Arm extends SubsystemBase {
       }
       io.setReference(mCurrentState.position, ffCommand);
     }
-    Logger.recordOutput("arm/speed command", mSpeed);
+    //Logger.recordOutput("arm/speed command", mSpeed);
   }
 }
