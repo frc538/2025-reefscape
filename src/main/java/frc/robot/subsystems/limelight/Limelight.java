@@ -81,6 +81,7 @@ public class Limelight extends SubsystemBase {
     mLimelightIOs[0].updateInputs(mLimelightIOInputs[0], driveFile.getRotation().getDegrees());
     mLimelightIOs[1].updateInputs(mLimelightIOInputs[1], driveFile.getRotation().getDegrees());
     Logger.processInputs(mLimelightIOInputs[0].LimelightName, mLimelightIOInputs[0]);
+    Logger.processInputs(mLimelightIOInputs[1].LimelightName, mLimelightIOInputs[1]);
 
     checkLimelight(0);
     checkLimelight(1);

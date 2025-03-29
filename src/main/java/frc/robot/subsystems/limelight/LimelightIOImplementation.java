@@ -41,7 +41,7 @@ public class LimelightIOImplementation implements LimelightIO {
         }
         else{
             inputs.mt2TagCount = 0;
-            inputs.mt2Pose = mt2.pose;
+            inputs.mt2Pose = new Pose2d();
             inputs.mt2TimeStamp = 0;
         }
     }
