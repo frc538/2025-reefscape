@@ -11,6 +11,13 @@ public interface IntakeIO {
     }
 
     /** Updates the set of loggable inputs. */
-    public default void updateInputs(ArmIOInputs inputs) {
-    }
+    public default void updateInputs(ArmIOInputs inputs) {}
+
+    public default void intakeIn() {}
+
+    public default void intakeOut() {}
+
+    public default void intakeStop() {}
+
+    public default void intakeHold() {}
 }
