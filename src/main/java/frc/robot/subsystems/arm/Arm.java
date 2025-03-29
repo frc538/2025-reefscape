@@ -115,5 +115,6 @@ public class Arm extends SubsystemBase {
       io.setReference(mCurrentState.position, ffCommand);
     }
     //Logger.recordOutput("arm/speed command", mSpeed);
+    Logger.recordOutput("FF", ffCommand);
   }
 }
