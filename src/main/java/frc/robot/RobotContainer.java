@@ -251,14 +251,10 @@ public class RobotContainer {
     mechanismController.povDown().whileTrue(elevator.PDotCommand(-0.006));
     // arm.setDefaultCommand(arm.MoveArm(() -> mechanismController.getRightY()));\
     arm.setDefaultCommand(arm.RateCommand(() -> mechanismController.getRightY()));
-    mechanismController.back().whileTrue(intake.intakeIn());
-    mechanismController.start().whileTrue(intake.intakeOut());
-    if (mechanismController.start().getAsBoolean() == true
-        && mechanismController.back().getAsBoolean() == true) {
-      intake.intakeHold();
-    }
-    if (mechanismController.start().getAsBoolean() == false
-        && mechanismController.back().getAsBoolean() == false) {
+    mechanismController.a().whileTrue(intake.intakeIn());
+    mechanismController.y().whileTrue(intake.intakeOut());
+    if (mechanismController.a().getAsBoolean() == true
+        && mechanismController.y().getAsBoolean() == true) {
       intake.intakeStop();
     }
     // elevator.setDefaultCommand(

@@ -27,13 +27,6 @@ public class Intake extends SubsystemBase {
         });
   }
 
-  public Command intakeHold() {
-    return run(
-        () -> {
-          io.intakeHold();
-        });
-  }
-
   public Command intakeStop() {
     return run(
         () -> {

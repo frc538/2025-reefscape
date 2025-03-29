@@ -39,11 +39,6 @@ public class IntakeIOServo implements IntakeIO {
   }
 
   public void intakeStop() {
-    servoLeft.setPulseWidth(0);
-    servoRight.setPulseWidth(0);
-  }
-
-  public void intakeHold() {
     servoLeft.setPulseWidth(1300);
     servoRight.setPulseWidth(1300);
   }
