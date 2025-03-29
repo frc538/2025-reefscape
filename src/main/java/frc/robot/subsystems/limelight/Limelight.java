@@ -3,8 +3,6 @@ package frc.robot.subsystems.limelight;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.limelight.LimelightIO.LimelightIOInputs;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Limelight extends SubsystemBase {
