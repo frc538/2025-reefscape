@@ -5,6 +5,10 @@ import edu.wpi.first.wpilibj.Servo;
 public class IntakeIOServo implements IntakeIO{
     private final Servo mServo;
 
+    public IntakeIOServo() {
+        mServo.
+    }
+
     public void updateInputs(IntakeIOInputs inputs) {
 
     }
