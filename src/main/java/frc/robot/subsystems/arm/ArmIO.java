@@ -6,8 +6,8 @@ public interface ArmIO {
 
   @AutoLog
   public static class ArmIOInputs {
-    public double armPosition = 0.0;
-    public double armVelocity = 0.0;
+    public double armPositionDegrees = 0.0;
+    public double armVelocityDegreesPerSecond = 0.0;
     public double AppliedOutput = 0.0;
     public double BusVoltage = 0.0;
     public double OutputCurrent = 0.0;
@@ -18,6 +18,10 @@ public interface ArmIO {
   public default void updateInputs(ArmIOInputs inputs) {}
 
   public default void armSpeedCommand(double speed) {}
+
+  public default void setReference(double position, double vol) {}
+
+  public default void setVoltage(double voltage) {}
 
   public default void armStop() {}
 }

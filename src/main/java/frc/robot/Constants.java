@@ -90,9 +90,10 @@ public final class Constants {
 
     public static int NeoFreeSpeedRPM = 5676;
     public static int CurrentLimit = 50;
-    public static double RotationConversion = 2 * Math.PI * Units.inchesToMeters(2.074);
-    public static double PositionConversionFactor = 1.5 / 9.0 * RotationConversion; // m/rotation
-    public static double VelocityConversionFactor = 1.5 / 9.0 * RotationConversion;
+    public static int gearRatio = 15;
+    public static double PositionConversionFactor =
+        360 / gearRatio; // Arm degrees rotation/motor Revolutions
+    public static double VelocityConversionFactor = 360 / gearRatio;
     public static double MotorFreeSpeedRevsPerSecond = NeoFreeSpeedRPM / 60.0;
   }
 }
