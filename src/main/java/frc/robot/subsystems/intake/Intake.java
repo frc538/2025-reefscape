@@ -19,6 +19,30 @@ public class Intake extends SubsystemBase {
     Servo servoLeft = new Servo(1);
     Servo servoRight = new Servo(0);
 
+    public Command intakeIn() {
+        return run(() -> {
+            io.intakeIn();
+        });
+    }
+
+    public Command intakeOut() {
+        return run(() -> {
+            io.intakeOut();
+        });
+    }
+    
+    public Command intakeHold() {
+        return run(() -> {
+            io.intakeHold();
+        });
+    }
+
+    public Command intakeStop() {
+        return run(() -> {
+            io.intakeStop();
+        });
+    }
+
     @Override
     public void periodic() {
         io.updateInputs(inputs);

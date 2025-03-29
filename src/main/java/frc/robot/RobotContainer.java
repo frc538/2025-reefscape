@@ -35,6 +35,9 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOServo;
 import frc.robot.subsystems.limelight.Limelight;
 import frc.robot.subsystems.limelight.LimelightIO;
 import frc.robot.subsystems.limelight.LimelightIOImplementation;
@@ -53,6 +56,7 @@ public class RobotContainer {
   private final ClimberSubsystem climberSubsystem;
   private final Elevator elevator;
   private final Arm arm;
+  private final Intake intake;
   private final Limelight limelight;
 
   // Controller
@@ -87,6 +91,10 @@ public class RobotContainer {
             new ClimberSubsystem(
                 new ClimberIOSparkMax(Constants.ClimberConstants.ClimberMotorCANId, 5, 6));
 
+        intake =
+            new Intake(
+                new IntakeIOServo(servoHub, Constants.IntakeConstants.leftChannel, Constants.IntakeConstants.rightChannel));
+
         elevator =
             new Elevator(
                 new ElevatorIOSparkMax(
@@ -117,6 +125,7 @@ public class RobotContainer {
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
         elevator = new Elevator(new ElevatorIOSim(0));
         arm = new Arm(new ArmIO() {});
+        intake = new Intake(new IntakeIO() {});
         LimelightIO[] LimelightsSim = new LimelightIO[2];
 
         LimelightsSim[0] = new LimelightIO() {};
@@ -136,6 +145,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         elevator = new Elevator(new ElevatorIO() {});
         climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
+        intake = new Intake(new IntakeIO() {});
         arm = new Arm(new ArmIO() {});
 
         LimelightIO[] LimelightsReplay = new LimelightIO[2];
@@ -238,6 +248,14 @@ public class RobotContainer {
     mechanismController.povDown().whileTrue(elevator.PDotCommand(-0.006));
     // arm.setDefaultCommand(arm.MoveArm(() -> mechanismController.getRightY()));\
     arm.setDefaultCommand(arm.RateCommand(() -> mechanismController.getRightY()));
+    mechanismController.back().whileTrue(intake.intakeIn());
+    mechanismController.start().whileTrue(intake.intakeOut());
+    if (mechanismController.start().getAsBoolean() == true && mechanismController.back().getAsBoolean() == true) {
+        intake.intakeHold();
+    }
+    if (mechanismController.start().getAsBoolean() == false && mechanismController.back().getAsBoolean() == false) {
+        intake.intakeStop();
+    }
     // elevator.setDefaultCommand(
     // elevator.PDotCommand(MathUtil.applyDeadband(-mechanismController.getLeftY() *
     // PDotGainNN.get(),0.1)));
