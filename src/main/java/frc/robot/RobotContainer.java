@@ -93,7 +93,10 @@ public class RobotContainer {
 
         intake =
             new Intake(
-                new IntakeIOServo(servoHub, Constants.IntakeConstants.leftChannel, Constants.IntakeConstants.rightChannel));
+                new IntakeIOServo(
+                    servoHub,
+                    Constants.IntakeConstants.leftChannel,
+                    Constants.IntakeConstants.rightChannel));
 
         elevator =
             new Elevator(
@@ -250,11 +253,13 @@ public class RobotContainer {
     arm.setDefaultCommand(arm.RateCommand(() -> mechanismController.getRightY()));
     mechanismController.back().whileTrue(intake.intakeIn());
     mechanismController.start().whileTrue(intake.intakeOut());
-    if (mechanismController.start().getAsBoolean() == true && mechanismController.back().getAsBoolean() == true) {
-        intake.intakeHold();
+    if (mechanismController.start().getAsBoolean() == true
+        && mechanismController.back().getAsBoolean() == true) {
+      intake.intakeHold();
     }
-    if (mechanismController.start().getAsBoolean() == false && mechanismController.back().getAsBoolean() == false) {
-        intake.intakeStop();
+    if (mechanismController.start().getAsBoolean() == false
+        && mechanismController.back().getAsBoolean() == false) {
+      intake.intakeStop();
     }
     // elevator.setDefaultCommand(
     // elevator.PDotCommand(MathUtil.applyDeadband(-mechanismController.getLeftY() *
