@@ -101,5 +101,9 @@ public final class Constants {
   public static class IntakeConstants {
     public static final ChannelId leftChannel = ChannelId.kChannelId0;
     public static final ChannelId rightChannel = ChannelId.kChannelId1;
+
+    public static final int intakeInPulseWidth = 500;
+    public static final int intakeOutPulseWidth = 2500;
+    public static final int intakeHoldPulseWidth = 1300;
   }
 }

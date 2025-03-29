@@ -2,6 +2,9 @@ package frc.robot.subsystems.intake;
 
 import com.revrobotics.servohub.ServoChannel;
 import com.revrobotics.servohub.ServoChannel.ChannelId;
+
+import frc.robot.Constants;
+
 import com.revrobotics.servohub.ServoHub;
 
 public class IntakeIOServo implements IntakeIO {
@@ -29,17 +32,17 @@ public class IntakeIOServo implements IntakeIO {
 
   @Override
   public void intakeIn() {
-    servoLeft.setPulseWidth(500);
-    servoRight.setPulseWidth(500);
+    servoLeft.setPulseWidth(Constants.IntakeConstants.intakeInPulseWidth);
+    servoRight.setPulseWidth(Constants.IntakeConstants.intakeInPulseWidth);
   }
 
   public void intakeOut() {
-    servoLeft.setPulseWidth(2500);
-    servoRight.setPulseWidth(2500);
+    servoLeft.setPulseWidth(Constants.IntakeConstants.intakeOutPulseWidth);
+    servoRight.setPulseWidth(Constants.IntakeConstants.intakeOutPulseWidth);
   }
 
   public void intakeStop() {
-    servoLeft.setPulseWidth(1300);
-    servoRight.setPulseWidth(1300);
+    servoLeft.setPulseWidth(Constants.IntakeConstants.intakeHoldPulseWidth);
+    servoRight.setPulseWidth(Constants.IntakeConstants.intakeHoldPulseWidth);
   }
 }
