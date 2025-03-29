@@ -53,6 +53,7 @@ public class RobotContainer {
   private final ClimberSubsystem climberSubsystem;
   private final Elevator elevator;
   private final Arm arm;
+  private final Limelight limelight;
 
   // Controller
   private final CommandXboxController driveController = new CommandXboxController(0);
