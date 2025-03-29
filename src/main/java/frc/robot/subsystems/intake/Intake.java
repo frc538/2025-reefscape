@@ -34,6 +34,14 @@ public class Intake extends SubsystemBase {
         });
   }
 
+  public Command intakeReset() {
+    return runEnd(() -> {
+        io.intakeResetOn();
+    }, () -> {
+        io.intakeResetOff();
+    });
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);

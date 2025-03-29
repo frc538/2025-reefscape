@@ -45,4 +45,14 @@ public class IntakeIOServo implements IntakeIO {
     servoLeft.setPulseWidth(Constants.IntakeConstants.intakeHoldPulseWidth);
     servoRight.setPulseWidth(Constants.IntakeConstants.intakeHoldPulseWidth);
   }
+
+  public void intakeResetOff() {
+    servoLeft.setPowered(false);
+    servoRight.setPowered(false);
+  }
+
+  public void intakeResetOn() {
+    servoLeft.setPowered(true);
+    servoRight.setPowered(true);
+  }
 }

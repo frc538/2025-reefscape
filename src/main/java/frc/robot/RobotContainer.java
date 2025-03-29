@@ -257,6 +257,7 @@ public class RobotContainer {
         && mechanismController.y().getAsBoolean() == true) {
       intake.intakeStop();
     }
+    mechanismController.button(8).whileTrue(intake.intakeReset());
     // elevator.setDefaultCommand(
     // elevator.PDotCommand(MathUtil.applyDeadband(-mechanismController.getLeftY() *
     // PDotGainNN.get(),0.1)));

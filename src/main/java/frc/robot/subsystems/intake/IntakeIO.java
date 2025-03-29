@@ -17,4 +17,8 @@ public interface IntakeIO {
   public default void intakeOut() {}
 
   public default void intakeStop() {}
+
+  public default void intakeResetOff() {}
+
+  public default void intakeResetOn() {}
 }
