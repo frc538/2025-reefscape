@@ -14,11 +14,11 @@ public class IntakeIOServo implements IntakeIO {
     servoRight = hub.getServoChannel(servoRightChannelId);
 
     servoRight.setPowered(true);
-    servoRight.setPulseWidth(1500);
+    servoRight.setPulseWidth(Constants.IntakeConstants.initialPulseWidth);
     servoRight.setEnabled(false);
 
     servoLeft.setPowered(true);
-    servoLeft.setPulseWidth(500);
+    servoLeft.setPulseWidth(Constants.IntakeConstants.initialPulseWidth);
     servoLeft.setEnabled(false);
   }
 

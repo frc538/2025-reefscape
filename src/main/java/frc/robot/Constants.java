@@ -105,5 +105,6 @@ public final class Constants {
     public static final int intakeInPulseWidth = 500;
     public static final int intakeOutPulseWidth = 2500;
     public static final int intakeHoldPulseWidth = 1300;
+    public static final int initialPulseWidth = 1500;
   }
 }
