@@ -21,27 +21,33 @@ public class Intake extends SubsystemBase {
   }
 
   public Command intakeIn() {
-    return runEnd(() -> {
-        io.intakeIn();
-    }, () -> {
-        io.intakeStop();
-    });
+    return runEnd(
+        () -> {
+          io.intakeIn();
+        },
+        () -> {
+          io.intakeStop();
+        });
   }
 
   public Command intakeOut() {
-    return runEnd(() -> {
-        io.intakeOut();
-    }, () -> {
-        io.intakeStop();
-    });
+    return runEnd(
+        () -> {
+          io.intakeOut();
+        },
+        () -> {
+          io.intakeStop();
+        });
   }
 
   public Command intakeReset() {
-    return runEnd(() -> {
-        io.intakeResetOn();
-    }, () -> {
-        io.intakeResetOff();
-    });
+    return runEnd(
+        () -> {
+          io.intakeResetOn();
+        },
+        () -> {
+          io.intakeResetOff();
+        });
   }
 
   @Override

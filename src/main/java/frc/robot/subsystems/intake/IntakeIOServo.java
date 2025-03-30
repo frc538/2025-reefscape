@@ -2,10 +2,8 @@ package frc.robot.subsystems.intake;
 
 import com.revrobotics.servohub.ServoChannel;
 import com.revrobotics.servohub.ServoChannel.ChannelId;
-
-import frc.robot.Constants;
-
 import com.revrobotics.servohub.ServoHub;
+import frc.robot.Constants;
 
 public class IntakeIOServo implements IntakeIO {
   private final ServoChannel servoLeft; // 0 is a placeholder
