@@ -15,11 +15,11 @@ public class IntakeIOServo implements IntakeIO {
 
     servoRight.setPowered(true);
     servoRight.setPulseWidth(Constants.IntakeConstants.initialPulseWidth);
-    servoRight.setEnabled(false);
+    servoRight.setEnabled(true);
 
     servoLeft.setPowered(true);
     servoLeft.setPulseWidth(Constants.IntakeConstants.initialPulseWidth);
-    servoLeft.setEnabled(false);
+    servoLeft.setEnabled(true);
   }
 
   @Override

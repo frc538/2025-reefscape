@@ -45,159 +45,169 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // Subsystems
-  private final Drive drive;
-  private final ClimberSubsystem climberSubsystem;
-  private final Elevator elevator;
-  private final Arm arm;
-  private final Intake intake;
-  private final Limelight limelight;
+    // Subsystems
+    private final Drive drive;
+    private final ClimberSubsystem climberSubsystem;
+    private final Elevator elevator;
+    private final Arm arm;
+    private final Intake intake;
+    private final Limelight limelight;
 
-  // Controller
-  private final CommandXboxController driveController = new CommandXboxController(0);
-  private final CommandXboxController mechanismController = new CommandXboxController(1);
+    // Controller
+    private final CommandXboxController driveController = new CommandXboxController(0);
+    private final CommandXboxController mechanismController = new CommandXboxController(1);
 
-  // Servo Hub
-  private final ServoHub servoHub = new ServoHub(3);
+    // Servo Hub
+    private final ServoHub servoHub = new ServoHub(3);
 
-  LoggedNetworkNumber PDotGainNN = new LoggedNetworkNumber("/SmartDashboard/PDot Gain", 0.1);
+    LoggedNetworkNumber PDotGainNN = new LoggedNetworkNumber("/SmartDashboard/PDot Gain", 0.1);
 
-  // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
+    // Dashboard inputs
+    private final LoggedDashboardChooser<Command> autoChooser;
 
-  // DriveCommands.ANGLE_MAX_ACCELERATION = (Put trigger value here-->);
-  // DriveCommands.ANGLE_MAX_VELOCITY = (Put trigger value here-->);
+    // DriveCommands.ANGLE_MAX_ACCELERATION = (Put trigger value here-->);
+    // DriveCommands.ANGLE_MAX_VELOCITY = (Put trigger value here-->);
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
-    switch (Constants.currentMode) {
-      case REAL:
-        // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                new ModuleIOTalonFX(TunerConstants.FrontRight),
-                new ModuleIOTalonFX(TunerConstants.BackLeft),
-                new ModuleIOTalonFX(TunerConstants.BackRight));
+    /**
+     * The container for the robot. Contains subsystems, OI devices, and commands.
+     */
+    public RobotContainer() {
+        switch (Constants.currentMode) {
+            case REAL:
+                // Real robot, instantiate hardware IO implementations
+                drive = new Drive(
+                        new GyroIOPigeon2(),
+                        new ModuleIOTalonFX(TunerConstants.FrontLeft),
+                        new ModuleIOTalonFX(TunerConstants.FrontRight),
+                        new ModuleIOTalonFX(TunerConstants.BackLeft),
+                        new ModuleIOTalonFX(TunerConstants.BackRight));
 
-        climberSubsystem =
-            new ClimberSubsystem(
-                new ClimberIOSparkMax(Constants.ClimberConstants.ClimberMotorCANId, 5, 6));
+                climberSubsystem = new ClimberSubsystem(
+                        new ClimberIOSparkMax(Constants.ClimberConstants.ClimberMotorCANId, 5, 6));
 
-        intake =
-            new Intake(
-                new IntakeIOServo(
-                    servoHub,
-                    Constants.IntakeConstants.leftChannel,
-                    Constants.IntakeConstants.rightChannel));
+                intake = new Intake(
+                        new IntakeIOServo(
+                                servoHub,
+                                Constants.IntakeConstants.leftChannel,
+                                Constants.IntakeConstants.rightChannel));
 
-        elevator =
-            new Elevator(
-                new ElevatorIOSparkMax(
-                    Constants.ElevatorConstants.leftCanId,
-                    Constants.ElevatorConstants.rightCanId,
-                    Constants.ElevatorConstants.elevatorUpLimitDIOChannel,
-                    Constants.ElevatorConstants.elevatorDownLimitDIOChannel));
-        arm = new Arm(new ArmIOSparkMax(Constants.ArmConstants.ArmCanID));
-        LimelightIOImplementation[] Limelights = new LimelightIOImplementation[2];
+                elevator = new Elevator(
+                        new ElevatorIOSparkMax(
+                                Constants.ElevatorConstants.leftCanId,
+                                Constants.ElevatorConstants.rightCanId,
+                                Constants.ElevatorConstants.elevatorUpLimitDIOChannel,
+                                Constants.ElevatorConstants.elevatorDownLimitDIOChannel));
+                arm = new Arm(new ArmIOSparkMax(Constants.ArmConstants.ArmCanID));
+                LimelightIOImplementation[] Limelights = new LimelightIOImplementation[2];
 
-        Limelights[0] =
-            new LimelightIOImplementation(Constants.LimeLightConstants.limelightOneName);
-        Limelights[1] =
-            new LimelightIOImplementation(Constants.LimeLightConstants.limelightTwoName);
+                Limelights[0] = new LimelightIOImplementation(Constants.LimeLightConstants.limelightOneName);
+                Limelights[1] = new LimelightIOImplementation(Constants.LimeLightConstants.limelightTwoName);
 
-        limelight = new Limelight(drive, Limelights);
-        break;
+                limelight = new Limelight(drive, Limelights);
+                break;
 
-      case SIM:
-        // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(TunerConstants.FrontLeft),
-                new ModuleIOSim(TunerConstants.FrontRight),
-                new ModuleIOSim(TunerConstants.BackLeft),
-                new ModuleIOSim(TunerConstants.BackRight));
-        climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
-        elevator = new Elevator(new ElevatorIOSim(0));
-        arm = new Arm(new ArmIO() {});
-        intake = new Intake(new IntakeIO() {});
-        LimelightIO[] LimelightsSim = new LimelightIO[2];
+            case SIM:
+                // Sim robot, instantiate physics sim IO implementations
+                drive = new Drive(
+                        new GyroIO() {
+                        },
+                        new ModuleIOSim(TunerConstants.FrontLeft),
+                        new ModuleIOSim(TunerConstants.FrontRight),
+                        new ModuleIOSim(TunerConstants.BackLeft),
+                        new ModuleIOSim(TunerConstants.BackRight));
+                climberSubsystem = new ClimberSubsystem(new ClimberIO() {
+                });
+                elevator = new Elevator(new ElevatorIOSim(0));
+                arm = new Arm(new ArmIO() {
+                });
+                intake = new Intake(new IntakeIO() {
+                });
+                LimelightIO[] LimelightsSim = new LimelightIO[2];
 
-        LimelightsSim[0] = new LimelightIO() {};
-        LimelightsSim[1] = new LimelightIO() {};
+                LimelightsSim[0] = new LimelightIO() {
+                };
+                LimelightsSim[1] = new LimelightIO() {
+                };
 
-        limelight = new Limelight(drive, LimelightsSim);
-        break;
+                limelight = new Limelight(drive, LimelightsSim);
+                break;
 
-      default:
-        // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
-        elevator = new Elevator(new ElevatorIO() {});
-        climberSubsystem = new ClimberSubsystem(new ClimberIO() {});
-        intake = new Intake(new IntakeIO() {});
-        arm = new Arm(new ArmIO() {});
+            default:
+                // Replayed robot, disable IO implementations
+                drive = new Drive(
+                        new GyroIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        });
+                elevator = new Elevator(new ElevatorIO() {
+                });
+                climberSubsystem = new ClimberSubsystem(new ClimberIO() {
+                });
+                intake = new Intake(new IntakeIO() {
+                });
+                arm = new Arm(new ArmIO() {
+                });
 
-        LimelightIO[] LimelightsReplay = new LimelightIO[2];
+                LimelightIO[] LimelightsReplay = new LimelightIO[2];
 
-        LimelightsReplay[0] = new LimelightIO() {};
-        LimelightsReplay[1] = new LimelightIO() {};
+                LimelightsReplay[0] = new LimelightIO() {
+                };
+                LimelightsReplay[1] = new LimelightIO() {
+                };
 
-        limelight = new Limelight(drive, LimelightsReplay);
+                limelight = new Limelight(drive, LimelightsReplay);
 
-        break;
+                break;
+        }
+
+        // Set up auto routines
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
+        // Set up SysId routines
+        autoChooser.addOption(
+                "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+        autoChooser.addOption(
+                "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+        autoChooser.addOption(
+                "Drive SysId (Quasistatic Forward)",
+                drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        autoChooser.addOption(
+                "Drive SysId (Quasistatic Reverse)",
+                drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        autoChooser.addOption(
+                "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        autoChooser.addOption(
+                "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+        // Configure the button bindings
+        configureButtonBindings();
+
+        ServoHubConfig shc = new ServoHubConfig();
+        shc.channel1
+                .disableBehavior(BehaviorWhenDisabled.kDoNotSupplyPower)
+                .pulseRange(500, 1500, 2500);
+
+        shc.channel0
+                .disableBehavior(BehaviorWhenDisabled.kDoNotSupplyPower)
+                .pulseRange(500, 1500, 2500);
+
+        servoHub.configure(shc, ResetMode.kResetSafeParameters);
     }
-
-    // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-    // Set up SysId routines
-    autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-    // Configure the button bindings
-    configureButtonBindings();
-
-    ServoHubConfig shc = new ServoHubConfig();
-    shc.channel1
-        .disableBehavior(BehaviorWhenDisabled.kDoNotSupplyPower)
-        .pulseRange(500, 1500, 2500);
-
-    shc.channel3
-        .disableBehavior(BehaviorWhenDisabled.kDoNotSupplyPower)
-        .pulseRange(500, 1500, 2500);
-
-    shc.channel4
-        .disableBehavior(BehaviorWhenDisabled.kDoNotSupplyPower)
-        .pulseRange(500, 1500, 2500);
-
-    servoHub.configure(shc, ResetMode.kResetSafeParameters);
-  }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
@@ -240,6 +250,10 @@ public class RobotContainer {
     driveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     driveController.rightBumper().whileTrue((climberSubsystem.ClimberDown()));
     driveController.leftBumper().whileTrue((climberSubsystem.ClimberUp()));
+    climberSubsystem.setDefaultCommand(Commands.run(() -> {
+        climberSubsystem.ClimberSpeed(() -> {return driveController.getRightTriggerAxis() - driveController.getLeftTriggerAxis();});
+    }, climberSubsystem
+    ));
     driveController.y().onTrue(DriveCommands.boost());
     driveController.y().onFalse(DriveCommands.boostOff());
 
@@ -259,12 +273,12 @@ public class RobotContainer {
     // PDotGainNN.get(),0.1)));
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    return autoChooser.get();
-  }
+    /**
+     * Use this to pass the autonomous command to the main {@link Robot} class.
+     *
+     * @return the command to run in autonomous
+     */
+    public Command getAutonomousCommand() {
+        return autoChooser.get();
+    }
 }

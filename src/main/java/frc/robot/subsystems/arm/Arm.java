@@ -25,8 +25,8 @@ public class Arm extends SubsystemBase {
   double maxA = 90;
   double maxV = 45;
   double kS = 0;
-  double kG = 0; // simple feed forward control
-  double kV = 0;
+  double kG = 0.8; // simple feed forward control
+  double kV = 1;
 
   boolean simpleControl = true; // position control loop.
   double RateCommand = 0;
@@ -116,5 +116,6 @@ public class Arm extends SubsystemBase {
     }
     // Logger.recordOutput("arm/speed command", mSpeed);
     Logger.recordOutput("arm/ffCommand", ffCommand);
+    Logger.recordOutput("arm/RateCommand",RateCommand);
   }
 }

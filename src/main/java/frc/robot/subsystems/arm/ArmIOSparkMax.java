@@ -1,5 +1,7 @@
 package frc.robot.subsystems.arm;
 
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkRelativeEncoder;
@@ -26,6 +28,8 @@ public class ArmIOSparkMax implements ArmIO {
         .encoder
         .positionConversionFactor(Constants.ArmConstants.PositionConversionFactor)
         .velocityConversionFactor(Constants.ArmConstants.VelocityConversionFactor);
+
+    mSparkMax.configure(mConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   public void updateInputs(ArmIOInputs inputs) {

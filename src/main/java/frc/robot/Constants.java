@@ -78,7 +78,7 @@ public final class Constants {
   }
 
   public static class ClimberConstants {
-    public static final int CurrentLimit = 20;
+    public static final int CurrentLimit = 50;
     public static final int ClimberPositionConversionFactor = /* put real value here--> */ 1;
     public static final int ClimberVelocityConversionFactor = /* put real value here--> */ 1;
     public static final int ClimberWheelFreeSpeedMetersPerSecond = /* put real value here--> */ 1;
@@ -87,7 +87,7 @@ public final class Constants {
   }
 
   public static class ArmConstants {
-    public static final int ArmCanID = 46;
+    public static final int ArmCanID = 2;
 
     public static int NeoFreeSpeedRPM = 5676;
     public static int CurrentLimit = 50;

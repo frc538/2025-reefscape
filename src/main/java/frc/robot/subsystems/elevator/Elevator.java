@@ -15,7 +15,7 @@ public class Elevator extends SubsystemBase {
   private int positionTarget = 0;
   private int positionMax = 5;
   private int positionMin = 0;
-  private double calibratedGregStartingHeight = 0;
+  private double calibratedGregStartingHeight = 0.516;
   private double lowestObservedPosition = calibratedGregStartingHeight;
   private double highestObservedPosition = calibratedGregStartingHeight;
   private boolean bottomSwitchHit = false;
@@ -35,18 +35,18 @@ public class Elevator extends SubsystemBase {
 
   double mReferencePosition = 0.0;
 
-  double[] positionThresholds = {0.63, 1.36};
+  double[] positionThresholds = {0.55, 1.28};
 
   int gainIndex = 0;
 
-  double[] kS = {0, 0, 0};
-  double[] kG = {0, 0., 0};
-  double[] kV = {3.5, 3.9, 4.5};
-  double[] kA = {0, 0, 0};
+  double[] kS = {0, 0, 0.5};
+  double[] kG = {0.9, 1.1, 1.25};
+  double[] kV = {2.5, 2.5, 2.5};
+  double[] kA = {1, 1, 1};
   double[] maxV = {0.3, 0.3, 0.3};
   double[] maxA = {0.3, 0.3, 0.3};
-  double[] kP = {0.5, 0.5, 0.5};
-  double[] kI = {0.0, 0, 0};
+  double[] kP = {.75, .75, .75};
+  double[] kI = {0, 0, 0};
   double[] kD = {0, 0, 0};
 
   // section heights
@@ -56,7 +56,7 @@ public class Elevator extends SubsystemBase {
   // .628 / .420 =
 
   ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
-  LoggedNetworkNumber troughHeight = new LoggedNetworkNumber("/SmartDashboard/Trough Height", 0.46);
+  LoggedNetworkNumber troughHeight = new LoggedNetworkNumber("/SmartDashboard/Trough Height", 0.516);
   LoggedNetworkNumber coralLowHeight =
       new LoggedNetworkNumber("/SmartDashboard/Coral Low Height", 0.81);
   LoggedNetworkNumber coralMedHeight =
@@ -106,7 +106,7 @@ public class Elevator extends SubsystemBase {
   private void goToPosition() {
     switch (positionTarget) {
       case 0:
-        PositionCommand(0);
+        PositionCommand(0.516);
         break;
       case 1:
         PositionCommand(troughHeight.get());
@@ -199,14 +199,6 @@ public class Elevator extends SubsystemBase {
       gainIndex = 0;
     }
 
-    // kS[(int) gainIndexnn.get()] = kSnn.get();
-    // kV[(int) gainIndexnn.get()] = kVnn.get();
-    // kA[(int) gainIndexnn.get()] = kAnn.get();
-
-    // kP[(int) gainIndexnn.get()] = Pnn.get();
-    // kI[(int) gainIndexnn.get()] = Inn.get();
-    // kD[(int) gainIndexnn.get()] = Dnn.get();
-
     // Always update gains when read in from the network numbers into the gainIndex
     // value
     // Change the code to check if the configured parameter is different from the
@@ -234,7 +226,7 @@ public class Elevator extends SubsystemBase {
       // do stuff when disabled
       // init reference position to where it thinks it is as average.
       // TODO ************* use average of both encoders on real robot **************
-      mReferencePosition = inputs.leftEncoderValue;
+      mReferencePosition = calibratedGregStartingHeight;
       PDotPositionCommand = mReferencePosition;
       buttonPositionCommand = mReferencePosition;
       mDesiredState = new TrapezoidProfile.State(mReferencePosition, 0);
@@ -248,6 +240,7 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Elevator/Profile/Velocity", mCurrentState.velocity);
     Logger.recordOutput("Elevator/Lowest Observed Position", lowestObservedPosition);
     Logger.recordOutput("Elevator/Has Bottom Been Hit", bottomSwitchHit);
+    Logger.recordOutput("Elevator/gainIndex",gainIndex);
   }
 
   @Override
