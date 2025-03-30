@@ -13,25 +13,27 @@ public class Intake extends SubsystemBase {
 
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
-  public Command intakeIn() {
-    return run(
-        () -> {
-          io.intakeIn();
-        });
-  }
-
-  public Command intakeOut() {
-    return run(
-        () -> {
-          io.intakeOut();
-        });
-  }
-
   public Command intakeStop() {
     return run(
         () -> {
           io.intakeStop();
         });
+  }
+
+  public Command intakeIn() {
+    return runEnd(() -> {
+        io.intakeIn();
+    }, () -> {
+        io.intakeStop();
+    });
+  }
+
+  public Command intakeOut() {
+    return runEnd(() -> {
+        io.intakeOut();
+    }, () -> {
+        io.intakeStop();
+    });
   }
 
   public Command intakeReset() {
