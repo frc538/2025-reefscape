@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.revrobotics.servohub.ServoChannel.ChannelId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 
@@ -95,5 +96,15 @@ public final class Constants {
         360 / gearRatio; // Arm degrees rotation/motor Revolutions
     public static double VelocityConversionFactor = 360 / gearRatio;
     public static double MotorFreeSpeedRevsPerSecond = NeoFreeSpeedRPM / 60.0;
+  }
+
+  public static class IntakeConstants {
+    public static final ChannelId leftChannel = ChannelId.kChannelId0;
+    public static final ChannelId rightChannel = ChannelId.kChannelId1;
+
+    public static final int intakeInPulseWidth = 500;
+    public static final int intakeOutPulseWidth = 2500;
+    public static final int intakeHoldPulseWidth = 1300;
+    public static final int initialPulseWidth = 1500;
   }
 }
