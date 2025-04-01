@@ -56,13 +56,11 @@ public class Elevator extends SubsystemBase {
   // .628 / .420 =
 
   ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
-  LoggedNetworkNumber troughHeight = new LoggedNetworkNumber("/SmartDashboard/Trough Height", 0.516);
-  LoggedNetworkNumber coralLowHeight =
-      new LoggedNetworkNumber("/SmartDashboard/Coral Low Height", 0.81);
-  LoggedNetworkNumber coralMedHeight =
-      new LoggedNetworkNumber("/SmartDashboard/Coral Med Height", 1.21);
-  LoggedNetworkNumber coralHighHeight =
-      new LoggedNetworkNumber("/SmartDashboard/Coral High Height", 1.83);
+  LoggedNetworkNumber stowedHeight = new LoggedNetworkNumber("/SmartDashboard/Stowed Height", 0.516);
+  LoggedNetworkNumber algaeLowHeight =
+      new LoggedNetworkNumber("/SmartDashboard/Algae Low Height", 0.81);
+  LoggedNetworkNumber algaeHighHeight =
+      new LoggedNetworkNumber("/SmartDashboard/Algae High Height", 1.2);
   LoggedNetworkNumber bargeHeight = new LoggedNetworkNumber("/SmartDashboard/Barge Height", 1.9);
 
   LoggedNetworkNumber arbFF = new LoggedNetworkNumber("/SmartDashboard/Arbitrary FF Gain", 0.5);
@@ -106,21 +104,15 @@ public class Elevator extends SubsystemBase {
   private void goToPosition() {
     switch (positionTarget) {
       case 0:
-        PositionCommand(0.516);
+        PositionCommand(stowedHeight.get());
         break;
       case 1:
-        PositionCommand(troughHeight.get());
+        PositionCommand(algaeLowHeight.get());
         break;
       case 2:
-        PositionCommand(coralLowHeight.get());
+        PositionCommand(algaeHighHeight.get());
         break;
       case 3:
-        PositionCommand(coralMedHeight.get());
-        break;
-      case 4:
-        PositionCommand(coralHighHeight.get());
-        break;
-      case 5:
         PositionCommand(bargeHeight.get());
         break;
       default:
@@ -128,24 +120,16 @@ public class Elevator extends SubsystemBase {
     }
   }
 
-  public Command Bottom() {
-    return runOnce(() -> PositionCommand(0));
+  public Command Stowed() {
+    return runOnce(() -> PositionCommand(stowedHeight.get()));
   }
 
-  public Command Trough() {
-    return runOnce(() -> PositionCommand(troughHeight.get()));
+  public Command algaeLow() {
+    return runOnce(() -> PositionCommand(algaeLowHeight.get()));
   }
 
-  public Command CoralLow() {
-    return runOnce(() -> PositionCommand(coralLowHeight.get()));
-  }
-
-  public Command CoralMed() {
-    return runOnce(() -> PositionCommand(coralMedHeight.get()));
-  }
-
-  public Command CoralHigh() {
-    return runOnce(() -> PositionCommand(coralHighHeight.get()));
+  public Command algaeMed() {
+    return runOnce(() -> PositionCommand(algaeHighHeight.get()));
   }
 
   public Command Barge() {
@@ -247,7 +231,6 @@ public class Elevator extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
-    Logger.recordOutput("Elevator/Trough Height", troughHeight.get());
     if (UseButtonState) {
       Logger.recordOutput("Elevator/Command Source", "Button");
     } else {
