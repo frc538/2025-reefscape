@@ -15,6 +15,7 @@ public class Arm extends SubsystemBase {
   ArmIO io;
   private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
   private double mSpeed = 0.0;
+  private boolean algaePresentBoolean = false;
 
   Constraints profileConstraints;
   TrapezoidProfile commandProfile;
@@ -25,7 +26,9 @@ public class Arm extends SubsystemBase {
   double maxA = 90;
   double maxV = 45;
   double kS = 0;
-  double kG = 0.8; // simple feed forward control
+  double noAlgaeGain = 0.8; // simple feed forward control
+  double withAlgaeGain = 0.8;
+  double selectedkG = 0.8;
   double kV = 1;
 
   boolean simpleControl = true; // position control loop.
@@ -42,9 +45,23 @@ public class Arm extends SubsystemBase {
     profileConstraints = new Constraints(maxV, maxA);
     commandProfile = new TrapezoidProfile(profileConstraints);
 
-    m_feedforward = new ArmFeedforward(kS, kG, kV);
+    selectedkG = noAlgaeGain; // initialize without algae
+
+    m_feedforward = new ArmFeedforward(kS, selectedkG, kV);
     mCurrentState = new TrapezoidProfile.State();
     mDesiredState = new TrapezoidProfile.State();
+  }
+
+  public Command runArmToggle() {
+    return runOnce(() -> {
+      algaePresentBoolean = !algaePresentBoolean;
+      if (algaePresentBoolean == true) {
+        selectedkG = withAlgaeGain;
+      } else {
+        selectedkG = noAlgaeGain;
+      }
+      m_feedforward = new ArmFeedforward(kS, selectedkG, kV);
+    });
   }
 
   public Command MoveArm(DoubleSupplier speedSupplier) {
@@ -55,18 +72,19 @@ public class Arm extends SubsystemBase {
           io.armSpeedCommand(mSpeed);
         });
   }
-
-  public Command PDotCommand(double rate) {
-    return run(
-        () -> {
-          if (rate != 0) {
-            PDotRate = rate;
-            UseButtonState = false;
-            PDotPositionCommand = PDotPositionCommand + PDotRate;
-            setReference(PDotPositionCommand);
-          }
-        });
-  }
+  /*
+   * public Command PDotCommand(double rate) {
+   * return run(
+   * () -> {
+   * if (rate != 0) {
+   * PDotRate = rate;
+   * UseButtonState = false;
+   * PDotPositionCommand = PDotPositionCommand + PDotRate;
+   * setReference(PDotPositionCommand);
+   * }
+   * });
+   * }
+   */
 
   public Command RateCommand(DoubleSupplier rateSupplier) {
     return run(
@@ -74,12 +92,13 @@ public class Arm extends SubsystemBase {
           RateCommand = rateSupplier.getAsDouble();
         });
   }
-
-  private void setReference(double position) {
-    mReferencePosition = position;
-    mDesiredState = new TrapezoidProfile.State(mReferencePosition, 0);
-    Logger.recordOutput("arm/Commanded Position", position);
-  }
+  /*
+   * private void setReference(double position) {
+   * mReferencePosition = position;
+   * mDesiredState = new TrapezoidProfile.State(mReferencePosition, 0);
+   * Logger.recordOutput("arm/Commanded Position", position);
+   * }
+   */
 
   @Override
   public void periodic() {
@@ -90,10 +109,9 @@ public class Arm extends SubsystemBase {
     Logger.processInputs("arm subsystem", inputs);
 
     if (simpleControl) {
-      ffCommand =
-          m_feedforward.calculate(
-              Units.degreesToRadians(inputs.armPositionDegrees) - Units.degreesToRadians(90),
-              RateCommand);
+      ffCommand = m_feedforward.calculate(
+          Units.degreesToRadians(inputs.armPositionDegrees) - Units.degreesToRadians(90),
+          RateCommand);
       io.setVoltage(ffCommand);
     } else {
 
@@ -101,10 +119,9 @@ public class Arm extends SubsystemBase {
         /* Do the command processing */
         state_step = commandProfile.calculate(0.02, mCurrentState, mDesiredState);
         mCurrentState = state_step;
-        ffCommand =
-            m_feedforward.calculate(
-                Units.degreesToRadians(inputs.armPositionDegrees) - Units.degreesToRadians(90),
-                Units.degreesToRadians(mCurrentState.velocity));
+        ffCommand = m_feedforward.calculate(
+            Units.degreesToRadians(inputs.armPositionDegrees) - Units.degreesToRadians(90),
+            Units.degreesToRadians(mCurrentState.velocity));
       } else {
         // do stuff when disabled
         mReferencePosition = 0;
@@ -116,6 +133,8 @@ public class Arm extends SubsystemBase {
     }
     // Logger.recordOutput("arm/speed command", mSpeed);
     Logger.recordOutput("arm/ffCommand", ffCommand);
-    Logger.recordOutput("arm/RateCommand",RateCommand);
+    Logger.recordOutput("arm/RateCommand", RateCommand);
+    Logger.recordOutput("arm/selectedkG", selectedkG);
+    Logger.recordOutput("arm/Algae Present?", algaePresentBoolean);
   }
 }

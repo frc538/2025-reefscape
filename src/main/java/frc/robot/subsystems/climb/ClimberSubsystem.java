@@ -11,25 +11,45 @@ public class ClimberSubsystem extends SubsystemBase {
   private final ClimberIO io;
   private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
 
+  double mSpeed = 0;
+
   public ClimberSubsystem(ClimberIO IO) {
     io = IO;
   }
 
   public Command ClimberUp() {
-    return runEnd(() -> io.setOutput(-0.5), () -> io.setOutput(0.0));
+    return runEnd(() -> {
+      mSpeed = -1;
+      io.setOutput(mSpeed);
+
+    }, () -> {
+      io.setOutput(0.0);
+      mSpeed = 0;
+    });
   }
 
   public Command ClimberSpeed(DoubleSupplier speedSupplier) {
-    return run(() -> io.setOutput(speedSupplier.getAsDouble()));
+    return run(() -> {
+      mSpeed = speedSupplier.getAsDouble();
+      io.setOutput(mSpeed);
+    });
   }
 
   public Command ClimberDown() {
-    return runEnd(() -> io.setOutput(0.5), () -> io.setOutput(0.0));
+    return runEnd(() -> {
+      mSpeed = 1;
+      io.setOutput(mSpeed);
+
+    }, () -> {
+      io.setOutput(0.0);
+      mSpeed = 0;
+    });
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("climber subsystem", inputs);
+    Logger.recordOutput("climber subsystem/mSpeed", mSpeed);
   }
 }

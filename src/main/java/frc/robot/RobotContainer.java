@@ -267,6 +267,7 @@ public class RobotContainer {
     arm.setDefaultCommand(arm.RateCommand(() -> mechanismController.getRightY()));
     mechanismController.a().whileTrue(intake.intakeIn());
     mechanismController.y().whileTrue(intake.intakeOut());
+    mechanismController.x().onTrue(arm.runArmToggle());
     mechanismController.button(8).whileTrue(intake.intakeReset());
     // elevator.setDefaultCommand(
     // elevator.PDotCommand(MathUtil.applyDeadband(-mechanismController.getLeftY() *
