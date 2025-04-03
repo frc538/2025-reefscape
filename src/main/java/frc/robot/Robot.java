@@ -27,6 +27,7 @@ public class Robot extends LoggedRobot {
   private final RobotContainer m_robotContainer;
 
   public Robot() {
+    CameraServer.startAutomaticCapture();
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
     Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
@@ -132,7 +133,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopInit() {
     if (m_autonomousCommand != null) {
-      CameraServer.startAutomaticCapture();
       m_autonomousCommand.cancel();
     }
   }
