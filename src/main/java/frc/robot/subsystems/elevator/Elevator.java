@@ -82,7 +82,6 @@ public class Elevator extends SubsystemBase {
   }
 
   private void doPositionUp() {
-    System.out.println("PositionUp");
     if (positionTarget < positionMax) {
       positionTarget = positionTarget + 1;
     }
@@ -94,7 +93,6 @@ public class Elevator extends SubsystemBase {
   }
 
   private void doPositionDown() {
-    System.out.println("PositionDown");
     if (positionTarget > positionMin) {
       positionTarget = positionTarget - 1;
     }
