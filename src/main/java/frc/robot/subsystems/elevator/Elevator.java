@@ -13,7 +13,7 @@ public class Elevator extends SubsystemBase {
   ElevatorIO io;
 
   private int positionTarget = 0;
-  private int positionMax = 5;
+  private int positionMax = 3;
   private int positionMin = 0;
   private double calibratedGregStartingHeight = 0.516;
   private double lowestObservedPosition = calibratedGregStartingHeight;
