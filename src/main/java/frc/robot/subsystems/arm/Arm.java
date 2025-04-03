@@ -31,7 +31,7 @@ public class Arm extends SubsystemBase {
   double selectedkG = 0.8;
   double kV = 1;
   double rateGainNoAlgae = 1;
-  double rateGainWithAlgae = 1.8;
+  double rateGainWithAlgae = 2.2;
   double selectedRateGain = 1;
 
   boolean simpleControl = true; // position control loop.

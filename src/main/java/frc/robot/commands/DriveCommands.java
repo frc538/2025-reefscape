@@ -48,6 +48,9 @@ public class DriveCommands {
   public static double ANGLE_MAX_VELOCITY = 8.0;
   public static double ANGLE_MAX_ACCELERATION = 20.0;
 
+  public static double angularGain = 0.1;
+  public static double linearGain = 0.1;
+
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
@@ -61,7 +64,7 @@ public class DriveCommands {
     Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
 
     // Square magnitude for more precise control
-    linearMagnitude = linearMagnitude * linearMagnitude;
+    //linearMagnitude = linearMagnitude * linearMagnitude;
 
     Logger.recordOutput("Drive/LinearMagnitude", linearMagnitude);
     Logger.recordOutput("Drive/LinearDirection", linearDirection);
@@ -73,18 +76,24 @@ public class DriveCommands {
   }
 
   public static Command boost() {
-    return Commands.run(
+    return Commands.runOnce(
         () -> {
           ANGLE_MAX_ACCELERATION = 60;
           ANGLE_MAX_VELOCITY = 12;
+
+          linearGain = 1;
+          angularGain = 0.3;
         });
   }
 
   public static Command boostOff() {
-    return Commands.run(
+    return Commands.runOnce(
         () -> {
           ANGLE_MAX_ACCELERATION = 20;
           ANGLE_MAX_VELOCITY = 8;
+
+          linearGain = 0.1;
+          angularGain = 0.1;
         });
   }
 
@@ -113,16 +122,19 @@ public class DriveCommands {
           // Apply rotation deadband
           double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
 
-          // Square rotation value for more precise control
-          omega = Math.copySign(omega * omega, omega);
+          // // Square rotation value for more precise control
+          // omega = Math.copySign(omega * omega, omega);
 
           // Convert to field relative speeds & send command
           ChassisSpeeds speeds =
               new ChassisSpeeds(
-                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                  omega * drive.getMaxAngularSpeedRadPerSec());
+                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec() * linearGain,
+                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec() * linearGain,
+                  omega * drive.getMaxAngularSpeedRadPerSec() * angularGain);
           Logger.recordOutput("Drive/ChassisSpeeds", speeds);
+          Logger.recordOutput("Drive/linearGain",linearGain);
+          Logger.recordOutput("Drive/angularGain",angularGain);
+          
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == Alliance.Red;
