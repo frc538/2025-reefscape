@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  * (log replay from a file).
  */
 public final class Constants {
-  public static final Mode simMode = Mode.SIM;
+  public static final Mode simMode = Mode.REPLAY;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
   public static enum Mode {
@@ -79,7 +79,7 @@ public final class Constants {
 
   public static class ClimberConstants {
     public static final int CurrentLimit = 50;
-    public static final int ClimberPositionConversionFactor = /* put real value here--> */ 1;
+    public static final double ClimberPositionConversionFactor = 90.0/480.0; // 480 revolutions gives us 90 degrees on the climber.
     public static final int ClimberVelocityConversionFactor = /* put real value here--> */ 1;
     public static final int ClimberWheelFreeSpeedMetersPerSecond = /* put real value here--> */ 1;
     public static final int ClimberMotorCANId = 13;
