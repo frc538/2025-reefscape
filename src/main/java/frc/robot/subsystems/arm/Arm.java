@@ -42,6 +42,8 @@ public class Arm extends SubsystemBase {
   boolean UseButtonState = false;
   double mReferencePosition = 0;
 
+  double maxArmRate = 1200.00;
+
   public Arm(ArmIO IO) {
     io = IO;
 
@@ -108,7 +110,6 @@ public class Arm extends SubsystemBase {
   @Override
   public void periodic() {
     double ffCommand = 0;
-    TrapezoidProfile.State state_step = new TrapezoidProfile.State();
 
     io.updateInputs(inputs);
     Logger.processInputs("arm subsystem", inputs);
@@ -119,22 +120,11 @@ public class Arm extends SubsystemBase {
           RateCommand * selectedRateGain);
       io.setVoltage(ffCommand);
     } else {
-
-      if (RobotState.isEnabled() == true) {
-        /* Do the command processing */
-        state_step = commandProfile.calculate(0.02, mCurrentState, mDesiredState);
-        mCurrentState = state_step;
-        ffCommand = m_feedforward.calculate(
-            Units.degreesToRadians(inputs.armPositionDegrees) - Units.degreesToRadians(90),
-            Units.degreesToRadians(mCurrentState.velocity));
-      } else {
-        // do stuff when disabled
-        mReferencePosition = 0;
-        PDotPositionCommand = mReferencePosition;
-        mDesiredState = new TrapezoidProfile.State(mReferencePosition, 0);
-        mCurrentState = mDesiredState;
-      }
-      io.setReference(mCurrentState.position, ffCommand);
+      /* Do the command processing */
+      ffCommand = m_feedforward.calculate(
+          Units.degreesToRadians(inputs.armPositionDegrees) - Units.degreesToRadians(90),
+          RateCommand * selectedRateGain);
+      io.setReference(RateCommand * maxArmRate, ffCommand);
     }
     // Logger.recordOutput("arm/speed command", mSpeed);
     Logger.recordOutput("arm/ffCommand", ffCommand);

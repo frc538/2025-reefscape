@@ -1,16 +1,21 @@
 package frc.robot.subsystems.arm;
 
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkRelativeEncoder;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import frc.robot.Constants;
 
 public class ArmIOSparkMax implements ArmIO {
   private final SparkMax mSparkMax;
+  private final SparkClosedLoopController mController;
 
   SparkMaxConfig mConfig = new SparkMaxConfig();
 
@@ -29,7 +34,14 @@ public class ArmIOSparkMax implements ArmIO {
         .positionConversionFactor(Constants.ArmConstants.PositionConversionFactor)
         .velocityConversionFactor(Constants.ArmConstants.VelocityConversionFactor);
 
+    mConfig
+        .closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .pid(0.5, 0, 0)
+        .outputRange(-1, 1);
+
     mSparkMax.configure(mConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    mController = mSparkMax.getClosedLoopController();
   }
 
   public void updateInputs(ArmIOInputs inputs) {
@@ -42,8 +54,8 @@ public class ArmIOSparkMax implements ArmIO {
     inputs.MotorTemperature = mSparkMax.getMotorTemperature();
   }
 
-  public void armSpeedCommand(double speed) {
-    mSparkMax.set(speed);
+  public void armSpeedCommand(double speed, double ffvoltage) {
+    mController.setReference(speed, ControlType.kVelocity,ClosedLoopSlot.kSlot0, ffvoltage);
   }
 
   public void setVoltage(double voltage) {
