@@ -19,7 +19,7 @@ public class Limelight extends SubsystemBase {
   }
 
   public void checkLimelight(int LimelightIndex) {
-    boolean useMegaTag2 = true; // set to false to use MegaTag1
+    boolean useMegaTag2 = false; // set to false to use MegaTag1
     boolean doRejectUpdate = false;
     if (useMegaTag2 == false) {
 
