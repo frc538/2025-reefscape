@@ -27,7 +27,7 @@ public class Arm extends SubsystemBase {
   double maxV = 45;
   double kS = 0;
   double noAlgaeGain = 0.8; // simple feed forward control
-  double withAlgaeGain = 0.8;
+  double withAlgaeGain = 0.95;
   double selectedkG = 0.8;
   double kV = 1;
 

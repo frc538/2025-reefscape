@@ -36,10 +36,10 @@ public class ArmIOSparkMax implements ArmIO {
     inputs.armPositionDegrees = mEncoder.getPosition();
     inputs.armVelocityDegreesPerSecond = mEncoder.getVelocity();
 
-    mSparkMax.getAppliedOutput();
-    mSparkMax.getBusVoltage();
-    mSparkMax.getOutputCurrent();
-    mSparkMax.getMotorTemperature();
+    inputs.AppliedOutput = mSparkMax.getAppliedOutput();
+    inputs.BusVoltage = mSparkMax.getBusVoltage();
+    inputs.OutputCurrent = mSparkMax.getOutputCurrent();
+    inputs.MotorTemperature = mSparkMax.getMotorTemperature();
   }
 
   public void armSpeedCommand(double speed) {
