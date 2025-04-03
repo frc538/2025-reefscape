@@ -27,9 +27,12 @@ public class Arm extends SubsystemBase {
   double maxV = 45;
   double kS = 0;
   double noAlgaeGain = 0.8; // simple feed forward control
-  double withAlgaeGain = 0.95;
+  double withAlgaeGain = 1.9;
   double selectedkG = 0.8;
   double kV = 1;
+  double rateGainNoAlgae = 1;
+  double rateGainWithAlgae = 1.8;
+  double selectedRateGain = 1;
 
   boolean simpleControl = true; // position control loop.
   double RateCommand = 0;
@@ -57,8 +60,10 @@ public class Arm extends SubsystemBase {
       algaePresentBoolean = !algaePresentBoolean;
       if (algaePresentBoolean == true) {
         selectedkG = withAlgaeGain;
+        selectedRateGain = rateGainWithAlgae;
       } else {
         selectedkG = noAlgaeGain;
+        selectedRateGain = rateGainNoAlgae;
       }
       m_feedforward = new ArmFeedforward(kS, selectedkG, kV);
     });
@@ -111,7 +116,7 @@ public class Arm extends SubsystemBase {
     if (simpleControl) {
       ffCommand = m_feedforward.calculate(
           Units.degreesToRadians(inputs.armPositionDegrees) - Units.degreesToRadians(90),
-          RateCommand);
+          RateCommand * selectedRateGain);
       io.setVoltage(ffCommand);
     } else {
 
