@@ -48,8 +48,13 @@ public class DriveCommands {
   public static double ANGLE_MAX_VELOCITY = 8.0;
   public static double ANGLE_MAX_ACCELERATION = 20.0;
 
-  public static double angularGain = 0.1;
-  public static double linearGain = 0.15;
+  private static double angularGainNoBoost = 0.08;
+  private static double angularGainBoost = 0.3;
+  private static double linearGainNoBoost = 0.11;
+  private static double linearGainBoost = 1;
+
+  public static double angularGain = angularGainNoBoost;
+  public static double linearGain = linearGainNoBoost;
 
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
@@ -81,8 +86,8 @@ public class DriveCommands {
           ANGLE_MAX_ACCELERATION = 60;
           ANGLE_MAX_VELOCITY = 12;
 
-          linearGain = 1;
-          angularGain = 0.3;
+          linearGain = linearGainBoost;
+          angularGain = angularGainBoost;
         });
   }
 
@@ -92,8 +97,8 @@ public class DriveCommands {
           ANGLE_MAX_ACCELERATION = 20;
           ANGLE_MAX_VELOCITY = 8;
 
-          linearGain = 0.15;
-          angularGain = 0.1;
+          linearGain = linearGainNoBoost;
+          angularGain = angularGainNoBoost;
         });
   }
 
