@@ -33,7 +33,7 @@ public class Arm extends SubsystemBase {
   double rateGainWithAlgae = 2.2;
   double selectedRateGain = 1;
 
-  boolean simpleControl = true; // velocity control loop.
+  boolean simpleControl = false; // velocity control loop.
   double RateCommand = 0;
 
   double PDotPositionCommand = 0;
@@ -128,7 +128,9 @@ public class Arm extends SubsystemBase {
           m_feedforward.calculate(
               Units.degreesToRadians(inputs.armPositionDegrees) - Units.degreesToRadians(90),
               RateCommand * selectedRateGain);
-      io.setReference(RateCommand * maxArmRate, ffCommand);
+
+      RateCommand = RateCommand * maxArmRate;
+      io.setReference(RateCommand, ffCommand);
     }
     // Logger.recordOutput("arm/speed command", mSpeed);
     Logger.recordOutput("arm/ffCommand", ffCommand);

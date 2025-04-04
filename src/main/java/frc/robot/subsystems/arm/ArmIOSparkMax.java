@@ -17,6 +17,10 @@ public class ArmIOSparkMax implements ArmIO {
   private final SparkMax mSparkMax;
   private final SparkClosedLoopController mController;
 
+  private double kp = 0.0006;
+  private double ki = 0;
+  private double kd = 0;
+
   SparkMaxConfig mConfig = new SparkMaxConfig();
 
   SparkRelativeEncoder mEncoder;
@@ -37,7 +41,7 @@ public class ArmIOSparkMax implements ArmIO {
     mConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pid(0.0005, 0, 0)
+        .pid(kp, ki, kd)
         .outputRange(-1, 1);
 
     mSparkMax.configure(mConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
