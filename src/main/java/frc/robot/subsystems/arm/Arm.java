@@ -33,7 +33,7 @@ public class Arm extends SubsystemBase {
   double rateGainWithAlgae = 2.2;
   double selectedRateGain = 1;
 
-  boolean simpleControl = true; // position control loop.
+  boolean simpleControl = true; // velocity control loop.
   double RateCommand = 0;
 
   double PDotPositionCommand = 0;
@@ -41,7 +41,7 @@ public class Arm extends SubsystemBase {
   boolean UseButtonState = false;
   double mReferencePosition = 0;
 
-  double maxArmRate = 1200.00;
+  double maxArmRate = 100.00;
 
   public Arm(ArmIO IO) {
     io = IO;

@@ -31,13 +31,13 @@ public class ArmIOSparkMax implements ArmIO {
         .inverted(false);
     mConfig
         .encoder
-        .positionConversionFactor(Constants.ArmConstants.PositionConversionFactor)
-        .velocityConversionFactor(Constants.ArmConstants.VelocityConversionFactor);
+        .positionConversionFactor(Constants.ArmConstants.PositionConversionFactor) // Degrees of arm motion
+        .velocityConversionFactor(Constants.ArmConstants.VelocityConversionFactor);// Arm degrees per second
 
     mConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pid(0.5, 0, 0)
+        .pid(0.0005, 0, 0)
         .outputRange(-1, 1);
 
     mSparkMax.configure(mConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -54,8 +54,9 @@ public class ArmIOSparkMax implements ArmIO {
     inputs.MotorTemperature = mSparkMax.getMotorTemperature();
   }
 
-  public void armSpeedCommand(double speed, double ffvoltage) {
-    mController.setReference(speed, ControlType.kVelocity, ClosedLoopSlot.kSlot0, ffvoltage);
+  @Override
+  public void setReference(double speed, double ffvoltage) {
+    mController.setReference(speed, ControlType.kVelocity,ClosedLoopSlot.kSlot0, ffvoltage);
   }
 
   public void setVoltage(double voltage) {

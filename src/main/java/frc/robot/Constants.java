@@ -95,7 +95,7 @@ public final class Constants {
     public static int gearRatio = 25;
     public static double PositionConversionFactor =
         360.0 / gearRatio; // Arm degrees rotation/motor Revolutions
-    public static double VelocityConversionFactor = 360 / gearRatio;
+    public static double VelocityConversionFactor = 360.0 / gearRatio / 60.0; // Motor RPM to Arm degrees rotation per sec
     public static double MotorFreeSpeedRevsPerSecond = NeoFreeSpeedRPM / 60.0;
   }
 
