@@ -5,7 +5,6 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.DoubleSupplier;
@@ -58,17 +57,18 @@ public class Arm extends SubsystemBase {
   }
 
   public Command runArmToggle() {
-    return runOnce(() -> {
-      algaePresentBoolean = !algaePresentBoolean;
-      if (algaePresentBoolean == true) {
-        selectedkG = withAlgaeGain;
-        selectedRateGain = rateGainWithAlgae;
-      } else {
-        selectedkG = noAlgaeGain;
-        selectedRateGain = rateGainNoAlgae;
-      }
-      m_feedforward = new ArmFeedforward(kS, selectedkG, kV);
-    });
+    return runOnce(
+        () -> {
+          algaePresentBoolean = !algaePresentBoolean;
+          if (algaePresentBoolean == true) {
+            selectedkG = withAlgaeGain;
+            selectedRateGain = rateGainWithAlgae;
+          } else {
+            selectedkG = noAlgaeGain;
+            selectedRateGain = rateGainNoAlgae;
+          }
+          m_feedforward = new ArmFeedforward(kS, selectedkG, kV);
+        });
   }
 
   public Command MoveArm(DoubleSupplier speedSupplier) {
@@ -79,6 +79,7 @@ public class Arm extends SubsystemBase {
           io.armSpeedCommand(mSpeed);
         });
   }
+
   /*
    * public Command PDotCommand(double rate) {
    * return run(
@@ -99,6 +100,7 @@ public class Arm extends SubsystemBase {
           RateCommand = rateSupplier.getAsDouble();
         });
   }
+
   /*
    * private void setReference(double position) {
    * mReferencePosition = position;
@@ -115,15 +117,17 @@ public class Arm extends SubsystemBase {
     Logger.processInputs("arm subsystem", inputs);
 
     if (simpleControl) {
-      ffCommand = m_feedforward.calculate(
-          Units.degreesToRadians(inputs.armPositionDegrees) - Units.degreesToRadians(90),
-          RateCommand * selectedRateGain);
+      ffCommand =
+          m_feedforward.calculate(
+              Units.degreesToRadians(inputs.armPositionDegrees) - Units.degreesToRadians(90),
+              RateCommand * selectedRateGain);
       io.setVoltage(ffCommand);
     } else {
       /* Do the command processing */
-      ffCommand = m_feedforward.calculate(
-          Units.degreesToRadians(inputs.armPositionDegrees) - Units.degreesToRadians(90),
-          RateCommand * selectedRateGain);
+      ffCommand =
+          m_feedforward.calculate(
+              Units.degreesToRadians(inputs.armPositionDegrees) - Units.degreesToRadians(90),
+              RateCommand * selectedRateGain);
       io.setReference(RateCommand * maxArmRate, ffCommand);
     }
     // Logger.recordOutput("arm/speed command", mSpeed);

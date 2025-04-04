@@ -64,7 +64,7 @@ public class DriveCommands {
     Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
 
     // Square magnitude for more precise control
-    //linearMagnitude = linearMagnitude * linearMagnitude;
+    // linearMagnitude = linearMagnitude * linearMagnitude;
 
     Logger.recordOutput("Drive/LinearMagnitude", linearMagnitude);
     Logger.recordOutput("Drive/LinearDirection", linearDirection);
@@ -132,9 +132,9 @@ public class DriveCommands {
                   linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec() * linearGain,
                   omega * drive.getMaxAngularSpeedRadPerSec() * angularGain);
           Logger.recordOutput("Drive/ChassisSpeeds", speeds);
-          Logger.recordOutput("Drive/linearGain",linearGain);
-          Logger.recordOutput("Drive/angularGain",angularGain);
-          
+          Logger.recordOutput("Drive/linearGain", linearGain);
+          Logger.recordOutput("Drive/angularGain", angularGain);
+
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == Alliance.Red;

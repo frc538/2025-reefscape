@@ -56,7 +56,8 @@ public class Elevator extends SubsystemBase {
   // .628 / .420 =
 
   ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
-  LoggedNetworkNumber stowedHeight = new LoggedNetworkNumber("/SmartDashboard/Stowed Height", 0.516);
+  LoggedNetworkNumber stowedHeight =
+      new LoggedNetworkNumber("/SmartDashboard/Stowed Height", 0.516);
   LoggedNetworkNumber algaeLowHeight =
       new LoggedNetworkNumber("/SmartDashboard/Algae Low Height", 0.81);
   LoggedNetworkNumber algaeHighHeight =
@@ -222,7 +223,7 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Elevator/Profile/Velocity", mCurrentState.velocity);
     Logger.recordOutput("Elevator/Lowest Observed Position", lowestObservedPosition);
     Logger.recordOutput("Elevator/Has Bottom Been Hit", bottomSwitchHit);
-    Logger.recordOutput("Elevator/gainIndex",gainIndex);
+    Logger.recordOutput("Elevator/gainIndex", gainIndex);
   }
 
   @Override

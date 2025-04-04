@@ -2,9 +2,7 @@ package frc.robot.subsystems.climb;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import java.util.function.DoubleSupplier;
-
 import org.littletonrobotics.junction.Logger;
 
 public class ClimberSubsystem extends SubsystemBase {
@@ -18,32 +16,35 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   public Command ClimberUp() {
-    return runEnd(() -> {
-      mSpeed = -1;
-      io.setOutput(mSpeed);
-
-    }, () -> {
-      io.setOutput(0.0);
-      mSpeed = 0;
-    });
+    return runEnd(
+        () -> {
+          mSpeed = -1;
+          io.setOutput(mSpeed);
+        },
+        () -> {
+          io.setOutput(0.0);
+          mSpeed = 0;
+        });
   }
 
   public Command ClimberSpeed(DoubleSupplier speedSupplier) {
-    return run(() -> {
-      mSpeed = speedSupplier.getAsDouble();
-      io.setOutput(mSpeed);
-    });
+    return run(
+        () -> {
+          mSpeed = speedSupplier.getAsDouble();
+          io.setOutput(mSpeed);
+        });
   }
 
   public Command ClimberDown() {
-    return runEnd(() -> {
-      mSpeed = 1;
-      io.setOutput(mSpeed);
-
-    }, () -> {
-      io.setOutput(0.0);
-      mSpeed = 0;
-    });
+    return runEnd(
+        () -> {
+          mSpeed = 1;
+          io.setOutput(mSpeed);
+        },
+        () -> {
+          io.setOutput(0.0);
+          mSpeed = 0;
+        });
   }
 
   @Override
