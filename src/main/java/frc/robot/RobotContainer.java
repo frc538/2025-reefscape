@@ -248,8 +248,8 @@ public class RobotContainer {
                   });
             },
             climberSubsystem));
-    driveController.y().onTrue(DriveCommands.boost());
-    driveController.y().onFalse(DriveCommands.boostOff());
+    driveController.rightStick().onTrue(DriveCommands.boost());
+    driveController.rightStick().onFalse(DriveCommands.boostOff());
 
     // MECHANISM CONTROLLER COMMANDS
 
