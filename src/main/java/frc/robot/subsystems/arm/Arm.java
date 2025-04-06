@@ -5,7 +5,6 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.DoubleSupplier;
@@ -15,6 +14,7 @@ public class Arm extends SubsystemBase {
   ArmIO io;
   private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
   private double mSpeed = 0.0;
+  private boolean algaePresentBoolean = false;
 
   Constraints profileConstraints;
   TrapezoidProfile commandProfile;
@@ -25,10 +25,15 @@ public class Arm extends SubsystemBase {
   double maxA = 90;
   double maxV = 45;
   double kS = 0;
-  double kG = 0; // simple feed forward control
-  double kV = 0;
+  double noAlgaeGain = 0.8; // simple feed forward control
+  double withAlgaeGain = 1.9;
+  double selectedkG = 0.8;
+  double kV = 1;
+  double rateGainNoAlgae = 1;
+  double rateGainWithAlgae = 2.2;
+  double selectedRateGain = 1;
 
-  boolean simpleControl = true; // position control loop.
+  boolean simpleControl = false; // velocity control loop.
   double RateCommand = 0;
 
   double PDotPositionCommand = 0;
@@ -36,15 +41,34 @@ public class Arm extends SubsystemBase {
   boolean UseButtonState = false;
   double mReferencePosition = 0;
 
+  double maxArmRate = 100.00;
+
   public Arm(ArmIO IO) {
     io = IO;
 
     profileConstraints = new Constraints(maxV, maxA);
     commandProfile = new TrapezoidProfile(profileConstraints);
 
-    m_feedforward = new ArmFeedforward(kS, kG, kV);
+    selectedkG = noAlgaeGain; // initialize without algae
+
+    m_feedforward = new ArmFeedforward(kS, selectedkG, kV);
     mCurrentState = new TrapezoidProfile.State();
     mDesiredState = new TrapezoidProfile.State();
+  }
+
+  public Command runArmToggle() {
+    return runOnce(
+        () -> {
+          algaePresentBoolean = !algaePresentBoolean;
+          if (algaePresentBoolean == true) {
+            selectedkG = withAlgaeGain;
+            selectedRateGain = rateGainWithAlgae;
+          } else {
+            selectedkG = noAlgaeGain;
+            selectedRateGain = rateGainNoAlgae;
+          }
+          m_feedforward = new ArmFeedforward(kS, selectedkG, kV);
+        });
   }
 
   public Command MoveArm(DoubleSupplier speedSupplier) {
@@ -56,17 +80,19 @@ public class Arm extends SubsystemBase {
         });
   }
 
-  public Command PDotCommand(double rate) {
-    return run(
-        () -> {
-          if (rate != 0) {
-            PDotRate = rate;
-            UseButtonState = false;
-            PDotPositionCommand = PDotPositionCommand + PDotRate;
-            setReference(PDotPositionCommand);
-          }
-        });
-  }
+  /*
+   * public Command PDotCommand(double rate) {
+   * return run(
+   * () -> {
+   * if (rate != 0) {
+   * PDotRate = rate;
+   * UseButtonState = false;
+   * PDotPositionCommand = PDotPositionCommand + PDotRate;
+   * setReference(PDotPositionCommand);
+   * }
+   * });
+   * }
+   */
 
   public Command RateCommand(DoubleSupplier rateSupplier) {
     return run(
@@ -75,16 +101,17 @@ public class Arm extends SubsystemBase {
         });
   }
 
-  private void setReference(double position) {
-    mReferencePosition = position;
-    mDesiredState = new TrapezoidProfile.State(mReferencePosition, 0);
-    Logger.recordOutput("arm/Commanded Position", position);
-  }
+  /*
+   * private void setReference(double position) {
+   * mReferencePosition = position;
+   * mDesiredState = new TrapezoidProfile.State(mReferencePosition, 0);
+   * Logger.recordOutput("arm/Commanded Position", position);
+   * }
+   */
 
   @Override
   public void periodic() {
     double ffCommand = 0;
-    TrapezoidProfile.State state_step = new TrapezoidProfile.State();
 
     io.updateInputs(inputs);
     Logger.processInputs("arm subsystem", inputs);
@@ -93,28 +120,22 @@ public class Arm extends SubsystemBase {
       ffCommand =
           m_feedforward.calculate(
               Units.degreesToRadians(inputs.armPositionDegrees) - Units.degreesToRadians(90),
-              RateCommand);
+              RateCommand * selectedRateGain);
       io.setVoltage(ffCommand);
     } else {
+      /* Do the command processing */
+      ffCommand =
+          m_feedforward.calculate(
+              Units.degreesToRadians(inputs.armPositionDegrees) - Units.degreesToRadians(90),
+              RateCommand * selectedRateGain);
 
-      if (RobotState.isEnabled() == true) {
-        /* Do the command processing */
-        state_step = commandProfile.calculate(0.02, mCurrentState, mDesiredState);
-        mCurrentState = state_step;
-        ffCommand =
-            m_feedforward.calculate(
-                Units.degreesToRadians(inputs.armPositionDegrees) - Units.degreesToRadians(90),
-                Units.degreesToRadians(mCurrentState.velocity));
-      } else {
-        // do stuff when disabled
-        mReferencePosition = 0;
-        PDotPositionCommand = mReferencePosition;
-        mDesiredState = new TrapezoidProfile.State(mReferencePosition, 0);
-        mCurrentState = mDesiredState;
-      }
-      io.setReference(mCurrentState.position, ffCommand);
+      RateCommand = RateCommand * maxArmRate;
+      io.setReference(RateCommand, ffCommand);
     }
     // Logger.recordOutput("arm/speed command", mSpeed);
     Logger.recordOutput("arm/ffCommand", ffCommand);
+    Logger.recordOutput("arm/RateCommand", RateCommand);
+    Logger.recordOutput("arm/selectedkG", selectedkG);
+    Logger.recordOutput("arm/Algae Present?", algaePresentBoolean);
   }
 }

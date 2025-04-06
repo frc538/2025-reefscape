@@ -78,8 +78,9 @@ public final class Constants {
   }
 
   public static class ClimberConstants {
-    public static final int CurrentLimit = 20;
-    public static final int ClimberPositionConversionFactor = /* put real value here--> */ 1;
+    public static final int CurrentLimit = 50;
+    public static final double ClimberPositionConversionFactor =
+        90.0 / 480.0; // 480 revolutions gives us 90 degrees on the climber.
     public static final int ClimberVelocityConversionFactor = /* put real value here--> */ 1;
     public static final int ClimberWheelFreeSpeedMetersPerSecond = /* put real value here--> */ 1;
     public static final int ClimberMotorCANId = 13;
@@ -87,14 +88,15 @@ public final class Constants {
   }
 
   public static class ArmConstants {
-    public static final int ArmCanID = 46;
+    public static final int ArmCanID = 2;
 
     public static int NeoFreeSpeedRPM = 5676;
     public static int CurrentLimit = 50;
-    public static int gearRatio = 15;
+    public static int gearRatio = 25;
     public static double PositionConversionFactor =
-        360 / gearRatio; // Arm degrees rotation/motor Revolutions
-    public static double VelocityConversionFactor = 360 / gearRatio;
+        360.0 / gearRatio; // Arm degrees rotation/motor Revolutions
+    public static double VelocityConversionFactor =
+        360.0 / gearRatio / 60.0; // Motor RPM to Arm degrees rotation per sec
     public static double MotorFreeSpeedRevsPerSecond = NeoFreeSpeedRPM / 60.0;
   }
 

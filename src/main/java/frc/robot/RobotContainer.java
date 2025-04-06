@@ -9,6 +9,7 @@ import com.revrobotics.servohub.ServoHub;
 import com.revrobotics.servohub.ServoHub.ResetMode;
 import com.revrobotics.servohub.config.ServoChannelConfig.BehaviorWhenDisabled;
 import com.revrobotics.servohub.config.ServoHubConfig;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -188,11 +189,7 @@ public class RobotContainer {
         .disableBehavior(BehaviorWhenDisabled.kDoNotSupplyPower)
         .pulseRange(500, 1500, 2500);
 
-    shc.channel3
-        .disableBehavior(BehaviorWhenDisabled.kDoNotSupplyPower)
-        .pulseRange(500, 1500, 2500);
-
-    shc.channel4
+    shc.channel0
         .disableBehavior(BehaviorWhenDisabled.kDoNotSupplyPower)
         .pulseRange(500, 1500, 2500);
 
@@ -240,8 +237,18 @@ public class RobotContainer {
     driveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     driveController.rightBumper().whileTrue((climberSubsystem.ClimberDown()));
     driveController.leftBumper().whileTrue((climberSubsystem.ClimberUp()));
-    driveController.y().onTrue(DriveCommands.boost());
-    driveController.y().onFalse(DriveCommands.boostOff());
+    climberSubsystem.setDefaultCommand(
+        Commands.run(
+            () -> {
+              climberSubsystem.ClimberSpeed(
+                  () -> {
+                    return driveController.getRightTriggerAxis()
+                        - driveController.getLeftTriggerAxis();
+                  });
+            },
+            climberSubsystem));
+    driveController.rightStick().onTrue(DriveCommands.boost());
+    driveController.rightStick().onFalse(DriveCommands.boostOff());
 
     // MECHANISM CONTROLLER COMMANDS
 
@@ -250,9 +257,11 @@ public class RobotContainer {
     mechanismController.povUp().whileTrue(elevator.PDotCommand(0.006));
     mechanismController.povDown().whileTrue(elevator.PDotCommand(-0.006));
     // arm.setDefaultCommand(arm.MoveArm(() -> mechanismController.getRightY()));\
-    arm.setDefaultCommand(arm.RateCommand(() -> mechanismController.getRightY()));
+    arm.setDefaultCommand(
+        arm.RateCommand(() -> MathUtil.applyDeadband(mechanismController.getRightY(), 0.1)));
     mechanismController.a().whileTrue(intake.intakeIn());
     mechanismController.y().whileTrue(intake.intakeOut());
+    mechanismController.x().onTrue(arm.runArmToggle());
     mechanismController.button(8).whileTrue(intake.intakeReset());
     // elevator.setDefaultCommand(
     // elevator.PDotCommand(MathUtil.applyDeadband(-mechanismController.getLeftY() *

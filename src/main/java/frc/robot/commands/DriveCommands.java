@@ -43,10 +43,23 @@ public class DriveCommands {
   private static final double ANGLE_KP = 5.0;
   private static final double ANGLE_KD = 0.4;
 
-  // these two variables are constraints in units of velocity and acceleration(Like radians per
+  // these two variables are constraints in units of velocity and
+  // acceleration(Like radians per
   // second^2)
   public static double ANGLE_MAX_VELOCITY = 8.0;
   public static double ANGLE_MAX_ACCELERATION = 20.0;
+
+  private static double angularGainNoBoost = 0.08;
+  private static double angularGainBoost = 0.3;
+  private static double linearGainNoBoost = 0.11;
+  private static double linearGainBoost = 1;
+
+  public static double angularGain = angularGainNoBoost;
+  public static double linearGain = linearGainNoBoost;
+
+  public static double elevatorSpeedGainDown = 1;
+  public static double elevatorSpeedGainUp = 0;
+  public static double selectedElevatorSpeedGain = elevatorSpeedGainDown;
 
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
@@ -61,7 +74,7 @@ public class DriveCommands {
     Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
 
     // Square magnitude for more precise control
-    linearMagnitude = linearMagnitude * linearMagnitude;
+    // linearMagnitude = linearMagnitude * linearMagnitude;
 
     Logger.recordOutput("Drive/LinearMagnitude", linearMagnitude);
     Logger.recordOutput("Drive/LinearDirection", linearDirection);
@@ -73,18 +86,24 @@ public class DriveCommands {
   }
 
   public static Command boost() {
-    return Commands.run(
+    return Commands.runOnce(
         () -> {
           ANGLE_MAX_ACCELERATION = 60;
           ANGLE_MAX_VELOCITY = 12;
+
+          linearGain = linearGainBoost;
+          angularGain = angularGainBoost;
         });
   }
 
   public static Command boostOff() {
-    return Commands.run(
+    return Commands.runOnce(
         () -> {
           ANGLE_MAX_ACCELERATION = 20;
           ANGLE_MAX_VELOCITY = 8;
+
+          linearGain = linearGainNoBoost;
+          angularGain = angularGainNoBoost;
         });
   }
 
@@ -94,6 +113,11 @@ public class DriveCommands {
           ANGLE_MAX_ACCELERATION = Acceleration;
           ANGLE_MAX_VELOCITY = velocity;
         });
+  }
+
+  public static void elevatorDrivetrainGain(double percentHeight) {
+    selectedElevatorSpeedGain =
+        MathUtil.interpolate(elevatorSpeedGainDown, elevatorSpeedGainUp, percentHeight);
   }
 
   /**
@@ -113,25 +137,34 @@ public class DriveCommands {
           // Apply rotation deadband
           double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
 
-          // Square rotation value for more precise control
-          omega = Math.copySign(omega * omega, omega);
+          // // Square rotation value for more precise control
+          // omega = Math.copySign(omega * omega, omega);
 
           // Convert to field relative speeds & send command
           ChassisSpeeds speeds =
               new ChassisSpeeds(
-                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                  omega * drive.getMaxAngularSpeedRadPerSec());
+                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec() * linearGain,
+                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec() * linearGain,
+                  omega * drive.getMaxAngularSpeedRadPerSec() * angularGain);
           Logger.recordOutput("Drive/ChassisSpeeds", speeds);
+          Logger.recordOutput("Drive/linearGain", linearGain);
+          Logger.recordOutput("Drive/angularGain", angularGain);
+
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == Alliance.Red;
-          drive.runVelocity(
+
+          ChassisSpeeds chassisRelativeSpeeds =
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   speeds,
                   isFlipped
                       ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                      : drive.getRotation()));
+                      : drive.getRotation());
+
+          chassisRelativeSpeeds.vxMetersPerSecond =
+              chassisRelativeSpeeds.vxMetersPerSecond * selectedElevatorSpeedGain;
+
+          drive.runVelocity(chassisRelativeSpeeds);
         },
         drive);
   }
