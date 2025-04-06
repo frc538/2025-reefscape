@@ -46,8 +46,8 @@ public class Elevator extends SubsystemBase {
   double[] kG = {0.9, 1.1, 1.25};
   double[] kV = {2.5, 2.5, 2.5};
   double[] kA = {1, 1, 1};
-  double[] maxV = {0.4, 0.4, 0.4};
-  double[] maxA = {0.6, 0.6, 0.6};
+  double[] maxV = {0.6, 0.6, 0.6};
+  double[] maxA = {1, 1, 1};
   double[] kP = {.75, .75, .75};
   double[] kI = {0, 0, 0};
   double[] kD = {0, 0, 0};
