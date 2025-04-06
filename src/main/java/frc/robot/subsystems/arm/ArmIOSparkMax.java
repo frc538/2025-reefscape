@@ -35,8 +35,10 @@ public class ArmIOSparkMax implements ArmIO {
         .inverted(false);
     mConfig
         .encoder
-        .positionConversionFactor(Constants.ArmConstants.PositionConversionFactor) // Degrees of arm motion
-        .velocityConversionFactor(Constants.ArmConstants.VelocityConversionFactor);// Arm degrees per second
+        .positionConversionFactor(
+            Constants.ArmConstants.PositionConversionFactor) // Degrees of arm motion
+        .velocityConversionFactor(
+            Constants.ArmConstants.VelocityConversionFactor); // Arm degrees per second
 
     mConfig
         .closedLoop
@@ -60,7 +62,7 @@ public class ArmIOSparkMax implements ArmIO {
 
   @Override
   public void setReference(double speed, double ffvoltage) {
-    mController.setReference(speed, ControlType.kVelocity,ClosedLoopSlot.kSlot0, ffvoltage);
+    mController.setReference(speed, ControlType.kVelocity, ClosedLoopSlot.kSlot0, ffvoltage);
   }
 
   public void setVoltage(double voltage) {

@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.DriveCommands;
-
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -185,8 +184,12 @@ public class Elevator extends SubsystemBase {
       gainIndex = 0;
     }
 
-    //modify drive gains based on elevator height
-    double elevatorPercentage = MathUtil.clamp((averagePosition - stowedHeight.get())/(bargeHeight.get()-stowedHeight.get()), 0, 1);
+    // modify drive gains based on elevator height
+    double elevatorPercentage =
+        MathUtil.clamp(
+            (averagePosition - stowedHeight.get()) / (bargeHeight.get() - stowedHeight.get()),
+            0,
+            1);
     DriveCommands.elevatorDrivetrainGain(elevatorPercentage);
 
     // Always update gains when read in from the network numbers into the gainIndex

@@ -9,7 +9,6 @@ import com.revrobotics.servohub.ServoHub;
 import com.revrobotics.servohub.ServoHub.ResetMode;
 import com.revrobotics.servohub.config.ServoChannelConfig.BehaviorWhenDisabled;
 import com.revrobotics.servohub.config.ServoHubConfig;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -258,7 +257,8 @@ public class RobotContainer {
     mechanismController.povUp().whileTrue(elevator.PDotCommand(0.006));
     mechanismController.povDown().whileTrue(elevator.PDotCommand(-0.006));
     // arm.setDefaultCommand(arm.MoveArm(() -> mechanismController.getRightY()));\
-    arm.setDefaultCommand(arm.RateCommand(() -> MathUtil.applyDeadband(mechanismController.getRightY(),0.1)));
+    arm.setDefaultCommand(
+        arm.RateCommand(() -> MathUtil.applyDeadband(mechanismController.getRightY(), 0.1)));
     mechanismController.a().whileTrue(intake.intakeIn());
     mechanismController.y().whileTrue(intake.intakeOut());
     mechanismController.x().onTrue(arm.runArmToggle());
